@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -29,5 +30,8 @@ public class Account extends BaseEntity<UUID> {
 
     @Column( name = "password", length = 256, nullable = false )
     private String password;
+
+    @OneToMany( mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true )
+    private List<SecurityToken> securityTokens;
 
 }

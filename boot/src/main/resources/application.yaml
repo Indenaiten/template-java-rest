@@ -16,7 +16,8 @@ springdoc:
 
 app:
   security:
-    ignore-paths: "/actuator/**,/v3/api-docs/**,/swagger-ui/**"
+    ignore-paths:
+      all: "/actuator/**,/v3/api-docs/**,/swagger-ui/**,/api/auth/signup,/api/auth/login,/api/auth/refresh"
 
     cors:
       allowed-origins: ${SECURITY_CORS_ALLOWED_ORIGINS:*}
@@ -24,6 +25,17 @@ app:
       allowed-headers: ${SECURITY_CORS_ALLOWED_HEADERS:Content-Type,Authorization,Accept,Origin,X-Requested-With}
       exposed-headers: ${SECURITY_CORS_EXPOSED_HEADERS:Authorization}
       allow-credentials: ${SECURITY_CORS_ALLOW_CREDENTIALS:true}
+
+    token:
+      access-token:
+        secret: ${SECURITY_TOKEN_ACCESS_TOKEN_SECRET}
+        expiration: ${SECURITY_TOKEN_ACCESS_TOKEN_EXPIRATION:180000} # 3 minutes in milliseconds
+        name: ${SECURITY_TOKEN_ACCESS_TOKEN_NAME:Token}
+
+    refresh-token:
+      secret: ${SECURITY_TOKEN_REFRESH_TOKEN_SECRET}
+      expiration: ${SECURITY_TOKEN_REFRESH_TOKEN_EXPIRATION:604800000} # 7 days in milliseconds
+      name: ${SECURITY_TOKEN_REFRESH_TOKEN_NAME:Refresh-Token}
 
 spring:
   application:

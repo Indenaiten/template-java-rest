@@ -11,8 +11,23 @@ import java.util.Optional;
 @Component
 public class SecurityProperties extends Properties {
 
-    @Value( "${app.security.ignore-paths:}" )
+    @Value( "${app.security.ignore-paths.all:}" )
     private String ignorePaths;
+
+    @Value( "${app.security.ignore-paths.get:}" )
+    private String ignorePathsGet;
+
+    @Value( "${app.security.ignore-paths.post:}" )
+    private String ignorePathsPost;
+
+    @Value( "${app.security.ignore-paths.put:}" )
+    private String ignorePathsPut;
+
+    @Value( "${app.security.ignore-paths.patch:}" )
+    private String ignorePathsPatch;
+
+    @Value( "${app.security.ignore-paths.delete:}" )
+    private String ignorePathsDelete;
 
     @Value( "${app.security.cors.allowed-origins:}" )
     private String corsAllowedOrigins;
@@ -35,6 +50,26 @@ public class SecurityProperties extends Properties {
 
     public List<String> getIgnorePaths() {
         return this.convertToList( this.ignorePaths );
+    }
+
+    public List<String> getIgnorePathsGet() {
+        return this.convertToList( this.ignorePathsGet );
+    }
+
+    public List<String> getIgnorePathsPost() {
+        return this.convertToList( this.ignorePathsPost );
+    }
+
+    public List<String> getIgnorePathsPut() {
+        return this.convertToList( this.ignorePathsPut );
+    }
+
+    public List<String> getIgnorePathsPatch() {
+        return this.convertToList( this.ignorePathsPatch );
+    }
+
+    public List<String> getIgnorePathsDelete() {
+        return this.convertToList( this.ignorePathsDelete );
     }
 
     public List<String> getCorsAllowedOrigins() {
