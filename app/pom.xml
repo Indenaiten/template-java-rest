@@ -13,4 +13,19 @@
     <name>Rest Server - App</name>
     <description>Application Module Description</description>
     <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- SPRINGBOOT -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <!-- ARCHJUNIT -->
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
