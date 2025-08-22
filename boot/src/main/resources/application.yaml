@@ -11,6 +11,9 @@ management:
     health:
       show-details: always
 
+springdoc:
+  show-actuator: true
+
 app:
   security:
     ignore-paths: "/actuator/**,/v3/api-docs/**,/swagger-ui/**"
