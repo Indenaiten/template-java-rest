@@ -29,6 +29,12 @@ public class SecurityProperties extends Properties {
     @Value( "${app.security.cors.allow-credentials:}" )
     private Boolean corsAllowCredentials;
 
+    @Value( "${app.security.token.access-token.secret}" )
+    private String accessTokenSecret;
+
+    @Value( "${app.security.token.access-token.expiration:180000}" )
+    private Long accessTokenExpiration;
+
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| GETTERS |---------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\

@@ -27,8 +27,10 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dep.archjunit.version>1.2.1</dep.archjunit.version>
+        <dep.jsonwebtoken.version>0.11.5</dep.jsonwebtoken.version>
+        <dep.mapstruct.version>1.5.5.Final</dep.mapstruct.version>
         <dep.springdoc.version>2.8.8</dep.springdoc.version>
+        <dep.archjunit.version>1.2.1</dep.archjunit.version>
     </properties>
 
     <dependencyManagement>
@@ -44,6 +46,41 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>web</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <!-- JSON WEB TOKEN -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${dep.jsonwebtoken.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${dep.jsonwebtoken.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${dep.jsonwebtoken.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <!-- MAPSTRUCT -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${dep.mapstruct.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${dep.mapstruct.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- SPRINGDOC OPENAPI -->
@@ -75,6 +112,11 @@
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
+                            </path>
+
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>

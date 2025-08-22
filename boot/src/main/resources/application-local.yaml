@@ -1,3 +1,10 @@
+app:
+  security:
+    token:
+      access-token:
+        secret: 131b9be2-2f53-4378-bc8f-78a244a191e8
+        expiration: 86400000 # 24 hours in milliseconds
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/restserverdb

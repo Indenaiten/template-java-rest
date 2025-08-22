@@ -39,6 +39,12 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- SPRINGDOC -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+
         <!-- ARCHJUNIT -->
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
