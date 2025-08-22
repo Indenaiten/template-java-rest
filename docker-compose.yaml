@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: rest-server-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: restserverdb
+      POSTGRES_USER: restserveruser
+      POSTGRES_PASSWORD: restserverpass
+    volumes:
+      - vol-postgres:/var/lib/postgresql/data
+    networks:
+      - net-rest-server
+
+volumes:
+  vol-postgres:
+
+networks:
+  net-rest-server:
