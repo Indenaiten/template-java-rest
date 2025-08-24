@@ -1,5 +1,8 @@
 package com.codenaiten.template.rest.app.vo;
 
+import com.codenaiten.template.rest.app.exception.ValidationException;
+import com.codenaiten.template.rest.app.i18n.AppMessage;
+
 public class Email extends ValueObject<String>{
 
     /** Longitud mínima del correo electrónico */
@@ -17,9 +20,12 @@ public class Email extends ValueObject<String>{
 
     public Email( final String value ){
         super( value );
-        if( value.length() < MIN_SIZE ) throw new IllegalArgumentException( "Email must be at least %d characters long: %s".formatted( MIN_SIZE, value ));
-        if( value.length() > MAX_SIZE ) throw new IllegalArgumentException( "Email must be at most %d characters long: %s".formatted( MAX_SIZE, value ));
-        if( !value.matches( FORMAT )) throw new IllegalArgumentException( "Email must match the format '%s': %s".formatted( FORMAT, value ));
+        if( value.length() < MIN_SIZE )
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_VO_VALUE_REQUIRED, MIN_SIZE, value );
+        if( value.length() > MAX_SIZE )
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_VO_EMAIL_VALUE_MAX_SIZE, MAX_SIZE, value );
+        if( !value.matches( FORMAT ))
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_VO_EMAIL_VALUE_INVALID, FORMAT, value);
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

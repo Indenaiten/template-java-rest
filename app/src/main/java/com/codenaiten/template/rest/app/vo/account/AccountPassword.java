@@ -1,5 +1,7 @@
 package com.codenaiten.template.rest.app.vo.account;
 
+import com.codenaiten.template.rest.app.exception.ValidationException;
+import com.codenaiten.template.rest.app.i18n.AppMessage;
 import com.codenaiten.template.rest.app.vo.ValueObject;
 
 public class AccountPassword extends ValueObject<String> {
@@ -19,9 +21,12 @@ public class AccountPassword extends ValueObject<String> {
 
     public AccountPassword( final String value ){
         super( value );
-        if( value.length() < MIN_SIZE ) throw new IllegalArgumentException( "Account password must be at least %d characters long: %s".formatted( MIN_SIZE, value ));
-        if( value.length() > MAX_SIZE ) throw new IllegalArgumentException( "Account password must be at most %d characters long: %s".formatted( MAX_SIZE, value ));
-        if( !value.matches( FORMAT )) throw new IllegalArgumentException( "Account password must match the format '%s': %s".formatted( FORMAT, value ));
+        if( value.length() < MIN_SIZE )
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_VO_ACCOUNT_PASSWORD_VALUE_MIN_SIZE, MIN_SIZE, value );
+        if( value.length() > MAX_SIZE )
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_VO_ACCOUNT_PASSWORD_VALUE_MAX_SIZE, MAX_SIZE, value );
+        if( !value.matches( FORMAT ))
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_VO_ACCOUNT_PASSWORD_VALUE_INVALID, FORMAT, value );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

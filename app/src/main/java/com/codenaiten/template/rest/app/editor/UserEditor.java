@@ -1,6 +1,8 @@
 package com.codenaiten.template.rest.app.editor;
 
 import com.codenaiten.template.rest.app.entity.User;
+import com.codenaiten.template.rest.app.exception.ValidationException;
+import com.codenaiten.template.rest.app.i18n.AppMessage;
 import com.codenaiten.template.rest.app.policy.UserMinimumAgePolicy;
 import com.codenaiten.template.rest.app.repository.UserRepository;
 import com.codenaiten.template.rest.app.vo.Timestamp;
@@ -50,12 +52,13 @@ public class UserEditor {
 
         public Editor username( final UserUsername username ){
             //Check if username is null
-            if( Objects.isNull( username )) throw new IllegalArgumentException( "Username cannot be null" );
+            if( Objects.isNull( username ))
+                throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_USERNAME_REQUIRED );
             final String value = username.value();
 
             //Check if username is unique
             if( UserEditor.this.userRepository.existsByUsername( value ))
-                throw new IllegalArgumentException( "Username already exists: %s".formatted( value ));
+                throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_USERNAME_ALREADY_EXISTS, value );
 
             this.username = value;
             return this;
@@ -63,7 +66,8 @@ public class UserEditor {
 
         public Editor name( final UserName name ){
             //Check if name is null
-            if( Objects.isNull( name )) throw new IllegalArgumentException( "Name cannot be null" );
+            if( Objects.isNull( name ))
+                throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_NAME_REQUIRED );
             this.name = name.value();
             return this;
         }
@@ -75,7 +79,8 @@ public class UserEditor {
 
         public Editor birthdate( final LocalDate birthdate ){
             //Check if birthdate is null
-            if( Objects.isNull( birthdate )) throw new IllegalArgumentException( "Birthdate cannot be null" );
+            if( Objects.isNull( birthdate ))
+                throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_BIRTHDATE_REQUIRED );
 
             //Check if user age is valid
             final UserMinimumAgePolicy userMinimumAgePolicy = new UserMinimumAgePolicy();

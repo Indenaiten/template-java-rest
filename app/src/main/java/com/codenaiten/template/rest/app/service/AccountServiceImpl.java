@@ -4,6 +4,8 @@ import com.codenaiten.template.rest.app.api.AccountService;
 import com.codenaiten.template.rest.app.authentication.AuthenticationProvider;
 import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
 import com.codenaiten.template.rest.app.entity.Account;
+import com.codenaiten.template.rest.app.exception.account.AccountNotFoundByIdException;
+import com.codenaiten.template.rest.app.exception.auth.AuthNotFoundException;
 import com.codenaiten.template.rest.app.mapper.AccountMapper;
 import com.codenaiten.template.rest.app.repository.AccountRepository;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
@@ -27,9 +29,9 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountInfoResult getMyAccountInfo(){
         final AccountId id = this.authenticationProvider.getAuthenticatedAccountId()
-                .orElseThrow( () -> new IllegalStateException( "Authentication info not found" ));
+                .orElseThrow( AuthNotFoundException::new );
         final Account account = this.accountRepository.findById( id.value() )
-                .orElseThrow( () -> new IllegalArgumentException( "Account not found: %s".formatted( id )));
+                .orElseThrow( () -> new AccountNotFoundByIdException( id ));
         return this.accountMapper.toInfoResult( account );
     }
 
