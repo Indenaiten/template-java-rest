@@ -1,9 +1,12 @@
 package com.codenaiten.template.rest.app.vo.user;
 
+import com.codenaiten.template.rest.app.exception.ValidationException;
+import com.codenaiten.template.rest.app.i18n.AppMessage;
 import com.codenaiten.template.rest.app.vo.ValueObject;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class UserRole extends ValueObject<Integer> {
 
@@ -17,8 +20,10 @@ public class UserRole extends ValueObject<Integer> {
 
     public UserRole( final Integer value ){
         super( value );
-        if( ROLES.stream().noneMatch( role -> Objects.equals( role, value )))
-            throw new IllegalArgumentException( "Invalid user role value: %d".formatted( value ));
+        if( ROLES.stream().noneMatch( role -> Objects.equals( role, value ))){
+            final String roles = ROLES.stream().map( String::valueOf ).collect( Collectors.joining( ", " ));
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_VO_USER_ROLE_VALUE_INVALID, roles, value );
+        }
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

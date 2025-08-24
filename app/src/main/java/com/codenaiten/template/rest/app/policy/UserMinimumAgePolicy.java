@@ -1,5 +1,7 @@
 package com.codenaiten.template.rest.app.policy;
 
+import com.codenaiten.template.rest.app.exception.ValidationException;
+import com.codenaiten.template.rest.app.i18n.AppMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +25,7 @@ public class UserMinimumAgePolicy {
 
     public void check( final LocalDate birthdate ){
         if( !this.test( birthdate )){
-            throw new IllegalArgumentException( "User must be at least %d years old: %s".formatted( MINIMUM_AGE, birthdate ));
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_POLICY_USER_MIN_AGE, MINIMUM_AGE, birthdate );
         }
     }
 

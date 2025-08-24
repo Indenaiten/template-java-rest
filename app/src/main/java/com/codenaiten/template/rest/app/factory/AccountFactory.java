@@ -3,6 +3,8 @@ package com.codenaiten.template.rest.app.factory;
 import com.codenaiten.template.rest.app.authentication.PasswordEncoderManager;
 import com.codenaiten.template.rest.app.entity.Account;
 import com.codenaiten.template.rest.app.entity.User;
+import com.codenaiten.template.rest.app.exception.ValidationException;
+import com.codenaiten.template.rest.app.i18n.AppMessage;
 import com.codenaiten.template.rest.app.repository.AccountRepository;
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.Timestamp;
@@ -26,9 +28,12 @@ public class AccountFactory {
 
     public Factory create( final User owner, final Email email, final AccountPassword password ) {
         //Check Required fields
-        if( Objects.isNull( owner )) throw new IllegalArgumentException( "Owner is required" );
-        if( Objects.isNull( email )) throw new IllegalArgumentException( "Email is required" );
-        if( Objects.isNull( password )) throw new IllegalArgumentException( "Password is required" );
+        if( Objects.isNull( owner ))
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_ACCOUNT_OWNER_REQUIRED );
+        if( Objects.isNull( email ))
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_ACCOUNT_EMAIL_REQUIRED );
+        if( Objects.isNull( password ))
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_ACCOUNT_PASSWORD_REQUIRED );
 
         return new Factory( owner, email.value(), password.value() );
     }
@@ -46,7 +51,7 @@ public class AccountFactory {
         public Account build(){
             //Check if username is unique
             if( AccountFactory.this.accountRepository.existsByEmail( this.email ))
-                throw new IllegalArgumentException( "Account email already exists: %s".formatted( this.email ));
+                throw new ValidationException( AppMessage.ERROR_VALIDATION_ACCOUNT_EMAIL_ALREADY_EXISTS, this.email );
 
             //Encode password
             final String hashedPassword = AccountFactory.this.passwordEncoderManager.hash( this.password );

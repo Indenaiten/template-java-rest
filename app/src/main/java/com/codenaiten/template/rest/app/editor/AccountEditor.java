@@ -2,6 +2,8 @@ package com.codenaiten.template.rest.app.editor;
 
 import com.codenaiten.template.rest.app.authentication.PasswordEncoderManager;
 import com.codenaiten.template.rest.app.entity.Account;
+import com.codenaiten.template.rest.app.exception.ValidationException;
+import com.codenaiten.template.rest.app.i18n.AppMessage;
 import com.codenaiten.template.rest.app.repository.AccountRepository;
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.Timestamp;
@@ -38,12 +40,13 @@ public class AccountEditor {
 
         public Editor email( final Email email ){
             //Check if email is null
-            if( Objects.isNull( email )) throw new IllegalArgumentException( "Email cannot be null" );
+            if( Objects.isNull( email ))
+                throw new ValidationException( AppMessage.ERROR_VALIDATION_ACCOUNT_EMAIL_REQUIRED );
             final String value = email.value();
 
             //Check if username is unique
             if( AccountEditor.this.accountRepository.existsByEmail( value ))
-                throw new IllegalArgumentException( "Account email already exists: %s".formatted( value ));
+                throw new ValidationException( AppMessage.ERROR_VALIDATION_ACCOUNT_EMAIL_ALREADY_EXISTS, value );
 
             this.email = value;
             return this;
@@ -51,7 +54,8 @@ public class AccountEditor {
 
         public Editor password( final AccountPassword password ){
             //Check if password is null
-            if( Objects.isNull( password )) throw new IllegalArgumentException( "Password cannot be null" );
+            if( Objects.isNull( password ))
+                throw new ValidationException( AppMessage.ERROR_VALIDATION_ACCOUNT_PASSWORD_REQUIRED );
 
             //Encode password
             final String hashedPassword = AccountEditor.this.passwordEncoderManager.hash( password.value() );

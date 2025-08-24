@@ -1,6 +1,8 @@
 package com.codenaiten.template.rest.app.factory;
 
 import com.codenaiten.template.rest.app.entity.User;
+import com.codenaiten.template.rest.app.exception.ValidationException;
+import com.codenaiten.template.rest.app.i18n.AppMessage;
 import com.codenaiten.template.rest.app.policy.UserMinimumAgePolicy;
 import com.codenaiten.template.rest.app.repository.UserRepository;
 import com.codenaiten.template.rest.app.vo.Timestamp;
@@ -24,10 +26,11 @@ public class UserFactory {
 
     public Builder create( final UserRole role, final UserUsername username, final UserName name, final LocalDate birthdate ) {
         //Check Required fields
-        if( Objects.isNull( role )) throw new IllegalArgumentException( "Role is required" );
-        if( Objects.isNull( username )) throw new IllegalArgumentException( "Username is required" );
-        if( Objects.isNull( name )) throw new IllegalArgumentException( "Name is required" );
-        if( Objects.isNull( birthdate )) throw new IllegalArgumentException( "Birthdate is required" );
+        if( Objects.isNull( role ))
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_ROLE_REQUIRED );
+        if( Objects.isNull( username )) throw new ValidationException(AppMessage.ERROR_VALIDATION_USER_USERNAME_REQUIRED );
+        if( Objects.isNull( name )) throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_NAME_REQUIRED );
+        if( Objects.isNull( birthdate )) throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_BIRTHDATE_REQUIRED );
 
         return new Builder( role.value(), username.value(), name.value(), birthdate );
     }
@@ -57,7 +60,7 @@ public class UserFactory {
         public User build(){
             //Check if username is unique
             if( UserFactory.this.userRepository.existsByUsername( this.username ))
-                throw new IllegalArgumentException( "Username already exists: %s".formatted( this.username ));
+                throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_USERNAME_ALREADY_EXISTS, this.username);
 
             //Check if user age is valid
             final UserMinimumAgePolicy userMinimumAgePolicy = new UserMinimumAgePolicy();

@@ -4,6 +4,8 @@ import com.codenaiten.template.rest.app.authentication.TokenInfo;
 import com.codenaiten.template.rest.app.authentication.TokenJwtManager;
 import com.codenaiten.template.rest.app.entity.Account;
 import com.codenaiten.template.rest.app.entity.SecurityToken;
+import com.codenaiten.template.rest.app.exception.auth.InvalidTokenException;
+import com.codenaiten.template.rest.app.i18n.AppMessage;
 import com.codenaiten.template.rest.app.properties.TokenProperties;
 import com.codenaiten.template.rest.app.repository.SecurityTokenRepository;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
@@ -85,7 +87,8 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
         final UUID id = this.getSubject( refreshToken );
         final AccountId account = this.getAccountId( refreshToken );
         final UserId user = this.getUserId( refreshToken );
-        final SecurityToken securityToken = this.securityTokenRepository.findById( id ).orElseThrow( () -> new IllegalArgumentException( MESSAGE_INVALID_TOKEN ));
+        final SecurityToken securityToken = this.securityTokenRepository.findById( id )
+                .orElseThrow( () -> new InvalidTokenException( AppMessage.ERROR_SECURITY_AUTH_INVALID_REFRESH_TOKEN, refreshToken ));
         final UUID version = UUID.randomUUID();
         securityToken.setVersion( version );
         this.securityTokenRepository.save(securityToken);
@@ -103,7 +106,7 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
     @Override
     public UUID getSubject( final String token ){
         final String subject = this.parse( token )
-                .orElseThrow( () -> new IllegalArgumentException( MESSAGE_INVALID_TOKEN ))
+                .orElseThrow( () -> new InvalidTokenException( token ))
                 .getBody().getSubject();
         return UUID.fromString( subject );
     }
@@ -111,7 +114,7 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
     @Override
     public UUID getVersion( final String token ){
         final String claim = this.parse( token )
-                .orElseThrow( () -> new IllegalArgumentException( MESSAGE_INVALID_TOKEN ))
+                .orElseThrow( () -> new InvalidTokenException( token ))
                 .getBody().get( CLAIM_VERSION, String.class );
         return UUID.fromString( claim );
     }
@@ -119,7 +122,7 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
     @Override
     public AccountId getAccountId( final String token ){
         final String claim = this.parse( token )
-                .orElseThrow( () -> new IllegalArgumentException( MESSAGE_INVALID_TOKEN ))
+                .orElseThrow( () -> new InvalidTokenException( token ))
                 .getBody().get( CLAIM_ACCOUNT, String.class );
         return new AccountId( UUID.fromString( claim ));
     }
@@ -127,7 +130,7 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
     @Override
     public UserId getUserId( final String token ){
         final String claim = this.parse( token )
-                .orElseThrow( () -> new IllegalArgumentException( MESSAGE_INVALID_TOKEN ))
+                .orElseThrow( () -> new InvalidTokenException( token ))
                 .getBody().get( CLAIM_USER, String.class );
         return new UserId( UUID.fromString( claim ));
     }
@@ -222,7 +225,7 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
             final UUID id = this.getSubject( token );
             final UUID version = this.getVersion( token );
             final SecurityToken entity = this.securityTokenRepository.findById( id )
-                    .orElseThrow( () -> new IllegalArgumentException( MESSAGE_INVALID_TOKEN ));
+                    .orElseThrow( () -> new InvalidTokenException( token ));
             if( entity.getIp().isEmpty() ) return Objects.equals( entity.getVersion(), version );
             else return Objects.equals( entity.getVersion(), version ) && Objects.equals( entity.getIp().orElse( null ), ip );
         }

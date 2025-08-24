@@ -1,5 +1,8 @@
 package com.codenaiten.template.rest.app.vo;
 
+import com.codenaiten.template.rest.app.exception.ValidationException;
+import com.codenaiten.template.rest.app.i18n.AppMessage;
+
 import java.time.LocalDateTime;
 
 public class Timestamp extends ValueObject<LocalDateTime> {
@@ -10,7 +13,8 @@ public class Timestamp extends ValueObject<LocalDateTime> {
 
     public Timestamp( final LocalDateTime value ){
         super( value );
-        if( value.isAfter( LocalDateTime.now() )) throw new IllegalArgumentException( "Date time cannot be in the future: %s".formatted( value ));
+        if( value.isAfter( LocalDateTime.now() ))
+            throw new ValidationException( AppMessage.ERROR_VALIDATION_VO_TIMESTAMP_VALUE_FUTURE, value );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

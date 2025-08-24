@@ -1,5 +1,7 @@
 package com.codenaiten.template.rest.app.vo;
 
+import com.codenaiten.template.rest.app.exception.ValidationException;
+import com.codenaiten.template.rest.app.i18n.AppMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.EqualsAndHashCode;
@@ -20,7 +22,7 @@ public abstract class ValueObject<T extends Serializable> implements Serializabl
 
     @JsonCreator
     protected ValueObject( final T value ){
-        if( Objects.isNull( value )) throw new IllegalArgumentException( "Value cannot be null" );
+        if( Objects.isNull( value )) throw new ValidationException( AppMessage.ERROR_VALIDATION_VO_VALUE_REQUIRED );
         this.value = value;
     }
 

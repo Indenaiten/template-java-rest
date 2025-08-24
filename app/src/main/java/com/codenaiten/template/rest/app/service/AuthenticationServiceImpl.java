@@ -10,8 +10,10 @@ import com.codenaiten.template.rest.app.entity.Account;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.account.AccountNotFoundByIdException;
 import com.codenaiten.template.rest.app.exception.auth.AuthNotFoundException;
+import com.codenaiten.template.rest.app.exception.auth.InvalidTokenException;
 import com.codenaiten.template.rest.app.factory.AccountFactory;
 import com.codenaiten.template.rest.app.factory.UserFactory;
+import com.codenaiten.template.rest.app.i18n.AppMessage;
 import com.codenaiten.template.rest.app.mapper.AccountMapper;
 import com.codenaiten.template.rest.app.repository.AccountRepository;
 import com.codenaiten.template.rest.app.repository.UserRepository;
@@ -118,7 +120,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public LoginResult refresh( final String token ){
         // Step 01: Validate token
-        if( !this.jwtTokenManager.validateRefreshToken( token )) throw new IllegalArgumentException( "Invalid refresh token" );
+        if( !this.jwtTokenManager.validateRefreshToken( token ))
+            throw new InvalidTokenException( AppMessage.ERROR_SECURITY_AUTH_INVALID_REFRESH_TOKEN, token );
 
         // Step 02: Check if exitst Account ID & User ID
         final AccountId id = this.jwtTokenManager.getAccountId( token );

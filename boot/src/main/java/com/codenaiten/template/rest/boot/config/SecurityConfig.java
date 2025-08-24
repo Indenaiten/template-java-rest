@@ -16,7 +16,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.NullSecurityContextRepository;
 import org.springframework.security.web.savedrequest.NullRequestCache;
@@ -30,6 +32,8 @@ public class SecurityConfig{
 
     private final SecurityProperties securityProperties;
     private final TokenJwtFilter tokenJwtFilter;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final AccessDeniedHandler accessDeniedHandler;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| BEANS |------------------------------------------------------------------------------------------------------ \\
@@ -81,7 +85,11 @@ public class SecurityConfig{
                         .requestMatchers( HttpMethod.DELETE, this.securityProperties.getIgnorePathsDelete().toArray( new String[0] )).permitAll()
                         .anyRequest().authenticated()) // Set all other paths to authenticated
                 // Set JWT Filter
-                .addFilterBefore( this.tokenJwtFilter, UsernamePasswordAuthenticationFilter.class );
+                .addFilterBefore( this.tokenJwtFilter, UsernamePasswordAuthenticationFilter.class )
+                // Set Exception Handlers
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint( this.authenticationEntryPoint )
+                        .accessDeniedHandler( this.accessDeniedHandler ));
         return http.build();
     }
 
