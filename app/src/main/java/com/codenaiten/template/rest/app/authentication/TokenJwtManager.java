@@ -4,12 +4,15 @@ import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
 import com.codenaiten.template.rest.app.vo.user.UserId;
 
-//TODO: Añadir el refresh-token para poder actualizar el access-token cuando expira.
-//TODO: Crear un Repositorio para almacenar las versiones de los tokens para poder invalidarlos.
 public interface TokenJwtManager {
 
-    String create( AccountInfoResult accountInfoResult );
+    String createAccessToken( AccountInfoResult accountInfoResult );
+    String createRefreshToken( AccountInfoResult accountInfoResult );
     UserId getSubject( String token );
+    UserId getSubjectFromRefreshToken( String refreshToken );
     AccountId getAccountId( String token );
     boolean check( String token );
+    boolean checkRefreshToken( String refreshToken );
+    void invalidateUserTokens( UserId userId );
+    void invalidateSpecificTokens( UserId userId, String accessToken, String refreshToken );
 }

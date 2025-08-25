@@ -35,6 +35,12 @@ public class SecurityProperties extends Properties {
     @Value( "${app.security.token.access-token.expiration:180000}" )
     private Long accessTokenExpiration;
 
+    @Value( "${app.security.token.refresh-token.secret}" )
+    private String refreshTokenSecret;
+
+    @Value( "${app.security.token.refresh-token.expiration:1209600000}" )
+    private Long refreshTokenExpiration;
+
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| GETTERS |---------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
