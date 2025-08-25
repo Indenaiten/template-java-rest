@@ -2,14 +2,18 @@ package com.codenaiten.template.rest.web.rest.controller;
 
 import com.codenaiten.template.rest.app.api.AuthenticationService;
 import com.codenaiten.template.rest.app.dto.command.LoginCommand;
+import com.codenaiten.template.rest.app.dto.command.RefreshTokenCommand;
 import com.codenaiten.template.rest.app.dto.command.RegisterCommand;
 import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
 import com.codenaiten.template.rest.app.dto.result.LoginResult;
+import com.codenaiten.template.rest.app.dto.result.RefreshTokenResult;
 import com.codenaiten.template.rest.web.rest.api.AuthenticationApiRest;
 import com.codenaiten.template.rest.web.rest.dto.request.LoginRequest;
+import com.codenaiten.template.rest.web.rest.dto.request.RefreshTokenRequest;
 import com.codenaiten.template.rest.web.rest.dto.request.RegisterRequest;
 import com.codenaiten.template.rest.web.rest.dto.response.AccountInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.response.LoginResponse;
+import com.codenaiten.template.rest.web.rest.dto.response.RefreshTokenResponse;
 import com.codenaiten.template.rest.web.rest.mapper.AccountWebMapper;
 import com.codenaiten.template.rest.web.rest.mapper.AuthenticationWebMapper;
 import lombok.AllArgsConstructor;
@@ -44,6 +48,26 @@ public class AuthenticationRestController implements AuthenticationApiRest {
         final RegisterCommand command = this.authenticationMapper.toCommand( request );
         final AccountInfoResult result = this.authenticationService.register( command );
         final AccountInfoResponse response = this.accountMapper.toResponse( result );
+        return ResponseEntity.status( HttpStatus.CREATED ).body( response );
+    }
+
+    @Override
+    public ResponseEntity<Void> logout() {
+        this.authenticationService.logout();
+        return ResponseEntity.status( HttpStatus.OK ).build();
+    }
+
+    @Override
+    public ResponseEntity<Void> invalidate() {
+        this.authenticationService.invalidate();
+        return ResponseEntity.status( HttpStatus.OK ).build();
+    }
+
+    @Override
+    public ResponseEntity<RefreshTokenResponse> refresh( final RefreshTokenRequest request ) {
+        final RefreshTokenCommand command = this.authenticationMapper.toCommand( request );
+        final RefreshTokenResult result = this.authenticationService.refresh( command );
+        final RefreshTokenResponse response = this.authenticationMapper.toResponse( result );
         return ResponseEntity.status( HttpStatus.OK ).body( response );
     }
 

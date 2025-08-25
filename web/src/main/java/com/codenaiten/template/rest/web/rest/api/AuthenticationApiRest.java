@@ -1,14 +1,17 @@
 package com.codenaiten.template.rest.web.rest.api;
 
 import com.codenaiten.template.rest.web.rest.dto.request.LoginRequest;
+import com.codenaiten.template.rest.web.rest.dto.request.RefreshTokenRequest;
 import com.codenaiten.template.rest.web.rest.dto.request.RegisterRequest;
 import com.codenaiten.template.rest.web.rest.dto.response.AccountInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.response.LoginResponse;
+import com.codenaiten.template.rest.web.rest.dto.response.RefreshTokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +67,63 @@ public interface AuthenticationApiRest {
     ResponseEntity<AccountInfoResponse> register(
             @Parameter( description = "Datos del usuario a registrar", required = true )
             @RequestBody RegisterRequest request
+    );
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+// ---| LOGOUT |------------------------------------------------------------------------------------------------------ \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Operation(
+            summary = "Cerrar sesión",
+            description = "Invalida los tokens de acceso y actualización del usuario autenticado.",
+            operationId = "logout",
+            security = @SecurityRequirement( name = "Bearer Authentication" ),
+            responses = @ApiResponse(
+                    responseCode = "200",
+                    description = "Sesión cerrada exitosamente"
+            )
+    )
+    @PostMapping( "/logout" )
+    ResponseEntity<Void> logout();
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+// ---| INVALIDATE |-------------------------------------------------------------------------------------------------- \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Operation(
+            summary = "Invalidar todos los tokens",
+            description = "Invalida todos los tokens de acceso y actualización del usuario autenticado.",
+            operationId = "invalidate",
+            security = @SecurityRequirement( name = "Bearer Authentication" ),
+            responses = @ApiResponse(
+                    responseCode = "200",
+                    description = "Tokens invalidados exitosamente"
+            )
+    )
+    @PostMapping( "/invalidate" )
+    ResponseEntity<Void> invalidate();
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+// ---| REFRESH |---------------------------------------------------------------------------------------------------- \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Operation(
+            summary = "Actualizar tokens",
+            description = "Genera nuevos tokens de acceso y actualización usando un token de actualización válido.",
+            operationId = "refresh",
+            responses = @ApiResponse(
+                    responseCode = "200",
+                    description = "Tokens actualizados exitosamente",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema( implementation = RefreshTokenResponse.class )
+                    )
+            )
+    )
+    @PostMapping( "/refresh" )
+    ResponseEntity<RefreshTokenResponse> refresh(
+            @Parameter( description = "Token de actualización", required = true )
+            @RequestBody RefreshTokenRequest request
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
