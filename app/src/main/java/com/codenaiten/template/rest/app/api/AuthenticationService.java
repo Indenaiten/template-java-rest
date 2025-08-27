@@ -1,7 +1,7 @@
 package com.codenaiten.template.rest.app.api;
 
-import com.codenaiten.template.rest.app.dto.command.LoginCommand;
-import com.codenaiten.template.rest.app.dto.command.RegisterCommand;
+import com.codenaiten.template.rest.app.dto.command.auth.LoginCommand;
+import com.codenaiten.template.rest.app.dto.command.auth.RegisterCommand;
 import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
 import com.codenaiten.template.rest.app.dto.result.LoginResult;
 

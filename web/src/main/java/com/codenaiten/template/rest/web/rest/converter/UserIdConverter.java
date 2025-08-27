@@ -1,0 +1,28 @@
+package com.codenaiten.template.rest.web.rest.converter;
+
+import com.codenaiten.template.rest.app.vo.user.UserId;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+import java.util.UUID;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class UserIdConverter implements Converter<UUID, UserId>{
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+// ---| IMPLEMENTED METHODS |---------------------------------------------------------------------------------------- \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Override
+    public UserId convert( final UUID source ){
+        return Optional.ofNullable( source ).map( UserId::new ).orElse( null );
+    }
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+}

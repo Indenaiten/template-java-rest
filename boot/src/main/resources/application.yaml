@@ -13,21 +13,25 @@ management:
 
 springdoc:
   show-actuator: true
+  swagger-ui:
+    operationsSorter: method
 
 app:
-  i18n:
-    language:
-      default: ${I18N_LANGUAGE_DEFAULT:es}
+  locale:
+    default: ${LOCALE_DEFAULT:es}
+    cookie:
+      name: ${LOCALE_COOKIE_NAME:lang}
 
   security:
     ignore-paths:
-      all: "/actuator/**,/v3/api-docs/**,/swagger-ui/**,/api/auth/signup,/api/auth/login,/api/auth/refresh"
+      all: "/actuator/**,/v3/api-docs/**,/swagger-ui/**,/api/config/lang/**,/api/auth/signup,/api/auth/login,/api/auth/refresh"
+      get: "/api/account/role/supported"
 
     cors:
       allowed-origins: ${SECURITY_CORS_ALLOWED_ORIGINS:*}
       allowed-methods: ${SECURITY_CORS_ALLOWED_METHODS:GET,POST,PUT,PATCH,DELETE,OPTIONS}
       allowed-headers: ${SECURITY_CORS_ALLOWED_HEADERS:Content-Type,Authorization,Accept,Origin,X-Requested-With}
-      exposed-headers: ${SECURITY_CORS_EXPOSED_HEADERS:Authorization}
+      exposed-headers: ${SECURITY_CORS_EXPOSED_HEADERS:Authorization,Token}
       allow-credentials: ${SECURITY_CORS_ALLOW_CREDENTIALS:true}
 
     token:

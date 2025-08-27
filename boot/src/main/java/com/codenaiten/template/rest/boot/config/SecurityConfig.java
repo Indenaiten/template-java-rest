@@ -3,6 +3,7 @@ package com.codenaiten.template.rest.boot.config;
 import com.codenaiten.template.rest.app.properties.SecurityProperties;
 import com.codenaiten.template.rest.web.rest.filter.TokenJwtFilter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,6 +27,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig{

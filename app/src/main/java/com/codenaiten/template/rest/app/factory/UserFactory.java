@@ -1,12 +1,15 @@
 package com.codenaiten.template.rest.app.factory;
 
+import com.codenaiten.template.rest.app.AppMessage;
 import com.codenaiten.template.rest.app.entity.User;
-import com.codenaiten.template.rest.app.exception.ValidationException;
-import com.codenaiten.template.rest.app.i18n.AppMessage;
+import com.codenaiten.template.rest.app.exception.validation.ValidationException;
 import com.codenaiten.template.rest.app.policy.UserMinimumAgePolicy;
-import com.codenaiten.template.rest.app.repository.UserRepository;
+import com.codenaiten.template.rest.app.policy.UserUsernameUniquenessPolicy;
 import com.codenaiten.template.rest.app.vo.Timestamp;
-import com.codenaiten.template.rest.app.vo.user.*;
+import com.codenaiten.template.rest.app.vo.user.UserId;
+import com.codenaiten.template.rest.app.vo.user.UserName;
+import com.codenaiten.template.rest.app.vo.user.UserSurname;
+import com.codenaiten.template.rest.app.vo.user.UserUsername;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,26 +21,20 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserFactory {
 
-    private final UserRepository userRepository;
+    private final UserUsernameUniquenessPolicy userUsernameUniquenessPolicy;
+    private final UserMinimumAgePolicy userMinimumAgePolicy;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| METHODS |---------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    public Builder create( final UserRole role, final UserUsername username, final UserName name, final LocalDate birthdate ) {
+    public Factory create( final UserUsername username, final UserName name, final LocalDate birthdate ) {
         //Check Required fields
-        if( Objects.isNull( role ))
-            throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_ROLE_REQUIRED );
         if( Objects.isNull( username )) throw new ValidationException(AppMessage.ERROR_VALIDATION_USER_USERNAME_REQUIRED );
         if( Objects.isNull( name )) throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_NAME_REQUIRED );
         if( Objects.isNull( birthdate )) throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_BIRTHDATE_REQUIRED );
 
-        return new Builder( role.value(), username.value(), name.value(), birthdate );
-    }
-
-    public Builder create( final UserUsername username, final UserName name, final LocalDate birthdate ) {
-        final UserRole role = UserRole.USER;
-        return create( role, username, name, birthdate );
+        return new Factory( username.value(), name.value(), birthdate );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -45,37 +42,29 @@ public class UserFactory {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @RequiredArgsConstructor
-    public class Builder {
-        private final Integer role;
+    public class Factory {
         private final String username;
         private final String name;
         private final LocalDate birthdate;
         private String surname;
 
-        public Builder surname( final UserSurname surname ){
+        public Factory surname(final UserSurname surname ){
             this.surname = Optional.ofNullable( surname ).map( UserSurname::value ).orElse( null );
             return this;
         }
 
         public User build(){
             //Check if username is unique
-            if( UserFactory.this.userRepository.existsByUsername( this.username ))
-                throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_USERNAME_ALREADY_EXISTS, this.username);
+            UserFactory.this.userUsernameUniquenessPolicy.check( new UserUsername( this.username ));
 
             //Check if user age is valid
-            final UserMinimumAgePolicy userMinimumAgePolicy = new UserMinimumAgePolicy();
-            userMinimumAgePolicy.check( this.birthdate );
-
-            //If is the first user, set role to ADMIN
-            Integer role = this.role;
-            if( UserFactory.this.userRepository.count() == 0 ) role = UserRole.ADMIN.value();
+            UserFactory.this.userMinimumAgePolicy.check( this.birthdate );
 
             //Create User
             final UserId id = UserId.random();
             final Timestamp now = Timestamp.now();
-            return User.builder().id( id.value() ).role( role ).username( this.username ).name( this.name )
-                    .surname( this.surname ).birthdate( this.birthdate ).createdAt( now.value() )
-                    .updatedAt( now.value() ).build();
+            return User.builder().id( id.value() ).username( this.username ).name( this.name ).surname( this.surname )
+                    .birthdate( this.birthdate ).createdAt( now.value() ).updatedAt( now.value() ).build();
         }
     }
 

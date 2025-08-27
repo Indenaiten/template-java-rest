@@ -2,16 +2,14 @@ package com.codenaiten.template.rest.app.authentication.impl;
 
 import com.codenaiten.template.rest.app.authentication.AuthenticatedUser;
 import com.codenaiten.template.rest.app.authentication.AuthenticationProvider;
-import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
-import com.codenaiten.template.rest.app.dto.result.UserInfoResult;
-import com.codenaiten.template.rest.app.vo.account.AccountId;
-import com.codenaiten.template.rest.app.vo.user.UserId;
+import com.codenaiten.template.rest.app.entity.Account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -32,25 +30,18 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
     }
 
     @Override
-    public Optional<UserId> getAuthenticatedUserId(){
-        return this.getAuthenticatedUser()
-                .map( AuthenticatedUser::getInfo )
-                .map( AccountInfoResult::owner )
-                .map( UserInfoResult::id )
-                .map( UserId::new );
-    }
-
-    @Override
-    public Optional<AccountId> getAuthenticatedAccountId(){
-        return this.getAuthenticatedUser()
-                .map( AuthenticatedUser::getInfo )
-                .map( AccountInfoResult::id )
-                .map( AccountId::new );
+    public Optional<Account> getAuthenticatedAccount(){
+        return this.getAuthenticatedUser().map( AuthenticatedUser::getAccount );
     }
 
     @Override
     public Optional<String> getAccessToken(){
         return this.getAuthenticatedUser().flatMap( AuthenticatedUser::getToken );
+    }
+
+    @Override
+    public Optional<Locale> getLanguage(){
+        return this.getAuthenticatedAccount().flatMap( Account::getLang ).map( Locale::forLanguageTag );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

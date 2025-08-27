@@ -24,9 +24,6 @@ public class User extends BaseEntity<UUID> {
     @Id
     private UUID id;
 
-    @Column( name = "role", nullable = false )
-    private Integer role;
-
     @Column( name = "username", length = UserUsername.MAX_SIZE, nullable = false, unique = true )
     private String username;
 
@@ -39,7 +36,7 @@ public class User extends BaseEntity<UUID> {
     @Column( name = "birthdate", nullable = false )
     private LocalDate birthdate;
 
-    @OneToOne( mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true )
+    @OneToOne( mappedBy = "owner", cascade = CascadeType.ALL )
     private Account account;
 
 // ------------------------------------------------------------------------------------------------------------------ \\

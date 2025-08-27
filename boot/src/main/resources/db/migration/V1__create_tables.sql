@@ -1,6 +1,5 @@
 CREATE TABLE users (
     id UUID PRIMARY KEY,
-    role INT4 NOT NULL,
     username VARCHAR( 25 ) NOT NULL UNIQUE,
     name VARCHAR( 50 ) NOT NULL,
     surname VARCHAR( 50 ),
@@ -12,6 +11,8 @@ CREATE TABLE users (
 CREATE TABLE accounts (
     id UUID PRIMARY KEY,
     owner UUID NOT NULL,
+    lang VARCHAR( 10 ),
+    role INT4 NOT NULL,
     email VARCHAR( 256 ) NOT NULL UNIQUE,
     password VARCHAR( 256 ) NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,

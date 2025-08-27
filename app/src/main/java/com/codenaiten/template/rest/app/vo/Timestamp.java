@@ -1,7 +1,7 @@
 package com.codenaiten.template.rest.app.vo;
 
-import com.codenaiten.template.rest.app.exception.ValidationException;
-import com.codenaiten.template.rest.app.i18n.AppMessage;
+import com.codenaiten.template.rest.app.AppMessage;
+import com.codenaiten.template.rest.app.exception.validation.ValidationException;
 
 import java.time.LocalDateTime;
 

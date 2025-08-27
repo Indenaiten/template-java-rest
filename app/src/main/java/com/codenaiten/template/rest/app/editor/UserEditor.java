@@ -1,13 +1,12 @@
 package com.codenaiten.template.rest.app.editor;
 
+import com.codenaiten.template.rest.app.AppMessage;
 import com.codenaiten.template.rest.app.entity.User;
-import com.codenaiten.template.rest.app.exception.ValidationException;
-import com.codenaiten.template.rest.app.i18n.AppMessage;
+import com.codenaiten.template.rest.app.exception.validation.ValidationException;
 import com.codenaiten.template.rest.app.policy.UserMinimumAgePolicy;
-import com.codenaiten.template.rest.app.repository.UserRepository;
+import com.codenaiten.template.rest.app.policy.UserUsernameUniquenessPolicy;
 import com.codenaiten.template.rest.app.vo.Timestamp;
 import com.codenaiten.template.rest.app.vo.user.UserName;
-import com.codenaiten.template.rest.app.vo.user.UserRole;
 import com.codenaiten.template.rest.app.vo.user.UserSurname;
 import com.codenaiten.template.rest.app.vo.user.UserUsername;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserEditor {
 
-    private final UserRepository userRepository;
+    private final UserUsernameUniquenessPolicy userUsernameUniquenessPolicy;
+    private final UserMinimumAgePolicy userMinimumAgePolicy;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| METHODS |---------------------------------------------------------------------------------------------------- \\
@@ -35,32 +35,31 @@ public class UserEditor {
 // ---| EDITOR |----------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    @RequiredArgsConstructor
     public class Editor {
 
         private final User user;
-        private Integer role;
         private String username;
         private String name;
         private String surname;
         private LocalDate birthdate;
 
-        public Editor role( final UserRole role ){
-            this.role = Optional.ofNullable( role ).map( UserRole::value ).orElse( UserRole.USER.value() );
-            return this;
+        public Editor( final User user ){
+            this.user = user;
+            this.username = user.getUsername();
+            this.name = user.getName();
+            this.surname = user.getSurname().orElse( null );
+            this.birthdate = user.getBirthdate();
         }
 
         public Editor username( final UserUsername username ){
             //Check if username is null
             if( Objects.isNull( username ))
                 throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_USERNAME_REQUIRED );
-            final String value = username.value();
 
             //Check if username is unique
-            if( UserEditor.this.userRepository.existsByUsername( value ))
-                throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_USERNAME_ALREADY_EXISTS, value );
+            UserEditor.this.userUsernameUniquenessPolicy.check( username );
 
-            this.username = value;
+            this.username = username.value();
             return this;
         }
 
@@ -83,16 +82,14 @@ public class UserEditor {
                 throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_BIRTHDATE_REQUIRED );
 
             //Check if user age is valid
-            final UserMinimumAgePolicy userMinimumAgePolicy = new UserMinimumAgePolicy();
-            userMinimumAgePolicy.check( this.birthdate );
+            UserEditor.this.userMinimumAgePolicy.check( birthdate );
 
             this.birthdate = birthdate;
             return this;
         }
 
         public boolean hasChanges() {
-            return !Objects.equals( this.role, this.user.getRole() ) ||
-                   !Objects.equals( this.username, this.user.getUsername() ) ||
+            return !Objects.equals( this.username, this.user.getUsername() ) ||
                    !Objects.equals( this.name, this.user.getName() ) ||
                    !Objects.equals( this.surname, this.user.getSurname().orElse( null )) ||
                    !Objects.equals( this.birthdate, this.user.getBirthdate() );
@@ -100,7 +97,6 @@ public class UserEditor {
 
         public void apply(){
             if( this.hasChanges() ){
-                this.user.setRole( this.role );
                 this.user.setUsername( this.username );
                 this.user.setName( this.name );
                 this.user.setSurname( this.surname );

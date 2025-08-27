@@ -4,9 +4,8 @@ import com.codenaiten.template.rest.app.authentication.TokenInfo;
 import com.codenaiten.template.rest.app.authentication.TokenJwtManager;
 import com.codenaiten.template.rest.app.entity.Account;
 import com.codenaiten.template.rest.app.entity.SecurityToken;
-import com.codenaiten.template.rest.app.exception.auth.InvalidTokenException;
-import com.codenaiten.template.rest.app.i18n.AppMessage;
-import com.codenaiten.template.rest.app.properties.TokenProperties;
+import com.codenaiten.template.rest.app.exception.InvalidTokenException;
+import com.codenaiten.template.rest.app.properties.TokenSecurityProperties;
 import com.codenaiten.template.rest.app.repository.SecurityTokenRepository;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
 import com.codenaiten.template.rest.app.vo.user.UserId;
@@ -35,7 +34,7 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    private final TokenProperties tokenProperties;
+    private final TokenSecurityProperties tokenSecurityProperties;
     private final SecurityTokenRepository securityTokenRepository;
 
     private Long accessTokenDuration = 180000L;
@@ -50,10 +49,10 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
 
     @PostConstruct
     public void init() {
-        this.accessTokenDuration = this.tokenProperties.getAccessTokenExpiration();
-        this.accessTokenSecret = this.tokenProperties.getAccessTokenSecret();
-        this.refreshTokenDuration = this.tokenProperties.getRefreshTokenExpiration();
-        this.refreshTokenSecret = this.tokenProperties.getRefreshTokenSecret();
+        this.accessTokenDuration = this.tokenSecurityProperties.getAccessTokenExpiration();
+        this.accessTokenSecret = this.tokenSecurityProperties.getAccessTokenSecret();
+        this.refreshTokenDuration = this.tokenSecurityProperties.getRefreshTokenExpiration();
+        this.refreshTokenSecret = this.tokenSecurityProperties.getRefreshTokenSecret();
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -88,7 +87,7 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
         final AccountId account = this.getAccountId( refreshToken );
         final UserId user = this.getUserId( refreshToken );
         final SecurityToken securityToken = this.securityTokenRepository.findById( id )
-                .orElseThrow( () -> new InvalidTokenException( AppMessage.ERROR_SECURITY_AUTH_INVALID_REFRESH_TOKEN, refreshToken ));
+                .orElseThrow( () -> new InvalidTokenException( refreshToken ));
         final UUID version = UUID.randomUUID();
         securityToken.setVersion( version );
         this.securityTokenRepository.save( securityToken );

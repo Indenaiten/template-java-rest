@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -23,7 +25,8 @@ public class SecurityToken extends BaseEntity<UUID> {
     @Column( name = "version", nullable = false, unique = true )
     private UUID version;
 
-    @ManyToOne( fetch = FetchType.LAZY )
+    @ManyToOne( fetch = FetchType.LAZY, optional = false )
+    @OnDelete( action = OnDeleteAction.CASCADE )
     @JoinColumn( name = "account", nullable = false )
     private Account account;
 

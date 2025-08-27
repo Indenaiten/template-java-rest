@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.app.exception;
 
-import com.codenaiten.template.rest.app.i18n.AppMessage;
+import com.codenaiten.template.rest.app.AppMessage;
 import com.codenaiten.template.rest.app.i18n.MessageI18n;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class AppException extends RuntimeException{
 
-    private static final AppMessage MESSAGE_DEFAULT = AppMessage.ERROR_GENERIC;
+    private static final AppMessage MESSAGE = AppMessage.ERROR_GENERIC;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
@@ -21,8 +21,8 @@ public class AppException extends RuntimeException{
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     public AppException(){
-        super( MESSAGE_DEFAULT.getLoggerMessage() );
-        this.messageI18n = MESSAGE_DEFAULT;
+        super( MESSAGE.getLoggerMessage() );
+        this.messageI18n = MESSAGE;
         this.args = new String[0];
     }
 

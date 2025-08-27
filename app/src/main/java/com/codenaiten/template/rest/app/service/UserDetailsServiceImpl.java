@@ -1,9 +1,7 @@
 package com.codenaiten.template.rest.app.service;
 
 import com.codenaiten.template.rest.app.authentication.AuthenticatedUser;
-import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
 import com.codenaiten.template.rest.app.entity.Account;
-import com.codenaiten.template.rest.app.mapper.AccountMapper;
 import com.codenaiten.template.rest.app.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +19,6 @@ import java.util.UUID;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final AccountRepository accountRepository;
-    private final AccountMapper accountMapper;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| IMPLEMENTED METHODS |---------------------------------------------------------------------------------------- \\
@@ -42,9 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         final Account account = result.orElseThrow( () -> new UsernameNotFoundException( login ));
-        final String password = account.getPassword();
-        final AccountInfoResult info = this.accountMapper.toInfoResult( account );
-        return new AuthenticatedUser( info, password );
+        return new AuthenticatedUser( account );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
