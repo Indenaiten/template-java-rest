@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -107,7 +108,8 @@ public interface AuthenticationApiRest {
     @PostMapping( "/login" )
     ResponseEntity<LoginResponse> login(
             @Parameter( description = "Credenciales del usuario", required = true )
-            @RequestBody LoginRequest request
+            @RequestBody LoginRequest request,
+            HttpServletRequest httpServletRequest
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -181,7 +183,8 @@ public interface AuthenticationApiRest {
     @PostMapping( "/refresh" )
     ResponseEntity<LoginResponse> refresh(
             @Parameter( description = "El refresh securityToken para actualizar los tokens de acceso", required = true, hidden = true )
-            @CookieValue( name = REFRESH_TOKEN_NAME ) String securityToken
+            @CookieValue( name = REFRESH_TOKEN_NAME ) String securityToken,
+            HttpServletRequest httpServletRequest
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\

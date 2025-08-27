@@ -5,6 +5,7 @@ import com.codenaiten.template.rest.app.authentication.SecurityUtils;
 import com.codenaiten.template.rest.app.authentication.TokenJwtManager;
 import com.codenaiten.template.rest.app.properties.TokenProperties;
 import com.codenaiten.template.rest.app.vo.user.UserId;
+import com.codenaiten.template.rest.web.rest.util.HttpRequestUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -19,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -36,7 +36,6 @@ public class TokenJwtFilter extends OncePerRequestFilter {
     private final TokenProperties tokenProperties;
     private final TokenJwtManager tokenJwtManager;
     private final UserDetailsService userDetailsService;
-    private final PathMatcher pathMatcher;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| OVERRIDE METHODS |------------------------------------------------------------------------------------------- \\
@@ -65,7 +64,8 @@ public class TokenJwtFilter extends OncePerRequestFilter {
                             .map( Cookie::getValue )
                             .findFirst()).orElse( null );
 
-        if( Objects.isNull( SecurityContextHolder.getContext().getAuthentication() ) && Objects.nonNull( token ) && this.tokenJwtManager.validateAccessToken( token )) {
+        final String ip = HttpRequestUtil.getClientIp( request );
+        if( Objects.isNull( SecurityContextHolder.getContext().getAuthentication() ) && Objects.nonNull( token ) && this.tokenJwtManager.validateAccessToken( token, ip )) {
             final UserId userId = this.tokenJwtManager.getUserId( token );
             final UserDetails userDetails = this.userDetailsService.loadUserByUsername( userId.toString() );
             if( userDetails instanceof AuthenticatedUser authenticatedUser ) authenticatedUser.setToken( token );

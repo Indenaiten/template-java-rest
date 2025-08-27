@@ -9,11 +9,11 @@ import java.util.UUID;
 
 public interface TokenJwtManager {
 
-    TokenInfo create( String ip, Account result );
+    TokenInfo create( Account result, String ip );
     TokenInfo create( Account result );
 
     TokenInfo refresh( String refreshToken );
-    TokenInfo refresh( String ip, String refreshToken );
+    TokenInfo refresh( String refreshToken, String ip );
 
     UUID getSubject( String token );
     UUID getVersion( String token );

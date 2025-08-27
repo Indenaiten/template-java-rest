@@ -62,13 +62,13 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
 
     @Override
     @Transactional
-    public TokenInfo create( final String ip, final Account account ) {
+    public TokenInfo create( final Account account, final String ip ) {
         final AccountId accountId = new AccountId( account.getId() );
         final UserId userId = new UserId( account.getOwner().getId() );
         final UUID id = UUID.randomUUID();
         final UUID version = UUID.randomUUID();
         final SecurityToken securityToken = SecurityToken.builder().id( id ).account( account ).ip( ip ).version( version ).build();
-        this.securityTokenRepository.save(securityToken);
+        this.securityTokenRepository.save( securityToken );
         final String accessToken = this.create( id, this.accessTokenSecret, this.accessTokenDuration, version, accountId, userId );
         final String refreshToken = this.create( id, this.refreshTokenSecret, this.refreshTokenDuration, version, accountId, userId );
         return TokenInfo.builder().accountId( account.getId() ).token( accessToken ).refreshToken( refreshToken ).build();
@@ -77,12 +77,12 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
     @Override
     @Transactional
     public TokenInfo create( final Account account ) {
-        return this.create( null, account );
+        return this.create( account, null );
     }
 
     @Override
     @Transactional
-    public TokenInfo refresh( final String ip, final String refreshToken ){
+    public TokenInfo refresh( final String refreshToken, final String ip ){
         this.validateRefreshToken( ip, refreshToken );
         final UUID id = this.getSubject( refreshToken );
         final AccountId account = this.getAccountId( refreshToken );
@@ -91,7 +91,7 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
                 .orElseThrow( () -> new InvalidTokenException( AppMessage.ERROR_SECURITY_AUTH_INVALID_REFRESH_TOKEN, refreshToken ));
         final UUID version = UUID.randomUUID();
         securityToken.setVersion( version );
-        this.securityTokenRepository.save(securityToken);
+        this.securityTokenRepository.save( securityToken );
         final String accessToken = this.create( id, this.accessTokenSecret, this.accessTokenDuration, version, account, user );
         final String newRefreshToken = this.create( id, this.refreshTokenSecret, this.refreshTokenDuration, version, account, user );
         return TokenInfo.builder().accountId( account.value() ).token( accessToken ).refreshToken( newRefreshToken ).build();
@@ -100,7 +100,7 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
     @Override
     @Transactional
     public TokenInfo refresh( final String refreshToken ){
-        return this.refresh( null, refreshToken );
+        return this.refresh( refreshToken, null );
     }
 
     @Override
@@ -155,7 +155,7 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
     }
 
     @Override
-    public boolean validateAccessToken( final String ip, final String token ) {
+    public boolean validateAccessToken( final String token, final String ip ) {
         try {
             return this.validate( token, this.accessTokenSecret, ip );
         }
@@ -170,7 +170,7 @@ public class TokenJwtManagerImpl implements TokenJwtManager {
     }
 
     @Override
-    public boolean validateRefreshToken( final String ip, final String token ) {
+    public boolean validateRefreshToken( final String token, final String ip ) {
         try {
             return this.validate( token, this.refreshTokenSecret, ip );
         }

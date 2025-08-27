@@ -10,8 +10,8 @@ import java.util.List;
 public interface AuthenticationService {
 
     AccountInfoResult register( RegisterCommand command );
-    LoginResult login( LoginCommand command );
-    LoginResult refresh( String token );
+    LoginResult login( LoginCommand command, String ip );
+    LoginResult refresh( String token, String ip );
     void logout();
     void invalidate( List<String> ips );
     void invalidate();

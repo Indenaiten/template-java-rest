@@ -14,6 +14,8 @@ import com.codenaiten.template.rest.web.rest.dto.response.AccountInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.response.LoginResponse;
 import com.codenaiten.template.rest.web.rest.mapper.AccountWebMapper;
 import com.codenaiten.template.rest.web.rest.mapper.AuthenticationWebMapper;
+import com.codenaiten.template.rest.web.rest.util.HttpRequestUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -48,16 +50,18 @@ public class AuthenticationRestController implements AuthenticationApiRest {
     }
 
     @Override
-    public ResponseEntity<LoginResponse> login( final LoginRequest request ){
+    public ResponseEntity<LoginResponse> login( final LoginRequest request, final HttpServletRequest httpServletRequest ){
+        final String ip = HttpRequestUtil.getClientIp( httpServletRequest );
         final LoginCommand command = this.authenticationMapper.toCommand( request );
-        final LoginResult result = this.authenticationService.login( command );
+        final LoginResult result = this.authenticationService.login( command, ip );
         final LoginResponse response = this.authenticationMapper.toResponse( result );
         return this.response( response, result.tokenInfo() );
     }
 
     @Override
-    public ResponseEntity<LoginResponse> refresh( final String token ){
-        final LoginResult result = this.authenticationService.refresh( token );
+    public ResponseEntity<LoginResponse> refresh( final String token, final HttpServletRequest httpServletRequest ){
+        final String ip = HttpRequestUtil.getClientIp( httpServletRequest );
+        final LoginResult result = this.authenticationService.refresh( token, ip );
         final LoginResponse response = this.authenticationMapper.toResponse( result );
         return this.response( response, result.tokenInfo() );
     }
@@ -78,7 +82,7 @@ public class AuthenticationRestController implements AuthenticationApiRest {
 // ---| HELPER METHODS |--------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    public <T> ResponseEntity<T> response( final T body, final TokenInfo info ){
+    private <T> ResponseEntity<T> response( final T body, final TokenInfo info ){
         final ResponseEntity.BodyBuilder builder = ResponseEntity.status( HttpStatus.OK );
         final String accessTokenName = this.tokenProperties.getAccessTokenName().toLowerCase();
         final String refreshTokenName = this.tokenProperties.getRefreshTokenName().toLowerCase();
@@ -106,7 +110,7 @@ public class AuthenticationRestController implements AuthenticationApiRest {
         else return builder.build();
     }
 
-    public <T> ResponseEntity<T> response( final T body ){
+    private <T> ResponseEntity<T> response( final T body ){
         return response( body, null );
     }
 

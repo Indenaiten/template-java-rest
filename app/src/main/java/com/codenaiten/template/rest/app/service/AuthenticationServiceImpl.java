@@ -92,7 +92,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public LoginResult login( final LoginCommand command ){
+    public LoginResult login( final LoginCommand command, final String ip ){
         // Step 01: Get provided data
         final String login = command.login();
         final AccountPassword password = command.password();
@@ -111,16 +111,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final AccountInfoResult info = user.getInfo();
         final AccountId id = new AccountId( info.id() );
         final Account account = this.accountRepository.findById( id.value() ).orElseThrow( () -> new AccountNotFoundByIdException( id ));
-        final TokenInfo result = this.jwtTokenManager.create( account );
+        final TokenInfo result = this.jwtTokenManager.create( account, ip );
 
         // Step 05: Return result
         return new LoginResult( info.id(), info.owner().id(), result );
     }
 
     @Override
-    public LoginResult refresh( final String token ){
+    public LoginResult refresh( final String token, final String ip ){
         // Step 01: Validate token
-        if( !this.jwtTokenManager.validateRefreshToken( token ))
+        if( !this.jwtTokenManager.validateRefreshToken( token, ip ))
             throw new InvalidTokenException( AppMessage.ERROR_SECURITY_AUTH_INVALID_REFRESH_TOKEN, token );
 
         // Step 02: Check if exitst Account ID & User ID
@@ -128,7 +128,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final Account account = this.accountRepository.findById( id.value() ).orElseThrow( () -> new AccountNotFoundByIdException( id ));
 
         // Step 03: Generate new Tokens from refresh token
-        final TokenInfo result = this.jwtTokenManager.refresh( token );
+        final TokenInfo result = this.jwtTokenManager.refresh( token, ip );
 
         // Step 04: Return result
         return new LoginResult( account.getId(), account.getOwner().getId(), result );
