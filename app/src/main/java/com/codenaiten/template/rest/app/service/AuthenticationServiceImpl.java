@@ -111,7 +111,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public LoginResult login( final LoginCommand command, final String ip ){
         // Step 01: Get provided data
-        final String login = command.login();
+        final String login = command.login().toLowerCase().trim();
         final AccountPassword password = command.password();
 
         // Step 02: Authenticate user

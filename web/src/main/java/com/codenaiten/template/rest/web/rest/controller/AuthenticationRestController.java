@@ -65,7 +65,7 @@ public class AuthenticationRestController implements AuthenticationApiRest {
 
     @Override
     public ResponseEntity<ApiRestResponse<LoginResponse>> login( final LoginRequest request ){
-        final String ip = HttpRequestUtil.getClientIp( httpServletRequest );
+        final String ip = HttpRequestUtil.getClientIp( httpServletRequest ).orElse( null );
         final LoginCommand command = this.authenticationMapper.toCommand( request );
         final LoginResult result = this.authenticationService.login( command, ip );
         final LoginResponse response = this.authenticationMapper.toResponse( result );
@@ -77,7 +77,7 @@ public class AuthenticationRestController implements AuthenticationApiRest {
 
     @Override
     public ResponseEntity<ApiRestResponse<LoginResponse>> refresh( final String token ){
-        final String ip = HttpRequestUtil.getClientIp( this.httpServletRequest );
+        final String ip = HttpRequestUtil.getClientIp( this.httpServletRequest ).orElse( null );
         final LoginResult result = this.authenticationService.refresh( token, ip );
         final LoginResponse response = this.authenticationMapper.toResponse( result );
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_AUTH_REFRESH_TOKEN, LogLevel.INFO );

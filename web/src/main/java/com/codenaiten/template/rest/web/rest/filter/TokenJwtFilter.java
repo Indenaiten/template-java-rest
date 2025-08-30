@@ -70,7 +70,7 @@ public class TokenJwtFilter extends OncePerRequestFilter {
                             .map( Cookie::getValue )
                             .findFirst()).orElse( null );
 
-        final String ip = HttpRequestUtil.getClientIp( request );
+        final String ip = HttpRequestUtil.getClientIp( request ).orElse( null );;
         if( Objects.isNull( SecurityContextHolder.getContext().getAuthentication() ) && Objects.nonNull( token )) {
             if( !this.tokenJwtManager.validateAccessToken( token, ip )) throw new InvalidAccessTokenException( token );
             final UserId userId = this.tokenJwtManager.getUserId( token );

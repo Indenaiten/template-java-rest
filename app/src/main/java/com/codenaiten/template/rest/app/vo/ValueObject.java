@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 public abstract class ValueObject<T extends Serializable> implements Serializable {
 
     @EqualsAndHashCode.Include
-    protected final T value;
+    protected T value;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| CONSTRUCTOR |------------------------------------------------------------------------------------------------ \\

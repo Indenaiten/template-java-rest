@@ -21,11 +21,12 @@ public class UserUsername extends ValueObject<String> {
 
     public UserUsername( final String value ){
         super( value );
-        if( value.length() < MIN_SIZE )
+        this.value = value.toLowerCase().trim();
+        if( this.value.length() < MIN_SIZE )
             throw new ValidationException( AppMessage.ERROR_VALIDATION_VO_USER_USERNAME_VALUE_MIN_SIZE, MIN_SIZE, value );
-        if( value.length() > MAX_SIZE )
+        if( this.value.length() > MAX_SIZE )
             throw new ValidationException( AppMessage.ERROR_VALIDATION_VO_USER_USERNAME_VALUE_MAX_SIZE, MAX_SIZE, value );
-        if( !value.matches( FORMAT ))
+        if( !this.value.matches( FORMAT ))
             throw new ValidationException( AppMessage.ERROR_VALIDATION_VO_USER_USERNAME_VALUE_INVALID, FORMAT, value );
     }
 
