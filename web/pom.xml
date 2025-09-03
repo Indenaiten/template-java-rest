@@ -52,4 +52,12 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <developers>
+        <developer>
+            <name>Ángel Herce Soto</name>
+            <email>angel.herce.soto@gmail.com</email>
+            <url>https://github.com/indenaiten</url>
+        </developer>
+    </developers>
 </project>
