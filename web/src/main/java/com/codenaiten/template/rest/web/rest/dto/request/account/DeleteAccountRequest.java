@@ -1,4 +1,4 @@
-package com.codenaiten.template.rest.web.rest.dto.request;
+package com.codenaiten.template.rest.web.rest.dto.request.account;
 
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Schema( description = "Petición para eliminar la cuenta del usuario autenticado" )
-public record AccountDeleteRequest(
+public record DeleteAccountRequest(
 
         @Schema( description = "Contraseña actual para confirmar la eliminación", example = "CurrentPassword.123", requiredMode = Schema.RequiredMode.REQUIRED )
         @NotNull

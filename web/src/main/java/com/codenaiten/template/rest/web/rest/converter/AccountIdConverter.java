@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Convierte un {@link UUID} a un objeto de tipo {@link AccountId}.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

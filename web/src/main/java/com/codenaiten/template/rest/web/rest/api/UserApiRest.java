@@ -2,13 +2,13 @@ package com.codenaiten.template.rest.web.rest.api;
 
 import com.codenaiten.template.rest.app.vo.user.UserId;
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;
-import com.codenaiten.template.rest.web.rest.dto.request.UserUpdateRequest;
-import com.codenaiten.template.rest.web.rest.dto.response.PageResponse;
+import com.codenaiten.template.rest.web.rest.dto.request.user.FilterUserRequest;
+import com.codenaiten.template.rest.web.rest.dto.request.user.UpdateUserRequest;
 import com.codenaiten.template.rest.web.rest.dto.response.UserInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.stub.ApiRestResponseWithUserInfoPageResponse;
 import com.codenaiten.template.rest.web.rest.dto.stub.ApiRestResponseWithUserInfoResponse;
-import com.codenaiten.template.rest.web.rest.exception.openapi.PrivateErrors;
-import com.codenaiten.template.rest.web.rest.exception.openapi.PublicErrors;
+import com.codenaiten.template.rest.web.rest.exception.openapi.AuthenticationErrors;
+import com.codenaiten.template.rest.web.rest.exception.openapi.CommonErrors;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,9 +19,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+@CommonErrors
 @Tag( name = "Usuarios" )
 @RequestMapping( "/api/user" )
-@PublicErrors
 public interface UserApiRest {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -38,7 +40,7 @@ public interface UserApiRest {
                                           )
                 )
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @GetMapping( "/me" )
     ResponseEntity<ApiRestResponse<UserInfoResponse>> me();
 
@@ -56,7 +58,7 @@ public interface UserApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithUserInfoResponse.class )
                   )
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @GetMapping("/{id}")
     ResponseEntity<ApiRestResponse<UserInfoResponse>> get(
             @Parameter( description = "ID único del usuario", required = true )
@@ -64,22 +66,26 @@ public interface UserApiRest {
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
-// ---| GET ALL USERS |---------------------------------------------------------------------------------------------- \\
+// ---| SEARCH USERS |----------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    @Operation( operationId = "getAll",
-                summary = "Recupera todos los usuarios con paginación",
-                description = "Permite recuperar todos los usuarios del sistema con paginación"
+    @Operation( operationId = "search",
+            summary = "Busca usuarios por criterios",
+            description = "Permite buscar usuarios por diferentes criterios con paginación"
     )
     @ApiResponse( responseCode = "200",
-                  description = "Lista de usuarios recuperada correctamente",
-                  content = @Content( mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                      schema = @Schema( implementation = ApiRestResponseWithUserInfoPageResponse.class )
-                  )
+            description = "Resultados de búsqueda recuperados correctamente",
+            content = @Content( mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema( implementation = ApiRestResponseWithUserInfoPageResponse.class )
+            )
     )
-    @PrivateErrors
-    @GetMapping({ "/all", "/all/{page}", "/all/{page}/{size}" })
-    ResponseEntity<ApiRestResponse<PageResponse<UserInfoResponse>>> getAll(
+    @AuthenticationErrors
+    @GetMapping({ "/search/all", "/search/all/{page}", "/search/all/{page}/{size}",
+                  "/search/term/{term}", "/search/term/{term}/{page}", "/search/term/{term}/{page}/{size}" })
+    ResponseEntity<ApiRestResponse<List<UserInfoResponse>>> search(
+            @Parameter( description = "Término de búsqueda", required = true )
+            @PathVariable( name = "term", required = false ) String search,
+
             @Parameter( description = "Número de página (comienza en 0)", example = "0" )
             @PathVariable( required = false ) Integer page,
 
@@ -101,41 +107,17 @@ public interface UserApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithUserInfoPageResponse.class )
                   )
     )
-    @PrivateErrors
-    @GetMapping({ "/search/{search}", "/search/{search}/{page}", "/search/{search}/{page}/{size}" })
-    ResponseEntity<ApiRestResponse<PageResponse<UserInfoResponse>>> search(
-            @Parameter( description = "Término de búsqueda", required = true )
-            @PathVariable String search,
+    @AuthenticationErrors
+    @PostMapping({ "/search", "/search/{page}", "/search/{page}/{size}" })
+    ResponseEntity<ApiRestResponse<List<UserInfoResponse>>> search(
+            @Parameter( description = "Filtro de búsqueda" )
+            @RequestBody( required = false ) FilterUserRequest filter,
 
             @Parameter( description = "Número de página (comienza en 0)", example = "0" )
             @PathVariable( required = false ) Integer page,
 
             @Parameter( description = "Tamaño de la página", example = "25" )
             @PathVariable( required = false ) Integer size
-    );
-
-// ------------------------------------------------------------------------------------------------------------------ \\
-// ---| UPDATE USER BY ID |------------------------------------------------------------------------------------------ \\
-// ------------------------------------------------------------------------------------------------------------------ \\
-
-    @Operation( operationId = "update",
-                summary = "Actualiza un usuario específico",
-                description = "Permite actualizar la información de un usuario específico por su ID"
-    )
-    @ApiResponse( responseCode = "200",
-                  description = "Usuario actualizado correctamente",
-                  content = @Content( mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                      schema = @Schema( implementation = ApiRestResponseWithUserInfoResponse.class )
-                  )
-    )
-    @PrivateErrors
-    @PutMapping( "/{id}" )
-    ResponseEntity<ApiRestResponse<UserInfoResponse>> update(
-            @Parameter( description = "ID único del usuario", required = true )
-            @PathVariable UserId id,
-
-            @Parameter( description = "Datos para actualizar el usuario", required = true )
-            @RequestBody UserUpdateRequest request
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -152,11 +134,35 @@ public interface UserApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithUserInfoResponse.class )
                   )
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @PutMapping( "/me" )
     ResponseEntity<ApiRestResponse<UserInfoResponse>> update(
             @Parameter( description = "Datos para actualizar la información del usuario", required = true )
-            @RequestBody UserUpdateRequest request
+            @RequestBody UpdateUserRequest request
+    );
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+// ---| UPDATE USER BY ID |------------------------------------------------------------------------------------------ \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Operation( operationId = "update",
+                summary = "Actualiza un usuario específico",
+                description = "Permite actualizar la información de un usuario específico por su ID"
+    )
+    @ApiResponse( responseCode = "200",
+                  description = "Usuario actualizado correctamente",
+                  content = @Content( mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                      schema = @Schema( implementation = ApiRestResponseWithUserInfoResponse.class )
+                  )
+    )
+    @AuthenticationErrors
+    @PutMapping( "/{id}" )
+    ResponseEntity<ApiRestResponse<UserInfoResponse>> update(
+            @Parameter( description = "ID único del usuario", required = true )
+            @PathVariable UserId id,
+
+            @Parameter( description = "Datos para actualizar el usuario", required = true )
+            @RequestBody UpdateUserRequest request
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\

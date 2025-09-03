@@ -3,7 +3,7 @@ package com.codenaiten.template.rest.web.rest.api;
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;
 import com.codenaiten.template.rest.web.rest.dto.Empty;
 import com.codenaiten.template.rest.web.rest.dto.stub.ApiRestResponseEmptyResponse;
-import com.codenaiten.template.rest.web.rest.exception.openapi.PublicErrors;
+import com.codenaiten.template.rest.web.rest.exception.openapi.CommonErrors;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,16 +20,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 import java.util.Locale;
 
+@CommonErrors
 @Tag( name = "Configuraciones" )
 @RequestMapping( "/api/config" )
-@PublicErrors
 public interface ConfigurationApiRest {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| CONFIG LANGUAGE |-------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    @Operation( operationId = "configLang",
+    @Operation( operationId = "updateLang",
                 summary = "Actualiza el lenguaje de la API",
                 description = "Permite actualizar el lenguaje de la API"
     )
@@ -40,7 +40,7 @@ public interface ConfigurationApiRest {
                   )
     )
     @PostMapping( "/lang/{lang}" )
-    ResponseEntity<ApiRestResponse<Empty>> configLang(
+    ResponseEntity<ApiRestResponse<Empty>> updateLang(
             @Parameter( description = "Lenguaje que se va a establecer en la API", required = true )
             @PathVariable Locale lang
     );

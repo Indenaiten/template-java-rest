@@ -1,4 +1,4 @@
-package com.codenaiten.template.rest.web.rest.dto.request;
+package com.codenaiten.template.rest.web.rest.dto.request.user;
 
 import com.codenaiten.template.rest.app.vo.user.UserName;
 import com.codenaiten.template.rest.app.vo.user.UserSurname;
@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Schema( description = "Petición para actualizar información de usuario" )
-public record UserUpdateRequest(
+public record UpdateUserRequest(
 
         @Schema( description = "Nickname de usuario único", example = "newusername" )
         @Size( min = UserUsername.MIN_SIZE, max = UserUsername.MAX_SIZE )

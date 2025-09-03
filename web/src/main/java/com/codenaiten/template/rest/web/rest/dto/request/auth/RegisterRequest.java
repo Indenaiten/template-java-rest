@@ -1,4 +1,4 @@
-package com.codenaiten.template.rest.web.rest.dto.request;
+package com.codenaiten.template.rest.web.rest.dto.request.auth;
 
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;

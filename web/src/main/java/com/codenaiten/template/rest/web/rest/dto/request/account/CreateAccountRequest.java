@@ -1,4 +1,4 @@
-package com.codenaiten.template.rest.web.rest.dto.request;
+package com.codenaiten.template.rest.web.rest.dto.request.account;
 
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.Locale;
 
 @Schema( description = "Petición para crear una nueva cuenta de usuario" )
-public record AccountCreateRequest(
+public record CreateAccountRequest(
 
         @Schema( description = "Nickname de usuario único", example = "root", requiredMode = Schema.RequiredMode.REQUIRED  )
         @NotNull

@@ -1,4 +1,4 @@
-package com.codenaiten.template.rest.web.rest.dto.request;
+package com.codenaiten.template.rest.web.rest.dto.request.account;
 
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Schema( description = "Petición para actualizar el email de la cuenta" )
-public record AccountEmailUpdateRequest(
+public record UpdateAccountEmailRequest(
 
         @Schema( description = "Contraseña actual para confirmar la acción", example = "CurrentPassword.123", requiredMode = Schema.RequiredMode.REQUIRED )
         @NotNull

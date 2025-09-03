@@ -20,11 +20,17 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Handler de errores para la excepción {@link AuthenticationException} de Spring Security.
+ *
+ * @see AuthenticationEntryPoint
+ */
 @Slf4j
 @Component
 @AllArgsConstructor
 public class AuthenticationExceptionHandler implements AuthenticationEntryPoint {
 
+    /** Manager de mensajes internacionalizados del sistema */
     private final MessageI18nManager messageI18nManager;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -34,11 +40,20 @@ public class AuthenticationExceptionHandler implements AuthenticationEntryPoint 
     @Override
     public void commence( final HttpServletRequest req, final HttpServletResponse res,
                           final AuthenticationException authException ) throws IOException {
+        // Step 01: Set i18n message
         final MessageI18n messageI18n = AppMessage.ERROR_SECURITY_AUTH_NOT_FOUND;
+
+        // Step 02: Log error message
         log.error( messageI18n.getLoggerMessage() );
         log.debug( authException.getMessage(), authException );
+
+        // Step 03: Get i18n error message
         final String message = this.messageI18nManager.getMessage( messageI18n, LogLevel.ERROR  );
+
+        // Step 04: Build wrapper response
         final ApiRestResponse<Empty> body = ApiRestResponse.securityError().message( message ).build();
+
+        // Step 05: Write response
         res.setStatus( HttpStatus.UNAUTHORIZED.value() );
         res.setContentType( MediaType.APPLICATION_JSON_VALUE );
         res.setCharacterEncoding( StandardCharsets.UTF_8.name() );

@@ -1,4 +1,4 @@
-package com.codenaiten.template.rest.web.rest.dto.request;
+package com.codenaiten.template.rest.web.rest.dto.request.account;
 
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
@@ -11,7 +11,7 @@ import jakarta.validation.constraints.Size;
 import java.util.Locale;
 
 @Schema( description = "Petición para actualizar información de cuenta" )
-public record AccountUpdateRequest(
+public record UpdateAccountRequest(
 
         @Schema( description = "Lenguaje de la cuenta de usuario", example = "es" )
         Locale lang,

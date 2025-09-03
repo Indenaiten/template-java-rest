@@ -2,15 +2,15 @@ package com.codenaiten.template.rest.web.rest.api;
 
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;
 import com.codenaiten.template.rest.web.rest.dto.Empty;
-import com.codenaiten.template.rest.web.rest.dto.request.LoginRequest;
-import com.codenaiten.template.rest.web.rest.dto.request.RegisterRequest;
+import com.codenaiten.template.rest.web.rest.dto.request.auth.LoginRequest;
+import com.codenaiten.template.rest.web.rest.dto.request.auth.RegisterRequest;
 import com.codenaiten.template.rest.web.rest.dto.response.AccountInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.response.LoginResponse;
 import com.codenaiten.template.rest.web.rest.dto.stub.ApiRestResponseEmptyResponse;
 import com.codenaiten.template.rest.web.rest.dto.stub.ApiRestResponseWithAccountInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.stub.ApiRestResponseWithLoginResponse;
-import com.codenaiten.template.rest.web.rest.exception.openapi.PrivateErrors;
-import com.codenaiten.template.rest.web.rest.exception.openapi.PublicErrors;
+import com.codenaiten.template.rest.web.rest.exception.openapi.AuthenticationErrors;
+import com.codenaiten.template.rest.web.rest.exception.openapi.CommonErrors;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+@CommonErrors
 @Tag( name = "Autenticación" )
 @RequestMapping( "/api/auth" )
-@PublicErrors
 public interface AuthenticationApiRest {
 
     String ACCESS_TOKEN_NAME = "token";
@@ -186,7 +186,7 @@ public interface AuthenticationApiRest {
                   content = @Content( mediaType = MediaType.APPLICATION_JSON_VALUE,
                                       schema = @Schema( implementation = ApiRestResponseEmptyResponse.class ))
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @PostMapping( "/logout" )
     ResponseEntity<ApiRestResponse<Empty>> logout();
 
@@ -215,7 +215,7 @@ public interface AuthenticationApiRest {
                   content = @Content( mediaType = MediaType.APPLICATION_JSON_VALUE,
                                       schema = @Schema( implementation = ApiRestResponseEmptyResponse.class ))
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @PostMapping( "/invalidate" )
     ResponseEntity<ApiRestResponse<Empty>> invalidate();
 

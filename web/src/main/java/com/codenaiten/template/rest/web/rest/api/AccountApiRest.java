@@ -2,15 +2,14 @@ package com.codenaiten.template.rest.web.rest.api;
 
 import com.codenaiten.template.rest.app.vo.account.AccountId;
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;
-import com.codenaiten.template.rest.web.rest.dto.request.*;
+import com.codenaiten.template.rest.web.rest.dto.request.account.*;
 import com.codenaiten.template.rest.web.rest.dto.response.AccountInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.response.AccountRoleInfoResponse;
-import com.codenaiten.template.rest.web.rest.dto.response.PageResponse;
 import com.codenaiten.template.rest.web.rest.dto.stub.ApiRestResponseWithAccountInfoPageResponse;
 import com.codenaiten.template.rest.web.rest.dto.stub.ApiRestResponseWithAccountInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.stub.ApiRestResponseWithAccountRoleInfoListResponse;
-import com.codenaiten.template.rest.web.rest.exception.openapi.PrivateErrors;
-import com.codenaiten.template.rest.web.rest.exception.openapi.PublicErrors;
+import com.codenaiten.template.rest.web.rest.exception.openapi.AuthenticationErrors;
+import com.codenaiten.template.rest.web.rest.exception.openapi.CommonErrors;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,9 +23,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Locale;
 
+@CommonErrors
 @Tag( name = "Cuentas" )
 @RequestMapping( "/api/account" )
-@PublicErrors
 public interface AccountApiRest {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -43,7 +42,7 @@ public interface AccountApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithAccountInfoResponse.class )
                   )
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @GetMapping( "/me" )
     ResponseEntity<ApiRestResponse<AccountInfoResponse>> me();
 
@@ -61,7 +60,7 @@ public interface AccountApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithAccountInfoResponse.class )
                   )
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @GetMapping("/{id}")
     ResponseEntity<ApiRestResponse<AccountInfoResponse>> get(
             @Parameter(description = "ID único de la cuenta", required = true)
@@ -69,22 +68,26 @@ public interface AccountApiRest {
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
-// ---| GET ALL ACCOUNTS |------------------------------------------------------------------------------------------- \\
+// ---| SEARCH ACCOUNTS |-------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    @Operation( operationId = "getAll",
-                summary = "Recupera todas las cuentas con paginación",
-                description = "Permite recuperar todas las cuentas del sistema con paginación"
+    @Operation( operationId = "search",
+                summary = "Busca cuentas por criterios",
+                description = "Permite buscar cuentas por diferentes criterios con paginación"
     )
     @ApiResponse( responseCode = "200",
-                  description = "Lista de cuentas recuperada correctamente",
+                  description = "Resultados de búsqueda recuperados correctamente",
                   content = @Content( mediaType = MediaType.APPLICATION_JSON_VALUE,
                                       schema = @Schema( implementation = ApiRestResponseWithAccountInfoPageResponse.class )
                   )
     )
-    @PrivateErrors
-    @GetMapping({ "/all", "/all/{page}", "/all/{page}/{size}" })
-    ResponseEntity<ApiRestResponse<PageResponse<AccountInfoResponse>>> getAll(
+    @AuthenticationErrors
+    @GetMapping({ "/search/all", "/search/all/{page}", "/search/all/{page}/{size}",
+                  "/search/term/{term}", "/search/term/{term}/{page}", "/search/term/{term}/{page}/{size}" })
+    ResponseEntity<ApiRestResponse<List<AccountInfoResponse>>> search(
+            @Parameter( description = "Término de búsqueda" )
+            @PathVariable( name = "term", required = false ) String search,
+
             @Parameter( description = "Número de página (comienza en 0)", example = "0" )
             @PathVariable( required = false ) Integer page,
 
@@ -106,11 +109,11 @@ public interface AccountApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithAccountInfoPageResponse.class )
                   )
     )
-    @PrivateErrors
-    @GetMapping({ "/search/{search}", "/search/{search}/{page}", "/search/{search}/{page}/{size}" })
-    ResponseEntity<ApiRestResponse<PageResponse<AccountInfoResponse>>> search(
-            @Parameter( description = "Término de búsqueda", required = true )
-            @PathVariable String search,
+    @AuthenticationErrors
+    @PostMapping({ "/search", "/search/{page}", "/search/{page}/{size}" })
+    ResponseEntity<ApiRestResponse<List<AccountInfoResponse>>> search(
+            @Parameter( description = "Filtro de búsqueda" )
+            @RequestBody( required = false ) FilterAccountRequest filter,
 
             @Parameter( description = "Número de página (comienza en 0)", example = "0" )
             @PathVariable( required = false ) Integer page,
@@ -150,11 +153,11 @@ public interface AccountApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithAccountInfoResponse.class )
                   )
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @PostMapping
     ResponseEntity<ApiRestResponse<AccountInfoResponse>> create(
             @Parameter( description = "Datos para crear la cuenta", required = true )
-            @RequestBody AccountCreateRequest request
+            @RequestBody CreateAccountRequest request
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -171,14 +174,14 @@ public interface AccountApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithAccountInfoResponse.class )
                   )
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @PutMapping( "/{id}" )
     ResponseEntity<ApiRestResponse<AccountInfoResponse>> update(
             @Parameter( description = "ID único de la cuenta", required = true )
             @PathVariable AccountId id,
 
             @Parameter( description = "Datos para actualizar la cuenta", required = true )
-            @RequestBody AccountUpdateRequest request
+            @RequestBody UpdateAccountRequest request
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -195,7 +198,7 @@ public interface AccountApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithAccountInfoResponse.class )
                   )
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @PatchMapping( "/me/lang/{lang}" )
     ResponseEntity<ApiRestResponse<AccountInfoResponse>> updateLang(
             @Parameter( description = "Lenguaje que se va a establecer en la cuenta del usuario", required = true )
@@ -216,11 +219,11 @@ public interface AccountApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithAccountInfoResponse.class )
                   )
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @PatchMapping( "/me/email" )
     ResponseEntity<ApiRestResponse<AccountInfoResponse>> updateEmail(
             @Parameter( description = "Datos para actualizar el email", required = true )
-            @RequestBody AccountEmailUpdateRequest request
+            @RequestBody UpdateAccountEmailRequest request
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -237,32 +240,11 @@ public interface AccountApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithAccountInfoResponse.class )
                   )
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @PatchMapping( "/me/password" )
     ResponseEntity<ApiRestResponse<AccountInfoResponse>> updatePassword(
             @Parameter( description = "Datos para actualizar la contraseña", required = true )
-            @RequestBody AccountPasswordUpdateRequest request
-    );
-
-// ------------------------------------------------------------------------------------------------------------------ \\
-// ---| DELETE ACCOUNT BY ID |--------------------------------------------------------------------------------------- \\
-// ------------------------------------------------------------------------------------------------------------------ \\
-
-    @Operation( operationId = "delete",
-                summary = "Elimina una cuenta específica por ID",
-                description = "Permite eliminar una cuenta específica del sistema por su ID"
-    )
-    @ApiResponse( responseCode = "200",
-                  description = "Cuenta eliminada correctamente",
-                  content = @Content( mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                      schema = @Schema( implementation = ApiRestResponseWithAccountInfoResponse.class )
-                  )
-    )
-    @PrivateErrors
-    @DeleteMapping( "/{id}" )
-    ResponseEntity<ApiRestResponse<AccountInfoResponse>> delete(
-            @Parameter( description = "ID único de la cuenta", required = true )
-            @PathVariable AccountId id
+            @RequestBody UpdateAccountPasswordRequest request
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -279,11 +261,32 @@ public interface AccountApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithAccountInfoResponse.class )
                   )
     )
-    @PrivateErrors
+    @AuthenticationErrors
     @DeleteMapping( "/me" )
     ResponseEntity<ApiRestResponse<AccountInfoResponse>> delete(
             @Parameter( description = "Datos para confirmar la eliminación de la cuenta", required = true )
-            @RequestBody AccountDeleteRequest request
+            @RequestBody DeleteAccountRequest request
+    );
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+// ---| DELETE ACCOUNT BY ID |--------------------------------------------------------------------------------------- \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Operation( operationId = "delete",
+                summary = "Elimina una cuenta específica por ID",
+                description = "Permite eliminar una cuenta específica del sistema por su ID"
+    )
+    @ApiResponse( responseCode = "200",
+                  description = "Cuenta eliminada correctamente",
+                  content = @Content( mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                      schema = @Schema( implementation = ApiRestResponseWithAccountInfoResponse.class )
+                  )
+    )
+    @AuthenticationErrors
+    @DeleteMapping( "/{id}" )
+    ResponseEntity<ApiRestResponse<AccountInfoResponse>> delete(
+            @Parameter( description = "ID único de la cuenta", required = true )
+            @PathVariable AccountId id
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
