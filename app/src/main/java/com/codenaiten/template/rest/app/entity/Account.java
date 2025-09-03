@@ -46,10 +46,24 @@ public class Account extends BaseEntity<UUID> {
 // ---| CHECKERS |--------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /**
+     * Comprueba si un {@link User} es propietario de la @{link Account}.
+     *
+     * @param user {@link User} que se va a comprobar si es propietario.
+     *
+     * @return {@code true} si el {@link User} es propietario de la @{link Account}, {@code false} en caso contrario.
+     */
     public boolean isOwner( final User user ){
         return Objects.equals( this.owner, user );
     }
 
+    /**
+     * Comprueba si un {@link Account} tiene un determinado {@link AccountRole}.
+     *
+     * @param role {@link AccountRole} que se va a comprobar si tiene.
+     *
+     * @return {@code true} si el {@link Account} tiene el {@link AccountRole} dado, {@code false} en caso contrario.
+     */
     public boolean hasRole( final AccountRole role ){
         return Objects.equals( this.role, role.value() );
     }
@@ -58,6 +72,12 @@ public class Account extends BaseEntity<UUID> {
 // ---| GETTERS |---------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /**
+     * Obtiene el idioma de la @{link Account}.
+     *
+     * @return {@link Optional} con el {@link String} que representa el idioma de la @{link Account} si existe,
+     *         {@link Optional#empty()} en caso contrario.
+     */
     public Optional<String> getLang(){
         return Optional.ofNullable( this.lang );
     }

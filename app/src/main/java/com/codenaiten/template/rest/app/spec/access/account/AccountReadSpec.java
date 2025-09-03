@@ -8,10 +8,18 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 
+/**
+ * Specification que permite comprobar si se tiene permiso para acceder a la información de los recursos de tipo
+ * {@link Account}.
+ *
+ * @see Specification
+ * @see Account
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class AccountReadSpec implements Specification<Account> {
 
+    /** {@link Account} a la que se requiere acceder */
     private final Account account;
 
 // ------------------------------------------------------------------------------------------------------------------ \\

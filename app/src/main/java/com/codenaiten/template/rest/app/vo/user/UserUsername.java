@@ -1,9 +1,16 @@
 package com.codenaiten.template.rest.app.vo.user;
 
 import com.codenaiten.template.rest.app.AppMessage;
+import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
 import com.codenaiten.template.rest.app.vo.ValueObject;
 
+/**
+ * Value Object que representa el username de un {@link User}
+ *
+ * @see ValueObject
+ * @see String
+ */
 public class UserUsername extends ValueObject<String> {
 
     /** Longitud mínima del nickname de un usuario */
@@ -19,6 +26,11 @@ public class UserUsername extends ValueObject<String> {
 // ---| CONSTRUCTOR |------------------------------------------------------------------------------------------------ \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /**
+     * Constructor que crea un {@link UserUsername} a partir de un {@link String}.
+     *
+     * @param value {@link String} que representa el valor del {@link UserUsername}.
+     */
     public UserUsername( final String value ){
         super( value );
         this.value = value.toLowerCase().trim();
@@ -34,6 +46,13 @@ public class UserUsername extends ValueObject<String> {
 // ---| VALIDATION |------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /**
+     * Valida si el valor de un {@link UserUsername} es valido.
+     *
+     * @param value {@link String} que representa el valor del {@link UserUsername}.
+     *
+     * @return {@code true} si el valor del {@link UserUsername} es valido, {@code false} en caso contrario.
+     */
     public static boolean test( final String value ){
         return test( () -> new UserUsername( value ));
     }

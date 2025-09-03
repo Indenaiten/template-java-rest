@@ -37,6 +37,12 @@ public class SecurityToken extends BaseEntity<UUID> {
 // ---| GETTERS |---------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /**
+     * Obtiene la IP del {@link SecurityToken}.
+     *
+     * @return {@link Optional} con el {@link String} que representa la IP del {@link SecurityToken} si existe,
+     *         {@link Optional#empty()} en caso contrario.
+     */
     public Optional<String> getIp(){
         return Optional.ofNullable( this.ip );
     }

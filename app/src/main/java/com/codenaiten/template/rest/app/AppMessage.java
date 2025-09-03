@@ -18,6 +18,11 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
+/**
+ * Claves I18n para los mensajes del sistema
+ *
+ * @see MessageI18n
+ */
 @Getter
 @RequiredArgsConstructor
 public enum AppMessage implements MessageI18n {
@@ -202,7 +207,10 @@ public enum AppMessage implements MessageI18n {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /** La clave i18n del mensaje de error */
     private final String key;
+
+    /** El mensaje de error que se puede mostrar en el log */
     private final String loggerMessage;
 
 // ------------------------------------------------------------------------------------------------------------------ \\

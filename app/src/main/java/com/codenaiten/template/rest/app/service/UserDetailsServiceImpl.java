@@ -18,6 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
+    /** Repository relacionado con las entidades de tipo {@link Account} */
     private final AccountRepository accountRepository;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -25,11 +26,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public UserDetails loadUserByUsername( final String login ) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername( final String login ) throws UsernameNotFoundException{
+        // Step 01: Get account by Email
         Optional<Account> result = this.accountRepository.findByEmail( login );
+
+        // Step 02: If not found, try to get account by Username
         if( result.isEmpty() ) result = this.accountRepository.findByOwner_Username( login );
+
+        // Step 03: If not found, try to get account by ID
         if( result.isEmpty() ){
             try {
+                // Convert login to UUID and try to get account by ID
                 final UUID uuid = UUID.fromString( login );
                 result = this.accountRepository.findByOwner_Id( uuid );
             }
@@ -38,7 +45,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             }
         }
 
+        // Step 04: If found get account, otherwise throw exception
         final Account account = result.orElseThrow( () -> new UsernameNotFoundException( login ));
+
+        // Step 05: Create AuthenticatedUser and return
         return new AuthenticatedUser( account );
     }
 

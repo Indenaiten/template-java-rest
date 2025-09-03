@@ -43,6 +43,12 @@ public class User extends BaseEntity<UUID> {
 // ---| GETTERS |---------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /**
+     * Obtiene el apellido del {@link User}.
+     *
+     * @return {@link Optional} con el {@link String} que representa el apellido del {@link User} si existe,
+     *         {@link Optional#empty()} en caso contrario.
+     */
     public Optional<String> getSurname(){
         return Optional.ofNullable( this.surname );
     }

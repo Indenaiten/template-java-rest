@@ -1,9 +1,16 @@
 package com.codenaiten.template.rest.app.vo.account;
 
 import com.codenaiten.template.rest.app.AppMessage;
+import com.codenaiten.template.rest.app.entity.Account;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
 import com.codenaiten.template.rest.app.vo.ValueObject;
 
+/**
+ * Value Object que representa la contraseña de una {@link Account}.
+ *
+ * @see ValueObject
+ * @see String
+ */
 public class AccountPassword extends ValueObject<String> {
 
     /** Longitud mínima de la contraseña de la cuenta de un usuario */
@@ -19,6 +26,11 @@ public class AccountPassword extends ValueObject<String> {
 // ---| CONSTRUCTOR |------------------------------------------------------------------------------------------------ \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /**
+     * Constructor que crea un {@link AccountPassword} a partir de un {@link String}.
+     *
+     * @param value {@link String} que representa el valor del {@link AccountPassword}.
+     */
     public AccountPassword( final String value ){
         super( value );
         if( value.length() < MIN_SIZE )
@@ -33,6 +45,13 @@ public class AccountPassword extends ValueObject<String> {
 // ---| VALIDATION |------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /**
+     * Valida si el valor de un {@link AccountPassword} es valido.
+     *
+     * @param value {@link String} que representa el valor del {@link AccountPassword}.
+     *
+     * @return {@code true} si el valor del {@link AccountPassword} es valido, {@code false} en caso contrario.
+     */
     public static boolean test( final String value ){
         return test( () -> new AccountPassword( value ));
     }

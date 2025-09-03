@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.app.authentication.impl;
 
-import com.codenaiten.template.rest.app.authentication.SecurityUtils;
+import com.codenaiten.template.rest.app.authentication.SecurityHelper;
 import com.codenaiten.template.rest.app.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SecurityUtilsImpl implements SecurityUtils {
+public class SecurityHelperImpl implements SecurityHelper {
 
     private final SecurityProperties securityProperties;
     private final PathMatcher pathMatcher;

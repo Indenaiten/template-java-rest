@@ -10,6 +10,10 @@ import java.util.Optional;
  */
 public abstract class Properties {
 
+// ------------------------------------------------------------------------------------------------------------------ \\
+// ---| HELPER METHODS |--------------------------------------------------------------------------------------------- \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
     /**
      * Convierte una cadena de texto en una lista de cadenas de texto.
      * Ejemplos:
@@ -28,6 +32,7 @@ public abstract class Properties {
                 .toList();
     }
 
+// ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
      * Obtiene un {@link Optional} a partir de un valor.
@@ -41,4 +46,7 @@ public abstract class Properties {
         if( value instanceof String valueString && valueString.isBlank() ) return Optional.empty();
         return Optional.ofNullable( value );
     }
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
 }

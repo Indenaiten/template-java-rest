@@ -17,18 +17,25 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class ConfigurationServiceImpl implements ConfigurationService{
 
+    /** Properties con información relacionada con la configuración del lenguaje del sistema */
     private final LocaleProperties localeProperties;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /** Policy que comprueba si un lenguaje es soportado */
     private LanguageSupportedPolicy languageSupportedPolicy;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| INITIALIZER |------------------------------------------------------------------------------------------------ \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /**
+     * Inicializa las propiedades necesarias que no son beans de Spring y que pueden requerir dependencias que si son
+     * beans de Spring, después de construir la clase.
+     */
     @PostConstruct
     public void init(){
+        // LanguageSupportedPolicy
         this.languageSupportedPolicy = new LanguageSupportedPolicy( this.localeProperties );
     }
 
@@ -38,20 +45,28 @@ public class ConfigurationServiceImpl implements ConfigurationService{
 
     @Override
     public void lang( final Locale lang ){
+        // Step 01: Check if language is supported
         this.languageSupportedPolicy.check( lang );
+
+        // Step 02: Set new Locale
         LocaleContextHolder.setLocale( lang );
     }
 
+// ------------------------------------------------------------------------------------------------------------------ \\
+
     @Override
-    public Locale getLang() {
+    public Locale getLang(){
+        // Step 01: Get current Locale
         return LocaleContextHolder.getLocale();
     }
 
+// ------------------------------------------------------------------------------------------------------------------ \\
+
     @Override
-    public List<Locale> getSupportedLanguages() {
+    public List<Locale> getSupportedLanguages(){
+        // Step 01: Get supported languages
         return this.localeProperties.getSupportedLocales();
     }
-
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 

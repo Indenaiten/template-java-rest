@@ -3,6 +3,12 @@ package com.codenaiten.template.rest.app.vo;
 import com.codenaiten.template.rest.app.AppMessage;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
 
+/**
+ * Value Object que representa un correo electrónico.
+ *
+ * @see ValueObject
+ * @see String
+ */
 public class Email extends ValueObject<String>{
 
     /** Longitud mínima del correo electrónico */
@@ -18,6 +24,11 @@ public class Email extends ValueObject<String>{
 // ---| CONSTRUCTOR |------------------------------------------------------------------------------------------------ \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /**
+     * Constructor que crea un {@link Email} a partir de un {@link String}.
+     *
+     * @param value {@link String} que representa el valor del {@link Email}.
+     */
     public Email( final String value ){
         super( value );
         if( value.length() < MIN_SIZE )
@@ -32,6 +43,13 @@ public class Email extends ValueObject<String>{
 // ---| VALIDATION |------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    /**
+     * Valida si el valor de un {@link Email} es valido.
+     *
+     * @param value {@link String} que representa el valor del {@link Email}.
+     *
+     * @return {@code true} si el valor del {@link Email} es valido, {@code false} en caso contrario.
+     */
     public static boolean test( final String value ){
         return test( () -> new Email( value ));
     }

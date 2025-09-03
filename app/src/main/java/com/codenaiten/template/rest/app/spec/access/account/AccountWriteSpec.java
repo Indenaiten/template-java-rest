@@ -8,10 +8,17 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 
+/**
+ * Specification que permite comprobar si se tiene permiso para actualizar los recursos de tipo {@link Account}.
+ *
+ * @see Specification
+ * @see Account
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class AccountWriteSpec implements Specification<Account> {
 
+    /** {@link Account} que se requiere actualizar */
     private final Account account;
 
 // ------------------------------------------------------------------------------------------------------------------ \\

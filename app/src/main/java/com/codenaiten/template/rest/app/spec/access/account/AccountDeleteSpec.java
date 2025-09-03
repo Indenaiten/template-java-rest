@@ -8,10 +8,17 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 
+/**
+ * Specification que permite comprobar si se tiene permiso para eliminar los recursos de tipo {@link Account}.
+ *
+ * @see Specification
+ * @see Account
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class AccountDeleteSpec implements Specification<Account> {
 
+    /** {@link Account} que se requiere eliminar */
     private final Account account;
 
 // ------------------------------------------------------------------------------------------------------------------ \\

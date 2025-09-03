@@ -27,7 +27,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class TokenJwtManagerImpl implements TokenJwtManager {
 
-    private static final String MESSAGE_INVALID_TOKEN = "Invalid token";
     private static final String CLAIM_VERSION = "version";
     private static final String CLAIM_ACCOUNT = "account";
     private static final String CLAIM_USER = "user";

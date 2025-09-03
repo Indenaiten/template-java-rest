@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MessageI18nManagerImpl implements MessageI18nManager{
 
+    /** MessageSource de Spring que permite obtener mensajes de un archivo de propiedades */
     private final MessageSource messageSource;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
