@@ -7,7 +7,6 @@ import com.codenaiten.template.rest.app.exception.validation.ValidationException
 import com.codenaiten.template.rest.app.vo.Timestamp;
 import com.codenaiten.template.rest.app.vo.image.ImageContentType;
 import com.codenaiten.template.rest.app.vo.image.ImageId;
-import com.codenaiten.template.rest.app.vo.user.UserSurname;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,25 +63,6 @@ public class ImageFactory {
 
     // -------------------------------------------------------------------------------------------------------------- \\
 
-        /** Información opcional de la clave de la {@link Image} */
-        private String key;
-
-    // -------------------------------------------------------------------------------------------------------------- \\
-
-        /**
-         * Permite asignar el key de la {@link Image}.
-         *
-         * @param key {@link UserSurname} que representa el apellido del {@link User}.
-         *
-         * @return {@link UserFactory.Factory} con el {@link UserSurname} asignado.
-         */
-        public Factory key( final String key ){
-            this.key = key;
-            return this;
-        }
-
-    // -------------------------------------------------------------------------------------------------------------- \\
-
         /**
          * Permite crear un objeto de tipo {@link Image} a partir de los datos proporcionados en el {@link Factory}.
          *
@@ -105,7 +85,7 @@ public class ImageFactory {
             // Step 01: Create Image and return
             final Timestamp now = Timestamp.now();
             return Image.builder().id( id.value() ).owner( this.owner ).contentType( this.imageContentType )
-                    .size( this.size ).key( this.key ).createdAt( now.value() ).updatedAt( now.value() ).build();
+                    .size( this.size ).createdAt( now.value() ).updatedAt( now.value() ).build();
         }
     }
 

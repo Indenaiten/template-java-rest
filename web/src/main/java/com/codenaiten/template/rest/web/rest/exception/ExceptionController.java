@@ -171,7 +171,7 @@ public class ExceptionController{
      */
     private ResponseEntity<ApiRestResponse<Empty>> handler( final Exception exception, final MessageI18n messageI18n, final Object... args ){
         // Step 01: Get i18n message
-        final String message = this.messageI18nManager.getMessage( messageI18n, LogLevel.ERROR, args );
+        final String message = this.messageI18nManager.getMessage( messageI18n, args );
 
         // Step 02: Build wrapper response
         ApiRestResponse<Empty> response = ApiRestResponse.error().message( message ).build();

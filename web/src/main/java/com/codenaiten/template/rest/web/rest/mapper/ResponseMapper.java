@@ -6,7 +6,6 @@ import com.codenaiten.template.rest.app.dto.result.LoginResult;
 import com.codenaiten.template.rest.app.dto.result.UserInfoResult;
 import com.codenaiten.template.rest.app.mapper.OptionalMapper;
 import com.codenaiten.template.rest.app.mapper.TemporalMapper;
-import com.codenaiten.template.rest.app.mapper.ValueObjectMapper;
 import com.codenaiten.template.rest.web.rest.dto.response.AccountInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.response.ImageInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.response.LoginResponse;
@@ -15,7 +14,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper( componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-         uses = { OptionalMapper.class, TemporalMapper.class, ValueObjectMapper.class })
+         uses = { OptionalMapper.class, TemporalMapper.class })
 public interface ResponseMapper {
 
 // ------------------------------------------------------------------------------------------------------------------ \\

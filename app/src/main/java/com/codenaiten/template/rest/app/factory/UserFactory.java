@@ -1,11 +1,13 @@
 package com.codenaiten.template.rest.app.factory;
 
 import com.codenaiten.template.rest.app.AppMessage;
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
 import com.codenaiten.template.rest.app.policy.UserMinimumAgePolicy;
 import com.codenaiten.template.rest.app.policy.UserUsernameUniquenessPolicy;
 import com.codenaiten.template.rest.app.vo.Timestamp;
+import com.codenaiten.template.rest.app.vo.image.ImageId;
 import com.codenaiten.template.rest.app.vo.user.UserId;
 import com.codenaiten.template.rest.app.vo.user.UserName;
 import com.codenaiten.template.rest.app.vo.user.UserSurname;
@@ -16,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Factory que permite crear objetos de tipo {@link User}.
@@ -74,10 +77,25 @@ public class UserFactory {
 
     // -------------------------------------------------------------------------------------------------------------- \\
 
+        /** Información opcional del {@link ImageId} de la {@link Image} que representa la image de perfil del {@link User} */
+        private UUID image;
+
         /** Información opcional del {@link UserSurname} del {@link User} */
         private String surname;
 
     // -------------------------------------------------------------------------------------------------------------- \\
+
+        /**
+         * Permite asignar el {@link ImageId} de la {@link Image} que representa la image de perfil del {@link User}.
+         *
+         * @param image {@link ImageId} que representa el id de la imagen de perfil del {@link User}.
+         *
+         * @return {@link Factory} con el {@link ImageId} asignado.
+         */
+        public Factory image( final ImageId image ){
+            this.image = Optional.ofNullable( image ).map( ImageId::value ).orElse( null );
+            return this;
+        }
 
         /**
          * Permite asignar el {@link UserSurname} del {@link User}.
@@ -108,8 +126,9 @@ public class UserFactory {
             // Step 03: Create User and return
             final UserId id = UserId.random();
             final Timestamp now = Timestamp.now();
-            return User.builder().id( id.value() ).username( this.username ).name( this.name ).surname( this.surname )
-                    .birthdate( this.birthdate ).createdAt( now.value() ).updatedAt( now.value() ).build();
+            return User.builder().id( id.value() ).image( this.image ).username( this.username ).name( this.name )
+                    .surname( this.surname ).birthdate( this.birthdate ).createdAt( now.value() ).updatedAt( now.value() )
+                    .build();
         }
     }
 

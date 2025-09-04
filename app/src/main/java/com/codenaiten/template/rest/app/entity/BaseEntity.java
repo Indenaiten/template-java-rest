@@ -33,9 +33,9 @@ public abstract class BaseEntity<T extends Serializable> {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Obtiene el identificador de la @{link BaseEntity}.
+     * Obtiene el identificador de la {@link BaseEntity}.
      *
-     * @return {@link T} que representa el identificador de la @{link BaseEntity}.
+     * @return {@link T} que representa el identificador de la {@link BaseEntity}.
      */
     @EqualsAndHashCode.Include
     abstract T getId();
@@ -66,9 +66,9 @@ public abstract class BaseEntity<T extends Serializable> {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Obtiene el identificador {@link T} de la @{link BaseEntity} en formato {@link String}.
+     * Obtiene el identificador {@link T} de la {@link BaseEntity} en formato {@link String}.
      *
-     * @return {@link String} con el identificador {@link T} de la @{link BaseEntity}.
+     * @return {@link String} con el identificador {@link T} de la {@link BaseEntity}.
      */
     @Override
     public String toString() {

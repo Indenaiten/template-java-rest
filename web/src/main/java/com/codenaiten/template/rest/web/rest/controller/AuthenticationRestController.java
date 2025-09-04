@@ -33,7 +33,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.Objects;
@@ -73,9 +72,9 @@ public class AuthenticationRestController implements AuthenticationApiRest {
 
     @Override
     @SneakyThrows
-    public ResponseEntity<ApiRestResponse<AccountInfoResponse>> register( final RegisterRequest request, final MultipartFile image ){
+    public ResponseEntity<ApiRestResponse<AccountInfoResponse>> register( final RegisterRequest request ){
         // Step 01: Create command
-        final RegisterCommand command = this.commandMapper.toCommand( request, image );
+        final RegisterCommand command = this.commandMapper.toCommand( request );
 
         // Step 02: Run use case
         final AccountInfoResult result = this.authenticationService.register( command );

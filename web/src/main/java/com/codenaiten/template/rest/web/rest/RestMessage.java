@@ -1,6 +1,7 @@
 package com.codenaiten.template.rest.web.rest;
 
 import com.codenaiten.template.rest.app.entity.Account;
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.i18n.MessageI18n;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
@@ -42,6 +43,13 @@ public enum RestMessage implements MessageI18n {
     SUCCESS_AUTH_LOGOUT( "rest.success.auth.logout", "User successfully logged out" ),
     /** Mensaje de éxito que se utiliza cuando se han invalidado todos los token de acceso de un usuario correctamente. */
     SUCCESS_AUTH_INVALIDATE( "rest.success.auth.invalidate", "User successfully revoked all tokens" ),
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+// ---| IMAGE |------------------------------------------------------------------------------------------------------ \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    /** Mensaje de éxito que se utiliza cuando se crea una nueva {@link Image} correctamente. */
+    SUCCESS_IMAGE_CREATE( "rest.success.image.create", "Image successfully created" ),
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| ACCOUNT |---------------------------------------------------------------------------------------------------- \\

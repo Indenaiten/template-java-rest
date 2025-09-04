@@ -1,26 +1,24 @@
 package com.codenaiten.template.rest.app.dto.command.account;
 
 import com.codenaiten.template.rest.app.entity.Account;
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
 import com.codenaiten.template.rest.app.vo.account.AccountRole;
-import com.codenaiten.template.rest.app.vo.image.ImageContentType;
+import com.codenaiten.template.rest.app.vo.image.ImageId;
 import com.codenaiten.template.rest.app.vo.user.UserName;
 import com.codenaiten.template.rest.app.vo.user.UserSurname;
 import com.codenaiten.template.rest.app.vo.user.UserUsername;
 
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.Locale;
 
 /**
  * DTO Command que contiene los datos de creación de una nueva {@link Account}.
  *
- * @param image {@link Array} de {@code byte} que representa la imagen de perfil del {@link User}.
- * @param imageContentType {@link ImageContentType} que representa el tipo de contenido de la imagen de perfil del {@link User}.
- * @param imageSize {@link Long} que representa el tamaño del contenido de la imagen de perfil del {@link User}.
  * @param lang {@link Locale} que representa el lenguaje de la {@link Account}.
+ * @param image {@link ImageId} de la {@link Image} que representa la imagen de perfil del {@link User}.
  * @param role {@link AccountRole} que representa el role de la {@link Account}.
  * @param username {@link UserUsername} que representa el username del {@link User} de la {@link Account}.
  * @param email {@link Email} que representa el email de la {@link Account}.
@@ -30,10 +28,8 @@ import java.util.Locale;
  * @param password {@link AccountPassword} que representa la contraseña de la {@link Account}.
  */
 public record CreateAccountCommand(
-        byte[] image,
-        ImageContentType imageContentType,
-        Long imageSize,
         Locale lang,
+        ImageId image,
         AccountRole role,
         UserUsername username,
         Email email,

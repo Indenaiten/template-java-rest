@@ -4,6 +4,8 @@ import com.codenaiten.template.rest.app.api.UserService;
 import com.codenaiten.template.rest.app.dto.command.PageableCommand;
 import com.codenaiten.template.rest.app.dto.command.user.FilterUserCommand;
 import com.codenaiten.template.rest.app.dto.command.user.UpdateUserCommand;
+import com.codenaiten.template.rest.app.dto.result.ImageContentResult;
+import com.codenaiten.template.rest.app.dto.result.ImageInfoResult;
 import com.codenaiten.template.rest.app.dto.result.PageResult;
 import com.codenaiten.template.rest.app.dto.result.UserInfoResult;
 import com.codenaiten.template.rest.app.i18n.MessageI18nManager;
@@ -20,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -171,6 +174,36 @@ public class UserRestController implements UserApiRest{
 
         // Step 06: Return response
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
+    }
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Override
+    public ResponseEntity<byte[]> viewImageProfileById( final UserId id ){
+        // Step 01: Run use case
+        final ImageContentResult result = this.userService.image( id );
+
+        // Step 02: Return response
+        final ImageInfoResult info = result.getInfo();
+        return ResponseEntity.status( HttpStatus.OK )
+                .contentType( MediaType.parseMediaType( info.getContentType() ))
+                .contentLength( info.getSize() )
+                .body( result.getBytes() );
+    }
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Override
+    public ResponseEntity<byte[]> viewMyImageProfile(){
+        // Step 01: Run use case
+        final ImageContentResult result = this.userService.image();
+
+        // Step 02: Return response
+        final ImageInfoResult info = result.getInfo();
+        return ResponseEntity.status( HttpStatus.OK )
+                .contentType( MediaType.parseMediaType( info.getContentType() ))
+                .contentLength( info.getSize() )
+                .body( result.getBytes() );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

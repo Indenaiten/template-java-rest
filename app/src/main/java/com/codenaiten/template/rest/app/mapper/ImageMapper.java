@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper( componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-         uses = { OptionalMapper.class, TemporalMapper.class, ValueObjectMapper.class })
+         uses = { OptionalMapper.class, TemporalMapper.class })
 public interface ImageMapper {
 
 // ------------------------------------------------------------------------------------------------------------------ \\

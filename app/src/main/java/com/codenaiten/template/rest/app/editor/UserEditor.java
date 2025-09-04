@@ -1,11 +1,13 @@
 package com.codenaiten.template.rest.app.editor;
 
 import com.codenaiten.template.rest.app.AppMessage;
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
 import com.codenaiten.template.rest.app.policy.UserMinimumAgePolicy;
 import com.codenaiten.template.rest.app.policy.UserUsernameUniquenessPolicy;
 import com.codenaiten.template.rest.app.vo.Timestamp;
+import com.codenaiten.template.rest.app.vo.image.ImageId;
 import com.codenaiten.template.rest.app.vo.user.UserName;
 import com.codenaiten.template.rest.app.vo.user.UserSurname;
 import com.codenaiten.template.rest.app.vo.user.UserUsername;
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Editor que permite actualizar objetos de tipo {@link User}.
@@ -58,6 +61,9 @@ public class UserEditor {
 
     // -------------------------------------------------------------------------------------------------------------- \\
 
+        /** Información del {@link ImageId} de la {@link Image} que representa la imagen de perfil del {@link User} */
+        private UUID image;
+
         /** Información del {@link UserUsername} que se va a actualizar en la instancia del {@link User} */
         private String username;
 
@@ -80,6 +86,7 @@ public class UserEditor {
          */
         public Editor( final User user ){
             this.user = user;
+            this.image = user.getImage().orElse( null );
             this.username = user.getUsername();
             this.name = user.getName();
             this.surname = user.getSurname().orElse( null );
@@ -87,6 +94,19 @@ public class UserEditor {
         }
 
     // -------------------------------------------------------------------------------------------------------------- \\
+
+        /**
+         * Permite asignar un nuevo {@link ImageId} de la {@link Image} que representa la nueva imagen de perfil del
+         * {@link User}.
+         *
+         * @param image {@link ImageId} de la {@link Image} que representa la nueva imagen de perfil del {@link User}.
+         *
+         * @return {@link Editor} con el nuevo {@link ImageId} asignado.
+         */
+        public Editor image( final ImageId image ){
+            this.image = Optional.ofNullable( image ).map( ImageId::value ).orElse( null );
+            return this;
+        }
 
         /**
          * Permite asignar un nuevo {@link UserUsername} en el {@link User} proporcionado en el {@link Editor}.
@@ -166,7 +186,8 @@ public class UserEditor {
          * @return {@code true} si hay cambios, {@code false} en caso contrario.
          */
         public boolean hasChanges() {
-            return !Objects.equals( this.username, this.user.getUsername() ) ||
+            return !Objects.equals( this.image, this.user.getImage().orElse( null )) ||
+                   !Objects.equals( this.username, this.user.getUsername() ) ||
                    !Objects.equals( this.name, this.user.getName() ) ||
                    !Objects.equals( this.surname, this.user.getSurname().orElse( null )) ||
                    !Objects.equals( this.birthdate, this.user.getBirthdate() );
@@ -179,6 +200,7 @@ public class UserEditor {
          */
         public void apply(){
             if( this.hasChanges() ){
+                this.user.setImage( this.image );
                 this.user.setUsername( this.username );
                 this.user.setName( this.name );
                 this.user.setSurname( this.surname );

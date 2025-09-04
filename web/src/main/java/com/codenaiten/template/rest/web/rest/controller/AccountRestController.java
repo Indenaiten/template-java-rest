@@ -8,7 +8,6 @@ import com.codenaiten.template.rest.app.dto.command.account.UpdateAccountCommand
 import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
 import com.codenaiten.template.rest.app.dto.result.PageResult;
 import com.codenaiten.template.rest.app.i18n.MessageI18nManager;
-import com.codenaiten.template.rest.app.mapper.ValueObjectMapper;
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
@@ -30,7 +29,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.List;
@@ -46,9 +44,6 @@ public class AccountRestController implements AccountApiRest {
 
     /** Service de cuentas de usuario del sistema */
     private final AccountService accountService;
-
-    /** Mapper de objetos relacionados con los {@link ValueObjectMapper} */
-    private final ValueObjectMapper valueObjectMapper;
 
     /** Mapper de objetos relacionados con los DTO de Request/Command */
     private final CommandMapper commandMapper;
@@ -173,10 +168,9 @@ public class AccountRestController implements AccountApiRest {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public ResponseEntity<ApiRestResponse<AccountInfoResponse>> create(
-            final CreateAccountRequest request, final MultipartFile image ){
+    public ResponseEntity<ApiRestResponse<AccountInfoResponse>> create( final CreateAccountRequest request ){
         // Step 01: Create command
-        final CreateAccountCommand command = this.commandMapper.toCommand( request, image );
+        final CreateAccountCommand command = this.commandMapper.toCommand( request );
 
         // Step 02: Run use case
         final AccountInfoResult result = this.accountService.create( command );
@@ -246,8 +240,8 @@ public class AccountRestController implements AccountApiRest {
     @Override
     public ResponseEntity<ApiRestResponse<AccountInfoResponse>> updateEmail( final UpdateAccountEmailRequest request ){
         // Step 01: Get data from request
-        final AccountPassword password = this.valueObjectMapper.toAccountPassword( request.password() );
-        final Email email = this.valueObjectMapper.toEmail( request.newEmail() );
+        final AccountPassword password = request.password();
+        final Email email = request.newEmail();
 
         // Step 02: Run use case
         final AccountInfoResult result = this.accountService.updateEmail( password, email );
@@ -270,8 +264,8 @@ public class AccountRestController implements AccountApiRest {
     @Override
     public ResponseEntity<ApiRestResponse<AccountInfoResponse>> updatePassword( final UpdateAccountPasswordRequest request ){
         // Step 01: Get data from request
-        final AccountPassword password = this.valueObjectMapper.toAccountPassword( request.password() );
-        final AccountPassword newPassword = this.valueObjectMapper.toAccountPassword( request.newPassword() );
+        final AccountPassword password = request.password();
+        final AccountPassword newPassword = request.newPassword();
 
         // Step 02: Run use case
         final AccountInfoResult result = this.accountService.updatePassword( password, newPassword );
@@ -314,7 +308,7 @@ public class AccountRestController implements AccountApiRest {
     @Override
     public ResponseEntity<ApiRestResponse<AccountInfoResponse>> delete( final DeleteAccountRequest request ){
         // Step 01: Get data from request
-        final AccountPassword password = this.valueObjectMapper.toAccountPassword( request.password() );
+        final AccountPassword password = request.password();
 
         // Step 02: Run use case
         final AccountInfoResult result = this.accountService.delete( password );

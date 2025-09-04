@@ -4,6 +4,7 @@ import com.codenaiten.template.rest.app.AppMessage;
 import com.codenaiten.template.rest.app.entity.Account;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
 import com.codenaiten.template.rest.app.vo.BaseValueObject;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 import java.util.UUID;
 
@@ -49,6 +50,7 @@ public class AccountId extends BaseValueObject<UUID> {
      *
      * @return {@link AccountId} que representa el valor del {@link AccountId}.
      */
+    @JsonCreator
     public static AccountId of( final String value ){
         final UUID id;
         try{ id = UUID.fromString( value ); }

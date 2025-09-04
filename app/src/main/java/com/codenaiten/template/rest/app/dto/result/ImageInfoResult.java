@@ -34,6 +34,9 @@ public class ImageInfoResult implements Serializable {
     /** El {@link ImageContentType} de la {@link Image} */
     private final String contentType;
 
+    /** El Content Size de la {@link Image} */
+    private final Long size;
+
     /** El {@link Timestamp} con la fecha y hora de creación de la {@link Image} */
     private final LocalDateTime createdAt;
 

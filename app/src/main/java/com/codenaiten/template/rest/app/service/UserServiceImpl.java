@@ -9,26 +9,24 @@ import com.codenaiten.template.rest.app.dto.result.ImageContentResult;
 import com.codenaiten.template.rest.app.dto.result.ImageInfoResult;
 import com.codenaiten.template.rest.app.dto.result.PageResult;
 import com.codenaiten.template.rest.app.dto.result.UserInfoResult;
-import com.codenaiten.template.rest.app.editor.ImageEditor;
 import com.codenaiten.template.rest.app.editor.UserEditor;
 import com.codenaiten.template.rest.app.entity.Account;
 import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.data.found.ImageNotFoundByIdException;
+import com.codenaiten.template.rest.app.exception.data.found.UserImageProfileNotExistsException;
 import com.codenaiten.template.rest.app.exception.data.found.UserNotFoundByIdException;
 import com.codenaiten.template.rest.app.exception.security.AuthNotFoundException;
-import com.codenaiten.template.rest.app.factory.ImageFactory;
 import com.codenaiten.template.rest.app.file.ImageFileManager;
 import com.codenaiten.template.rest.app.mapper.ImageMapper;
 import com.codenaiten.template.rest.app.mapper.UserMapper;
-import com.codenaiten.template.rest.app.mapper.ValueObjectMapper;
+import com.codenaiten.template.rest.app.policy.ImageAccessPolicy;
 import com.codenaiten.template.rest.app.policy.UserAccessPolicy;
 import com.codenaiten.template.rest.app.policy.UserMinimumAgePolicy;
 import com.codenaiten.template.rest.app.policy.UserUsernameUniquenessPolicy;
 import com.codenaiten.template.rest.app.properties.AppProperties;
 import com.codenaiten.template.rest.app.repository.ImageRepository;
 import com.codenaiten.template.rest.app.repository.UserRepository;
-import com.codenaiten.template.rest.app.vo.ValueObject;
 import com.codenaiten.template.rest.app.vo.image.ImageId;
 import com.codenaiten.template.rest.app.vo.user.UserId;
 import com.codenaiten.template.rest.app.vo.user.UserName;
@@ -69,9 +67,6 @@ public class UserServiceImpl implements UserService {
     /** Repository relacionado con las entidades de tipo {@link User} */
     private final UserRepository userRepository;
 
-    /** Mapper principal de objetos relacionados con los {@link ValueObject} */
-    private final ValueObjectMapper valueObjectMapper;
-
     /** Mapper principal de objetos relacionados con las {@link Image} */
     private final ImageMapper imageMapper;
 
@@ -80,14 +75,11 @@ public class UserServiceImpl implements UserService {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    /** Factory para crear entidades de tipo {@link Image} */
-    private ImageFactory imageFactory;
-
-    /** Editor para actualizar entidades de tipo {@link Image} */
-    private ImageEditor imageEditor;
-
     /** Editor para actualizar entidades de tipo {@link User} */
     private UserEditor userEditor;
+
+    /** Policy relacionado con las políticas de acceso de las {@link Image} */
+    private ImageAccessPolicy imageAccessPolicy;
 
     /** Policy relacionado con las políticas de acceso de los {@link User} */
     private UserAccessPolicy userAccessPolicy;
@@ -102,16 +94,13 @@ public class UserServiceImpl implements UserService {
      */
     @PostConstruct
     public void init(){
-        // ImageFactory & ImageEditor
-        this.imageFactory = new ImageFactory();
-        this.imageEditor = new ImageEditor();
-
         // UserEditor
         var userUsernameUniquenessPolicy = new UserUsernameUniquenessPolicy( this.userRepository );
         var userMinimumAgePolicy = new UserMinimumAgePolicy( this.appProperties );
         this.userEditor = new UserEditor( userUsernameUniquenessPolicy, userMinimumAgePolicy );
 
-        // UserAccessPolicy
+        // ImageAccessPolicy & UserAccessPolicy
+        this.imageAccessPolicy = new ImageAccessPolicy();
         this.userAccessPolicy = new UserAccessPolicy();
     }
 
@@ -209,23 +198,33 @@ public class UserServiceImpl implements UserService {
         this.userAccessPolicy.checkWrite( requester, user );
 
         // Step 03: Get provided data
+        final ImageId imageId = command.image();
         final UserUsername username = command.username();
         final UserName name = command.name();
         final UserSurname surname = command.surname();
         final LocalDate birthdate = command.birthdate();
 
-        // Step 04: Update user
-        final UserEditor.Editor editor = this.userEditor.update( user );
-        editor.username( username ).name( name ).surname( surname ).birthdate( birthdate );
+        // Step 04: Check if exists image if image ID is provided
+        if( Objects.nonNull( imageId )){
+            final Image image = this.imageRepository.findById( imageId.value() )
+                    .orElseThrow( () -> new ImageNotFoundByIdException( imageId ));
 
-        // Step 05: Save user changes
+            // Check if current user has read access to image
+            this.imageAccessPolicy.checkRead( requester, image );
+        }
+
+        // Step 05: Update user
+        final UserEditor.Editor editor = this.userEditor.update( user );
+        editor.image( imageId ).username( username ).name( name ).surname( surname ).birthdate( birthdate );
+
+        // Step 06: Save user changes
         if( editor.hasChanges() ){ // If editor has changes
             // Apply changes and save new data
             editor.apply();
             this.userRepository.save( user );
         }
 
-        // Step 06: Convert to Result and return
+        // Step 07: Convert to Result and return
         return this.userMapper.toInfoResult( user );
     }
 
@@ -239,14 +238,24 @@ public class UserServiceImpl implements UserService {
         final User user = requester.getOwner();
 
         // Step 02: Get provided data
+        final ImageId imageId = command.image();
         final UserUsername username = command.username();
         final UserName name = command.name();
         final UserSurname surname = command.surname();
         final LocalDate birthdate = command.birthdate();
 
-        // Step 03: Update user
+        // Step 03: Check if exists image if image ID is provided
+        if( Objects.nonNull( imageId )){
+            final Image image = this.imageRepository.findById( imageId.value() )
+                    .orElseThrow( () -> new ImageNotFoundByIdException( imageId ));
+
+            // Check if current user has read access to image
+            this.imageAccessPolicy.checkRead( requester, image );
+        }
+
+        // Step 04: Update user
         final UserEditor.Editor editor = this.userEditor.update( user );
-        editor.username( username ).name( name ).surname( surname ).birthdate( birthdate );
+        editor.image( imageId ).username( username ).name( name ).surname( surname ).birthdate( birthdate );
 
         // Step 04: Save user changes
         if( editor.hasChanges() ){ // If editor has changes
@@ -264,22 +273,28 @@ public class UserServiceImpl implements UserService {
     @Override
     @SneakyThrows( IOException.class )
     public ImageContentResult image( final UserId id ){
-        // Step 01: Find User by ID
+        // Step 01: Get authenticated user
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+
+        // Step 02: Find User by ID
         final User user = this.userRepository.findById( id.value() ).orElseThrow( () -> new UserNotFoundByIdException( id ));
 
-        // Step 02: Get Image Profile
-        final ImageId imageId = this.valueObjectMapper.toImageId( user.getId() );
+        // Step 03: Check if current user has image profile
+        if( user.getImage().isEmpty() ) throw new UserImageProfileNotExistsException( new UserId( requester.getId() ));
+
+        // Step 04: Get Image Profile
+        final ImageId imageId = new ImageId( user.getId() );
         final Image image = this.imageRepository.findById( imageId.value() )
                 .orElseThrow( () -> new ImageNotFoundByIdException( imageId ));
 
-        // Step 03: Convert to Result and return
+        // Step 05: Convert to Result and return
         final ImageInfoResult info = this.imageMapper.toInfoResult( image );
 
-        // Step 04: Get Image content
+        // Step 06: Get Image content
         final File file = this.imageFileManager.get( imageId );
         final byte[] content = this.imageFileManager.read( file );
 
-        // Step 05: Create result and return
+        // Step 07: Create result and return
         return new ImageContentResult( info, content );
     }
 
@@ -289,22 +304,25 @@ public class UserServiceImpl implements UserService {
     @SneakyThrows( IOException.class )
     public ImageContentResult image(){
         // Step 01: Get authenticated user
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
-        final User user = requester.getOwner();
+        final Account requesterAccount = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+        final User requester = requesterAccount.getOwner();
 
-        // Step 02: Get Image Profile
-        final ImageId imageId = this.valueObjectMapper.toImageId( user.getId() );
+        // Step 02: Check if current user has image profile
+        if( requester.getImage().isEmpty() ) throw new UserImageProfileNotExistsException( new UserId( requester.getId() ));
+
+        // Step 03: Get Image Profile
+        final ImageId imageId = new ImageId( requester.getId() );
         final Image image = this.imageRepository.findById( imageId.value() )
                 .orElseThrow( () -> new ImageNotFoundByIdException( imageId ));
 
-        // Step 03: Convert to Result and return
+        // Step 04: Convert to Result and return
         final ImageInfoResult info = this.imageMapper.toInfoResult( image );
 
-        // Step 04: Get Image content
+        // Step 05: Get Image content
         final File file = this.imageFileManager.get( imageId );
         final byte[] content = this.imageFileManager.read( file );
 
-        // Step 05: Create result and return
+        // Step 06: Create result and return
         return new ImageContentResult( info, content );
     }
 

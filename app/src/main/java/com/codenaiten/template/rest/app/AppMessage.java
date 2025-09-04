@@ -102,10 +102,13 @@ public enum AppMessage implements MessageI18n {
 // ---| IMAGE |------------------------------------------------------------------------------------------------------ \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    // Security Error
+    /** Mensaje de error de seguridad que se utiliza cuando un {@link Account} no tiene acceso de lectura a una {@link Image}*/
+    ERROR_SECURITY_IMAGE_READ_NOT_ALLOWED( "app.error.security.image.read.not.allowed", "Read operation for Image ID \"%s\" not allowed: { AccountId: %s }" ),
+
     // Data Error
     /** Mensaje de error de datos que se utiliza cuando no se encuentra una {@link Image} en el sistema a partir de su identificador {@link ImageId} */
     ERROR_DATA_IMAGE_NOT_FOUND_BY_ID( "app.error.data.image.not.found.by.id", "Image not found by ID: %s" ),
-
 
     // Validation Error
     /** Mensaje de error de validación que se utiliza cuando el {@link User} propietario de la {@link Image} es {@code null} */

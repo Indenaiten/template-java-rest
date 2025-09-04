@@ -14,6 +14,7 @@ import com.codenaiten.template.rest.app.entity.Account;
 import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.data.found.AccountNotFoundByIdException;
+import com.codenaiten.template.rest.app.exception.data.found.ImageNotFoundByIdException;
 import com.codenaiten.template.rest.app.exception.security.AuthNotFoundException;
 import com.codenaiten.template.rest.app.exception.security.IncorrectPasswordException;
 import com.codenaiten.template.rest.app.factory.AccountFactory;
@@ -21,7 +22,6 @@ import com.codenaiten.template.rest.app.factory.ImageFactory;
 import com.codenaiten.template.rest.app.factory.UserFactory;
 import com.codenaiten.template.rest.app.file.ImageFileManager;
 import com.codenaiten.template.rest.app.mapper.AccountMapper;
-import com.codenaiten.template.rest.app.mapper.ValueObjectMapper;
 import com.codenaiten.template.rest.app.policy.*;
 import com.codenaiten.template.rest.app.properties.AppProperties;
 import com.codenaiten.template.rest.app.properties.LocaleProperties;
@@ -29,11 +29,9 @@ import com.codenaiten.template.rest.app.repository.AccountRepository;
 import com.codenaiten.template.rest.app.repository.ImageRepository;
 import com.codenaiten.template.rest.app.repository.UserRepository;
 import com.codenaiten.template.rest.app.vo.Email;
-import com.codenaiten.template.rest.app.vo.ValueObject;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
 import com.codenaiten.template.rest.app.vo.account.AccountRole;
-import com.codenaiten.template.rest.app.vo.image.ImageContentType;
 import com.codenaiten.template.rest.app.vo.image.ImageId;
 import com.codenaiten.template.rest.app.vo.user.UserName;
 import com.codenaiten.template.rest.app.vo.user.UserSurname;
@@ -84,9 +82,6 @@ public class AccountServiceImpl implements AccountService {
     /** Repository relacionado con las entidades de tipo {@link User} */
     private final UserRepository userRepository;
 
-    /** Mapper principal de objetos relacionados con las {@link ValueObject} */
-    private final ValueObjectMapper valueObjectMapper;
-
     /** Mapper principal de objetos relacionados con las {@link Account} */
     private final AccountMapper accountMapper;
 
@@ -103,6 +98,9 @@ public class AccountServiceImpl implements AccountService {
 
     /** Factory para crear entidades de tipo {@link User} */
     private UserFactory userFactory;
+
+    /** Policy relacionado con las políticas de acceso de las {@link Image} */
+    private ImageAccessPolicy imageAccessPolicy;
 
     /** Policy relacionado con las políticas de acceso de las {@link Account} */
     private AccountAccessPolicy accountAccessPolicy;
@@ -132,7 +130,8 @@ public class AccountServiceImpl implements AccountService {
         var userMinimumAgePolicy = new UserMinimumAgePolicy( this.appProperties );
         this.userFactory = new UserFactory( userUsernameUniquenessPolicy, userMinimumAgePolicy );
 
-        // AccountAccessPolicy
+        // ImageAccessPolicy & AccountAccessPolicy
+        this.imageAccessPolicy = new ImageAccessPolicy();
         this.accountAccessPolicy = new AccountAccessPolicy();
     }
 
@@ -259,8 +258,7 @@ public class AccountServiceImpl implements AccountService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    @SneakyThrows( IOException.class )
-    @Transactional( rollbackFor = IOException.class )
+    @Transactional
     public AccountInfoResult create( final CreateAccountCommand command ){
         // Step 01: Get authenticated account
         final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
@@ -269,10 +267,8 @@ public class AccountServiceImpl implements AccountService {
         this.accountAccessPolicy.checkCreate( requester );
 
         // Step 03: Get provided data
-        final byte[] bytes = command.image();
-        final ImageContentType contentType = command.imageContentType();
-        final Long contentSize = command.imageSize();
         final Locale lang = command.lang();
+        final ImageId imageId = command.image();
         final AccountRole role = command.role();
         final UserUsername username = command.username();
         final Email email = command.email();
@@ -281,23 +277,24 @@ public class AccountServiceImpl implements AccountService {
         final UserSurname surname = command.surname();
         final LocalDate birthdate = command.birthdate();
 
+        // Step 04: Check if exists image if image ID is provided
+        if( Objects.nonNull( imageId )){
+            final Image image = this.imageRepository.findById( imageId.value() )
+                    .orElseThrow( () -> new ImageNotFoundByIdException( imageId ));
+
+            // Check if current user has read access to image
+            this.imageAccessPolicy.checkRead( requester, image );
+        }
+
         // Step 04: Create user and account
-        final User user = this.userFactory.create( username, name, birthdate ).surname( surname ).build();
+        final User user = this.userFactory.create( username, name, birthdate ).surname( surname ).image( imageId ).build();
         final Account account = this.accountFactory.create( user, email, password ).role( role ).lang( lang ).build();
 
         // Step 05: Save user and account
         this.userRepository.save( user );
         this.accountRepository.save( account );
 
-        // Step 06: Create image
-        if( Objects.nonNull( bytes ) && bytes.length > 0 ){
-            final ImageId imageId = this.valueObjectMapper.toImageId( user.getId() );
-            final Image image = this.imageFactory.create( user, contentType, contentSize ).build( imageId );
-            this.imageRepository.save( image );
-            this.imageFileManager.write( new ImageId( image.getId() ), bytes );
-        }
-
-        // Step 07: Convert to Result and return
+        // Step 06: Convert to Result and return
         return this.accountMapper.toInfoResult( account );
     }
 
@@ -425,7 +422,7 @@ public class AccountServiceImpl implements AccountService {
 
         // Step 04: Get Data
         final User user = account.getOwner();
-        final ImageId imageId = this.valueObjectMapper.toImageId( user.getId() );
+        final ImageId imageId = new ImageId( user.getId() );
 
         // Step 05: Delete account
         this.userRepository.delete( user );
@@ -453,7 +450,7 @@ public class AccountServiceImpl implements AccountService {
 
         // Step 03: Get Data
         final User user = requester.getOwner();
-        final ImageId imageId = this.valueObjectMapper.toImageId( user.getId() );
+        final ImageId imageId = new ImageId( user.getId() );
 
         // Step 04: Delete account
         this.userRepository.delete( user );

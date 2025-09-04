@@ -50,9 +50,6 @@ public class ImageEditor {
         /** Información del tamaño del contenido de la imagen que se va a actualizar en la instancia del {@link Image} */
         private Long size;
 
-        /** Información de la clave que se va a actualizar en la instancia del {@link Image} */
-        private String key;
-
     // -------------------------------------------------------------------------------------------------------------- \\
 
         /**
@@ -65,7 +62,6 @@ public class ImageEditor {
             this.image = image;
             this.contentType = image.getContentType();
             this.size = image.getSize();
-            this.key = image.getKey();
         }
 
     // -------------------------------------------------------------------------------------------------------------- \\
@@ -93,18 +89,6 @@ public class ImageEditor {
             return this;
         }
 
-        /**
-         * Permite asignar una nueva clave en el {@link Image} proporcionado en el {@link Editor}.
-         *
-         * @param key {@link String} que representa la nueva clave de la {@link Image}.
-         *
-         * @return {@link Editor} con la nueva clave de la {@link Image}.
-         */
-        public Editor key( final String key ){
-            this.key = key;
-            return this;
-        }
-
     // -------------------------------------------------------------------------------------------------------------- \\
 
         /**
@@ -115,8 +99,7 @@ public class ImageEditor {
          */
         public boolean hasChanges() {
             return !Objects.equals( this.contentType, this.image.getContentType() ) ||
-                   !Objects.equals( this.size, this.image.getSize() ) ||
-                   !Objects.equals( this.key, this.image.getKey() );
+                   !Objects.equals( this.size, this.image.getSize() );
         }
 
     // -------------------------------------------------------------------------------------------------------------- \\
@@ -128,7 +111,6 @@ public class ImageEditor {
             if( this.hasChanges() ){
                 this.image.setContentType( this.contentType );
                 this.image.setSize( this.size );
-                this.image.setKey( this.key );
                 this.image.setUpdatedAt( Timestamp.now().value() );
             }
         }

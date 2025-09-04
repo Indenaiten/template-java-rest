@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -32,6 +33,21 @@ public class Image extends BaseEntity<UUID> {
     @Column( name = "size", nullable = false )
     private Long size;
 
-    @Column( name = "key" )
-    private String key;
+// ------------------------------------------------------------------------------------------------------------------ \\
+// ---| CHECKERS |--------------------------------------------------------------------------------------------------- \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    /**
+     * Comprueba si un {@link User} es propietario de la {@link Image}.
+     *
+     * @param user {@link User} que se va a comprobar si es propietario.
+     *
+     * @return {@code true} si el {@link User} es propietario de la {@link Image}, {@code false} en caso contrario.
+     */
+    public boolean isOwner( final User user ){
+        return Objects.equals( this.owner, user );
+    }
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
 }

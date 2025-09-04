@@ -135,12 +135,12 @@ public interface UserApiRest {
             )
     )
     @AuthenticationErrors
-    @PutMapping( value = "/{id}" )
+    @PutMapping( "/{id}" )
     ResponseEntity<ApiRestResponse<UserInfoResponse>> update(
             @Parameter( description = "ID único del usuario", required = true )
             @PathVariable UserId id,
 
-            @Parameter( description = "Datos para actualizar la información del usuario", required = true )
+            @Parameter( description = "Datos para actualizar el usuario", required = true )
             @RequestBody UpdateUserRequest request
     );
 
@@ -159,10 +159,43 @@ public interface UserApiRest {
                   )
     )
     @AuthenticationErrors
-    @PutMapping( value = "/me" )
+    @PutMapping( "/me" )
     ResponseEntity<ApiRestResponse<UserInfoResponse>> update(
             @Parameter( description = "Datos para actualizar la información del usuario", required = true )
             @RequestBody UpdateUserRequest request
+    );
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+// ---| VIEW ME IMAGE PROFILE |-------------------------------------------------------------------------------------- \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Operation( operationId = "viewMyImageProfile",
+                summary = "Muestra la imagen de perfil del usuario autenticado",
+                description = "Permite mostrar la imagen de perfil del usuario autenticado"
+    )
+    @ApiResponse( responseCode = "200",
+                  description = "Image de perfil del usuario recuperada correctamente"
+    )
+    @AuthenticationErrors
+    @GetMapping( "/view/me" )
+    ResponseEntity<byte[]> viewMyImageProfile();
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+// ---| VIEW IMAGE PROFILE BY ID |----------------------------------------------------------------------------------- \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Operation( operationId = "viewImageProfileById",
+                summary = "Muestra la imagen de perfil del usuario autenticado",
+                description = "Permite mostrar la imagen de perfil del usuario autenticado"
+    )
+    @ApiResponse( responseCode = "200",
+                  description = "Image de perfil del usuario recuperada correctamente"
+    )
+    @AuthenticationErrors
+    @GetMapping( "/view/{id}" )
+    ResponseEntity<byte[]> viewImageProfileById(
+            @Parameter( description = "ID único del usuario", required = true )
+            @PathVariable UserId id
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\

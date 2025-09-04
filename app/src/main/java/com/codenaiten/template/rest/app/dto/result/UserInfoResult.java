@@ -1,7 +1,9 @@
 package com.codenaiten.template.rest.app.dto.result;
 
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.vo.Timestamp;
+import com.codenaiten.template.rest.app.vo.image.ImageId;
 import com.codenaiten.template.rest.app.vo.user.UserId;
 import com.codenaiten.template.rest.app.vo.user.UserName;
 import com.codenaiten.template.rest.app.vo.user.UserSurname;
@@ -33,6 +35,9 @@ public class UserInfoResult implements Serializable {
 
     /** El {@link UserId} único del {@link User} */
     private final UUID id;
+
+    /** El {@link ImageId} único de la {@link Image} que representa la imagen de perfil del {@link User} */
+    private final UUID image;
 
     /** El {@link UserUsername} único del {@link User} */
     private final String username;

@@ -1,5 +1,6 @@
 package com.codenaiten.template.rest.app.entity;
 
+import com.codenaiten.template.rest.app.vo.image.ImageId;
 import com.codenaiten.template.rest.app.vo.user.UserName;
 import com.codenaiten.template.rest.app.vo.user.UserSurname;
 import com.codenaiten.template.rest.app.vo.user.UserUsername;
@@ -24,6 +25,9 @@ public class User extends BaseEntity<UUID> {
     @Id
     private UUID id;
 
+    @Column( name = "image", unique = true )
+    private UUID image;
+
     @Column( name = "username", length = UserUsername.MAX_SIZE, nullable = false, unique = true )
     private String username;
 
@@ -42,6 +46,16 @@ public class User extends BaseEntity<UUID> {
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| GETTERS |---------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
+
+    /**
+     * Obtiene la {@link ImageId} de la {@link Image} quq representa la imagen de perfil del {@link User}.
+     *
+     * @return {@link Optional} con el {@link UUID} que representa la imagen de perfil del {@link User} si existe,
+     *         {@link Optional#empty()} en caso contrario.
+     */
+    public Optional<UUID> getImage(){
+        return Optional.ofNullable( this.image );
+    }
 
     /**
      * Obtiene el apellido del {@link User}.

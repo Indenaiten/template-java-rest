@@ -13,12 +13,12 @@ public record UpdateAccountPasswordRequest(
         @NotNull
         @Size( min = AccountPassword.MIN_SIZE, max = AccountPassword.MAX_SIZE )
         @Pattern( regexp = AccountPassword.FORMAT, message = "La contraseña debe tener entre 8 y 64 caracteres, y contener al menos una letra mayúscula, una minúscula, un número y un carácter especial." )
-        String password,
+        AccountPassword password,
 
         @Schema( description = "Nueva contraseña de usuario", example = "NewPassword.456", requiredMode = Schema.RequiredMode.REQUIRED )
         @NotNull
         @Size( min = AccountPassword.MIN_SIZE, max = AccountPassword.MAX_SIZE )
         @Pattern( regexp = AccountPassword.FORMAT, message = "La contraseña debe tener entre 8 y 64 caracteres, y contener al menos una letra mayúscula, una minúscula, un número y un carácter especial." )
-        String newPassword
+        AccountPassword newPassword
 ) {
 }

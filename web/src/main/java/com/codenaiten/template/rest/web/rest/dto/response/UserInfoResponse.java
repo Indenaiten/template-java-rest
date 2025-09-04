@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @RequiredArgsConstructor
 @Schema( description = "Información de un usuario" )
-public class UserInfoResponse implements Serializable{
+public class UserInfoResponse  implements Serializable{
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -23,6 +23,9 @@ public class UserInfoResponse implements Serializable{
 
     @Schema( description = "Identificador único del usuario", example = "8e423b1a-ec10-4d92-a0cb-88d7e3e9f5a6" )
     private final UUID id;
+
+    @Schema( description = "Identificador único de la imagen de perfil del usuario", example = "24843dfd-3783-4d47-8577-7d14d6c509e5" )
+    private final UUID image;
 
     @Schema( description = "Nombre de usuario", example = "Example" )
     private final String username;

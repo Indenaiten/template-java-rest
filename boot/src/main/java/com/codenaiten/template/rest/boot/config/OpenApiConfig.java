@@ -43,7 +43,8 @@ public class OpenApiConfig {
                         new Tag().name( "Configuraciones" ).description( "Operaciones relacionadas con la configuración de la API" ),
                         new Tag().name( "Autenticación" ).description( "Operaciones relacionadas con la autenticación" ),
                         new Tag().name( "Cuentas" ).description( "Operaciones relacionadas con las cuentas de usuario" ),
-                        new Tag().name( "Usuarios" ).description( "Operaciones relacionadas con la información de usuarios" )
+                        new Tag().name( "Usuarios" ).description( "Operaciones relacionadas con la información de usuarios" ),
+                        new Tag().name( "Imágenes" ).description( "Operaciones relacionadas con las cuentas de usuario" )
                 ));
     }
 
