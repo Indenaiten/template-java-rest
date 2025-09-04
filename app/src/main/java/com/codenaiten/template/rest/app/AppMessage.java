@@ -102,9 +102,18 @@ public enum AppMessage implements MessageI18n {
 // ---| IMAGE |------------------------------------------------------------------------------------------------------ \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
+    // Data Error
+    /** Mensaje de error de datos que se utiliza cuando no se encuentra una {@link Image} en el sistema a partir de su identificador {@link ImageId} */
+    ERROR_DATA_IMAGE_NOT_FOUND_BY_ID( "app.error.data.image.not.found.by.id", "Image not found by ID: %s" ),
+
+
     // Validation Error
+    /** Mensaje de error de validación que se utiliza cuando el {@link User} propietario de la {@link Image} es {@code null} */
+    ERROR_VALIDATION_IMAGE_OWNER_REQUIRED( "app.error.validation.image.owner.required", "Image Owner is required" ),
     /** Mensaje de error de validación que se utiliza cuando el {@link ImageContentType} de la {@link Image} es {@code null} */
     ERROR_VALIDATION_IMAGE_CONTENT_TYPE_REQUIRED( "app.error.validation.image.content-type.required", "Image Content Type is required" ),
+    /** Mensaje de error de validación que se utiliza cuando el tamaño del contenido de la {@link Image} es {@code null} */
+    ERROR_VALIDATION_IMAGE_SIZE_REQUIRED( "app.error.validation.image.size.required", "Image Content Size is required" ),
 
     // Validation Error - ImageId
     /** Mensaje de error de validación que se utiliza cuando el valor de un {@link ImageId} no se corresponde con el formato de un {@link UUID} */

@@ -19,6 +19,7 @@ import java.util.Locale;
  *
  * @param image {@link Array} de {@code byte} que representa la imagen de perfil del {@link User}.
  * @param imageContentType {@link ImageContentType} que representa el tipo de contenido de la imagen de perfil del {@link User}.
+ * @param imageSize {@link Long} que representa el tamaño del contenido de la imagen de perfil del {@link User}.
  * @param lang {@link Locale} que representa el lenguaje de la {@link Account}.
  * @param role {@link AccountRole} que representa el role de la {@link Account}.
  * @param username {@link UserUsername} que representa el username del {@link User} de la {@link Account}.
@@ -31,6 +32,7 @@ import java.util.Locale;
 public record CreateAccountCommand(
         byte[] image,
         ImageContentType imageContentType,
+        Long imageSize,
         Locale lang,
         AccountRole role,
         UserUsername username,

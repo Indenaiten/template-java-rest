@@ -24,9 +24,6 @@ public class UserInfoResponse implements Serializable{
     @Schema( description = "Identificador único del usuario", example = "8e423b1a-ec10-4d92-a0cb-88d7e3e9f5a6" )
     private final UUID id;
 
-    @Schema( description = "Información de la imagen de perfil del usuario" )
-    private final ImageInfoResponse image;
-
     @Schema( description = "Nombre de usuario", example = "Example" )
     private final String username;
 

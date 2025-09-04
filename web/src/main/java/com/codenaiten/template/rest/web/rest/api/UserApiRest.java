@@ -15,11 +15,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -137,16 +135,13 @@ public interface UserApiRest {
             )
     )
     @AuthenticationErrors
-    @PutMapping( value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
+    @PutMapping( value = "/{id}" )
     ResponseEntity<ApiRestResponse<UserInfoResponse>> update(
             @Parameter( description = "ID único del usuario", required = true )
             @PathVariable UserId id,
 
-            @ParameterObject
-            @ModelAttribute UpdateUserRequest request,
-
-            @Parameter( description = "Imágen de perfil del usuario" )
-            @RequestPart( required = false ) MultipartFile image
+            @Parameter( description = "Datos para actualizar la información del usuario", required = true )
+            @RequestBody UpdateUserRequest request
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -164,13 +159,10 @@ public interface UserApiRest {
                   )
     )
     @AuthenticationErrors
-    @PutMapping( value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
+    @PutMapping( value = "/me" )
     ResponseEntity<ApiRestResponse<UserInfoResponse>> update(
-            @ParameterObject
-            @ModelAttribute UpdateUserRequest request,
-
-            @Parameter( description = "Imágen de perfil del usuario" )
-            @RequestPart( required = false ) MultipartFile image
+            @Parameter( description = "Datos para actualizar la información del usuario", required = true )
+            @RequestBody UpdateUserRequest request
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\

@@ -3,8 +3,10 @@ package com.codenaiten.template.rest.app.api;
 import com.codenaiten.template.rest.app.dto.command.PageableCommand;
 import com.codenaiten.template.rest.app.dto.command.user.FilterUserCommand;
 import com.codenaiten.template.rest.app.dto.command.user.UpdateUserCommand;
+import com.codenaiten.template.rest.app.dto.result.ImageContentResult;
 import com.codenaiten.template.rest.app.dto.result.PageResult;
 import com.codenaiten.template.rest.app.dto.result.UserInfoResult;
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.vo.user.UserId;
 
@@ -81,6 +83,29 @@ public interface UserService {
      * @return {@link UserInfoResult} con la información actualizada del {@link User}.
      */
     UserInfoResult update( UpdateUserCommand command );
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    /**
+     * Obtiene la el contenido de la {@link Image} de perfil de un usuario a partir de la {@link UserId} del {@link User}
+     * a consultar.
+     *
+     * @param id {@link UserId} del {@link User} del cual se requiere recuperar el contenido de la {@link Image} de
+     *           perfil de un usuario.
+     *
+     * @return {@link ImageContentResult} con la información del contenido de la {@link Image} de perfil de un usuario.
+     */
+    ImageContentResult image( UserId id );
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    /**
+     * Obtiene la el contenido de la {@link Image} de perfil del usuario autenticado.
+     *
+     * @return {@link ImageContentResult} con la información del contenido de la {@link Image} de perfil del usuario
+     * autenticado.
+     */
+    ImageContentResult image();
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 

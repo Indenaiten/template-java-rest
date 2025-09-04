@@ -42,12 +42,19 @@ public interface CommandMapper {
         return null;
     }
 
+    @SneakyThrows
+    default Long toContentSize( final MultipartFile file ) {
+        if( Objects.nonNull( file ) ) return file.getSize();
+        return null;
+    }
+
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| AUTHENTICATION |--------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Mapping( target = "image", source = "image" )
     @Mapping( target = "imageContentType", source = "image" )
+    @Mapping( target = "imageSize", source = "image" )
     @Mapping( target = "lang", source = "request.lang" )
     @Mapping( target = "username", source = "request.username" )
     @Mapping( target = "email", source = "request.email" )
@@ -65,6 +72,7 @@ public interface CommandMapper {
 
     @Mapping( target = "image", source = "image" )
     @Mapping( target = "imageContentType", source = "image" )
+    @Mapping( target = "imageSize", source = "image" )
     @Mapping( target = "lang", source = "request.lang" )
     @Mapping( target = "role", source = "request.role" )
     @Mapping( target = "username", source = "request.username" )
@@ -83,13 +91,7 @@ public interface CommandMapper {
 // ---| USER |------------------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    @Mapping( target = "image", source = "image" )
-    @Mapping( target = "imageContentType", source = "image" )
-    @Mapping( target = "username", source = "request.username" )
-    @Mapping( target = "name", source = "request.name" )
-    @Mapping( target = "surname", source = "request.surname" )
-    @Mapping( target = "birthdate", source = "request.birthdate" )
-    UpdateUserCommand toCommand( UpdateUserRequest request, MultipartFile image );
+    UpdateUserCommand toCommand( UpdateUserRequest request );
 
     FilterUserCommand toCommand( FilterUserRequest request );
 

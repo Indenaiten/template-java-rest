@@ -17,6 +17,7 @@ import com.codenaiten.template.rest.app.factory.ImageFactory;
 import com.codenaiten.template.rest.app.factory.UserFactory;
 import com.codenaiten.template.rest.app.file.ImageFileManager;
 import com.codenaiten.template.rest.app.mapper.AccountMapper;
+import com.codenaiten.template.rest.app.mapper.ValueObjectMapper;
 import com.codenaiten.template.rest.app.policy.*;
 import com.codenaiten.template.rest.app.properties.AppProperties;
 import com.codenaiten.template.rest.app.properties.LocaleProperties;
@@ -24,6 +25,7 @@ import com.codenaiten.template.rest.app.repository.AccountRepository;
 import com.codenaiten.template.rest.app.repository.ImageRepository;
 import com.codenaiten.template.rest.app.repository.UserRepository;
 import com.codenaiten.template.rest.app.vo.Email;
+import com.codenaiten.template.rest.app.vo.ValueObject;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
 import com.codenaiten.template.rest.app.vo.image.ImageContentType;
@@ -85,6 +87,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     /** Repository relacionado con las entidades de tipo {@link Account} */
     private final AccountRepository accountRepository;
 
+    /** Mapper principal de objetos relacionados con las {@link ValueObject} */
+    private final ValueObjectMapper valueObjectMapper;
+
     /** Mapper principal de objetos relacionados con las {@link Account} */
     private final AccountMapper accountMapper;
 
@@ -135,6 +140,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Step 01: Get provided data
         final byte[] bytes = command.image();
         final ImageContentType contentType = command.imageContentType();
+        final Long contentSize = command.imageSize();
         final Locale lang = command.lang();
         final UserUsername username = command.username();
         final Email email = command.email();
@@ -143,19 +149,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final UserSurname surname = command.surname();
         final LocalDate birthdate = command.birthdate();
 
-        // Step 02: Create image, user and account
-        Image image = null;
-        if( Objects.nonNull( bytes ) && bytes.length > 0 ) image = this.imageFactory.create( contentType ).build();
-        final User user = this.userFactory.create( username, name, birthdate ).image( image ).surname( surname ).build();
+        // Step 02: Create user and account
+        final User user = this.userFactory.create( username, name, birthdate ).surname( surname ).build();
         final Account account = this.accountFactory.create( user, email, password ).lang( lang ).build();
 
-        // Step 03: Save image, user and account
-        if( Objects.nonNull( image )) this.imageRepository.save( image );
+        // Step 03: Save user and account
         this.userRepository.save( user );
         this.accountRepository.save( account );
 
-        // Step 04: Save image file if exists image
-        if( Objects.nonNull( image )) this.imageFileManager.write( new ImageId( image.getId() ), bytes );
+        // Step 04: Create image
+        if( Objects.nonNull( bytes ) && bytes.length > 0 ){
+            final ImageId imageId = this.valueObjectMapper.toImageId( user.getId() );
+            final Image image = this.imageFactory.create( user, contentType, contentSize ).build( imageId );
+            this.imageRepository.save( image );
+            this.imageFileManager.write( new ImageId( image.getId() ), bytes );
+        }
 
         // Step 05: Return result
         return this.accountMapper.toInfoResult( account );

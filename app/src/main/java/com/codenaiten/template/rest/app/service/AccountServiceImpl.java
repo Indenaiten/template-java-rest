@@ -21,6 +21,7 @@ import com.codenaiten.template.rest.app.factory.ImageFactory;
 import com.codenaiten.template.rest.app.factory.UserFactory;
 import com.codenaiten.template.rest.app.file.ImageFileManager;
 import com.codenaiten.template.rest.app.mapper.AccountMapper;
+import com.codenaiten.template.rest.app.mapper.ValueObjectMapper;
 import com.codenaiten.template.rest.app.policy.*;
 import com.codenaiten.template.rest.app.properties.AppProperties;
 import com.codenaiten.template.rest.app.properties.LocaleProperties;
@@ -28,6 +29,7 @@ import com.codenaiten.template.rest.app.repository.AccountRepository;
 import com.codenaiten.template.rest.app.repository.ImageRepository;
 import com.codenaiten.template.rest.app.repository.UserRepository;
 import com.codenaiten.template.rest.app.vo.Email;
+import com.codenaiten.template.rest.app.vo.ValueObject;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
 import com.codenaiten.template.rest.app.vo.account.AccountRole;
@@ -81,6 +83,9 @@ public class AccountServiceImpl implements AccountService {
 
     /** Repository relacionado con las entidades de tipo {@link User} */
     private final UserRepository userRepository;
+
+    /** Mapper principal de objetos relacionados con las {@link ValueObject} */
+    private final ValueObjectMapper valueObjectMapper;
 
     /** Mapper principal de objetos relacionados con las {@link Account} */
     private final AccountMapper accountMapper;
@@ -266,6 +271,7 @@ public class AccountServiceImpl implements AccountService {
         // Step 03: Get provided data
         final byte[] bytes = command.image();
         final ImageContentType contentType = command.imageContentType();
+        final Long contentSize = command.imageSize();
         final Locale lang = command.lang();
         final AccountRole role = command.role();
         final UserUsername username = command.username();
@@ -275,20 +281,23 @@ public class AccountServiceImpl implements AccountService {
         final UserSurname surname = command.surname();
         final LocalDate birthdate = command.birthdate();
 
-        // Step 04: Create image, user and account
-        Image image = null;
-        if( Objects.nonNull( bytes ) && bytes.length > 0 ) image = this.imageFactory.create( contentType ).build();
-        final User user = this.userFactory.create( username, name, birthdate ).image( image ).surname( surname ).build();
+        // Step 04: Create user and account
+        final User user = this.userFactory.create( username, name, birthdate ).surname( surname ).build();
         final Account account = this.accountFactory.create( user, email, password ).role( role ).lang( lang ).build();
 
-        // Step 05: Save image, user and account
-        if( Objects.nonNull( image )) this.imageRepository.save( image );
+        // Step 05: Save user and account
         this.userRepository.save( user );
         this.accountRepository.save( account );
 
-        if( Objects.nonNull( image )) this.imageFileManager.write( new ImageId( image.getId() ), bytes );
+        // Step 06: Create image
+        if( Objects.nonNull( bytes ) && bytes.length > 0 ){
+            final ImageId imageId = this.valueObjectMapper.toImageId( user.getId() );
+            final Image image = this.imageFactory.create( user, contentType, contentSize ).build( imageId );
+            this.imageRepository.save( image );
+            this.imageFileManager.write( new ImageId( image.getId() ), bytes );
+        }
 
-        // Step 06: Convert to Result and return
+        // Step 07: Convert to Result and return
         return this.accountMapper.toInfoResult( account );
     }
 
@@ -414,20 +423,19 @@ public class AccountServiceImpl implements AccountService {
         // Step 03: Check if current account has delete access
         this.accountAccessPolicy.checkDelete( requester, account );
 
-        // Step 04: Delete account
+        // Step 04: Get Data
         final User user = account.getOwner();
-        final Optional<Image> image = user.getImage();
-        image.ifPresent( this.imageRepository::delete );
+        final ImageId imageId = this.valueObjectMapper.toImageId( user.getId() );
+
+        // Step 05: Delete account
         this.userRepository.delete( user );
 
-        // Step 05: Delete image file if exists image
-        if( image.isPresent() ){
-            final ImageId imageId = new ImageId( image.get().getId() );
-            final File file = this.imageFileManager.get( imageId );
-            this.imageFileManager.delete( file );
-        }
+        // Step 06: Delete Image profile
+        this.imageRepository.deleteById( imageId.value() );
+        final File file = this.imageFileManager.get( imageId );
+        this.imageFileManager.delete( file );
 
-        // Step 06: Convert to Result and return
+        // Step 07: Convert to Result and return
         return this.accountMapper.toInfoResult( account );
     }
 
@@ -443,18 +451,17 @@ public class AccountServiceImpl implements AccountService {
         // Step 02: Check if account password is correct
         if( !this.passwordEncoderManager.check( password.value(), requester.getPassword() )) throw new IncorrectPasswordException();
 
-        // Step 04: Delete account
+        // Step 03: Get Data
         final User user = requester.getOwner();
-        final Optional<Image> image = user.getImage();
-        image.ifPresent( this.imageRepository::delete );
+        final ImageId imageId = this.valueObjectMapper.toImageId( user.getId() );
+
+        // Step 04: Delete account
         this.userRepository.delete( user );
 
-        // Step 05: Delete image file if exists image
-        if( image.isPresent() ){
-            final ImageId imageId = new ImageId( image.get().getId() );
-            final File file = this.imageFileManager.get( imageId );
-            this.imageFileManager.delete( file );
-        }
+        // Step 05: Delete Image profile
+        this.imageRepository.deleteById( imageId.value() );
+        final File file = this.imageFileManager.get( imageId );
+        this.imageFileManager.delete( file );
 
         // Step 06: Convert to Result and return
         return this.accountMapper.toInfoResult( requester );

@@ -22,7 +22,6 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -131,10 +130,9 @@ public class UserRestController implements UserApiRest{
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public ResponseEntity<ApiRestResponse<UserInfoResponse>> update(
-            final UserId id, final UpdateUserRequest request, final MultipartFile image ){
+    public ResponseEntity<ApiRestResponse<UserInfoResponse>> update( final UserId id, final UpdateUserRequest request ){
         // Step 01: Create command
-        final UpdateUserCommand command = this.commandMapper.toCommand( request, image );
+        final UpdateUserCommand command = this.commandMapper.toCommand( request );
 
         // Step 02: Run use case
         final UserInfoResult result = this.userService.update( id, command );
@@ -155,10 +153,9 @@ public class UserRestController implements UserApiRest{
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public ResponseEntity<ApiRestResponse<UserInfoResponse>> update(
-            final UpdateUserRequest request, final MultipartFile image ){
+    public ResponseEntity<ApiRestResponse<UserInfoResponse>> update( final UpdateUserRequest request ){
         // Step 01: Create command
-        final UpdateUserCommand command = this.commandMapper.toCommand( request, image );
+        final UpdateUserCommand command = this.commandMapper.toCommand( request );
 
         // Step 02: Run use case
         final UserInfoResult result = this.userService.update( command );
