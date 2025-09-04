@@ -3,15 +3,15 @@ package com.codenaiten.template.rest.app.vo.user;
 import com.codenaiten.template.rest.app.AppMessage;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
-import com.codenaiten.template.rest.app.vo.ValueObject;
+import com.codenaiten.template.rest.app.vo.BaseValueObject;
 
 /**
  * Value Object que representa el apellido de un {@link User}.
  *
- * @see ValueObject
+ * @see BaseValueObject
  * @see String
  */
-public class UserSurname extends ValueObject<String> {
+public class UserSurname extends BaseValueObject<String> {
 
     /** Longitud mínima del apellido de un usuario */
     public static final int MIN_SIZE = 3;
@@ -20,7 +20,7 @@ public class UserSurname extends ValueObject<String> {
     public static final int MAX_SIZE = 50;
 
     /** Expresión regular que define el formato válido de un apellido de usuario */
-    public static final String FORMAT = "^\\p{L}(?:[\\p{L} .'-]+\\p{L})$";
+    public static final String FORMAT = "^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ '-][A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$";
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| CONSTRUCTOR |------------------------------------------------------------------------------------------------ \\

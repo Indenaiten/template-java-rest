@@ -16,9 +16,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Locale;
@@ -154,10 +156,13 @@ public interface AccountApiRest {
                   )
     )
     @AuthenticationErrors
-    @PostMapping
+    @PostMapping( consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
     ResponseEntity<ApiRestResponse<AccountInfoResponse>> create(
-            @Parameter( description = "Datos para crear la cuenta", required = true )
-            @RequestBody CreateAccountRequest request
+            @ParameterObject
+            @ModelAttribute CreateAccountRequest request,
+
+            @Parameter( description = "Imágen de perfil del usuario" )
+            @RequestPart( required = false ) MultipartFile image
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\

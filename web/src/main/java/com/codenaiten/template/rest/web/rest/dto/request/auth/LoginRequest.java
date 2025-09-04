@@ -1,6 +1,5 @@
 package com.codenaiten.template.rest.web.rest.dto.request.auth;
 
-import com.codenaiten.template.rest.app.vo.account.AccountPassword;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -13,7 +12,6 @@ public record LoginRequest(
 
         @Schema( description = "Contraseña de la cuenta del usuario", type="string", example = "Root.123", requiredMode = Schema.RequiredMode.REQUIRED  )
         @NotNull
-        AccountPassword password
-
+        String password
 ) {
 }

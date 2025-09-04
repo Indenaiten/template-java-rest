@@ -1,6 +1,7 @@
 package com.codenaiten.template.rest.app.factory;
 
 import com.codenaiten.template.rest.app.AppMessage;
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
 import com.codenaiten.template.rest.app.policy.UserMinimumAgePolicy;
@@ -14,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -75,17 +75,32 @@ public class UserFactory {
 
     // -------------------------------------------------------------------------------------------------------------- \\
 
+        /** Información opcional de la {@link Image} del perfil del {@link User} */
+        private Image image;
+
         /** Información opcional del {@link UserSurname} del {@link User} */
         private String surname;
 
     // -------------------------------------------------------------------------------------------------------------- \\
 
         /**
+         * Permite asignar el {@link Image} de perfil del {@link User}.
+         *
+         * @param image {@link Image} que representa la imágen de perfil del {@link User}.
+         *
+         * @return {@link Factory} con la {@link Image} de perfil asignada.
+         */
+        public Factory image( final Image image ){
+            this.image = image;
+            return this;
+        }
+
+        /**
          * Permite asignar el {@link UserSurname} del {@link User}.
          *
          * @param surname {@link UserSurname} que representa el apellido del {@link User}.
          *
-         * @return {@link Factory} con el {@link Locale} asignado.
+         * @return {@link Factory} con el {@link UserSurname} asignado.
          */
         public Factory surname( final UserSurname surname ){
             this.surname = Optional.ofNullable( surname ).map( UserSurname::value ).orElse( null );
@@ -109,8 +124,9 @@ public class UserFactory {
             // Step 03: Create User and return
             final UserId id = UserId.random();
             final Timestamp now = Timestamp.now();
-            return User.builder().id( id.value() ).username( this.username ).name( this.name ).surname( this.surname )
-                    .birthdate( this.birthdate ).createdAt( now.value() ).updatedAt( now.value() ).build();
+            return User.builder().id( id.value() ).image( this.image ).username( this.username ).name( this.name )
+                    .surname( this.surname ).birthdate( this.birthdate ).createdAt( now.value() ).updatedAt( now.value() )
+                    .build();
         }
     }
 

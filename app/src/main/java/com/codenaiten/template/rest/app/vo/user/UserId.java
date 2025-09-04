@@ -3,17 +3,17 @@ package com.codenaiten.template.rest.app.vo.user;
 import com.codenaiten.template.rest.app.AppMessage;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
-import com.codenaiten.template.rest.app.vo.ValueObject;
+import com.codenaiten.template.rest.app.vo.BaseValueObject;
 
 import java.util.UUID;
 
 /**
  * Value Object que representa un identificador de un {@link User}.
  *
- * @see ValueObject
+ * @see BaseValueObject
  * @see UUID
  */
-public class UserId extends ValueObject<UUID> {
+public class UserId extends BaseValueObject<UUID> {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| CONSTRUCTOR |------------------------------------------------------------------------------------------------ \\

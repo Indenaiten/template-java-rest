@@ -3,15 +3,15 @@ package com.codenaiten.template.rest.app.vo.user;
 import com.codenaiten.template.rest.app.AppMessage;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
-import com.codenaiten.template.rest.app.vo.ValueObject;
+import com.codenaiten.template.rest.app.vo.BaseValueObject;
 
 /**
  * Value Object que representa el username de un {@link User}
  *
- * @see ValueObject
+ * @see BaseValueObject
  * @see String
  */
-public class UserUsername extends ValueObject<String> {
+public class UserUsername extends BaseValueObject<String> {
 
     /** Longitud mínima del nickname de un usuario */
     public static final int MIN_SIZE = 3;

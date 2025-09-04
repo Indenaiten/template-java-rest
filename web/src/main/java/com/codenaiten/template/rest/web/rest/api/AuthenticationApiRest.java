@@ -18,12 +18,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @CommonErrors
 @Tag( name = "Autenticación" )
@@ -47,10 +46,13 @@ public interface AuthenticationApiRest {
                                       schema = @Schema( implementation = ApiRestResponseWithAccountInfoResponse.class )
                   )
     )
-    @PostMapping( "/signup" )
+    @PostMapping( value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
     ResponseEntity<ApiRestResponse<AccountInfoResponse>> register(
-            @Parameter( description = "Datos del usuario a registrar", required = true )
-            @RequestBody RegisterRequest request
+            @ParameterObject
+            @ModelAttribute RegisterRequest request,
+
+            @Parameter( description = "Imágen de perfil del usuario" )
+            @RequestPart( required = false ) MultipartFile image
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\

@@ -1,14 +1,17 @@
 package com.codenaiten.template.rest.app;
 
 import com.codenaiten.template.rest.app.entity.Account;
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.i18n.MessageI18n;
+import com.codenaiten.template.rest.app.vo.BaseValueObject;
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.Timestamp;
-import com.codenaiten.template.rest.app.vo.ValueObject;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
 import com.codenaiten.template.rest.app.vo.account.AccountRole;
+import com.codenaiten.template.rest.app.vo.image.ImageContentType;
+import com.codenaiten.template.rest.app.vo.image.ImageId;
 import com.codenaiten.template.rest.app.vo.user.UserId;
 import com.codenaiten.template.rest.app.vo.user.UserName;
 import com.codenaiten.template.rest.app.vo.user.UserSurname;
@@ -60,7 +63,7 @@ public enum AppMessage implements MessageI18n {
     ERROR_VALIDATION_GENERIC( "app.error.validation.generic", "An unexpected validation error has occurred" ),
 
     // Validation Error - ValueObject
-    /** Mensaje de error de validación que se utiliza cuando el valor de un {@link ValueObject} es {@code null} */
+    /** Mensaje de error de validación que se utiliza cuando el valor de un {@link BaseValueObject} es {@code null} */
     ERROR_VALIDATION_VO_VALUE_REQUIRED( "app.error.validation.vo.value.required", "The value for the Value Object is required" ),
 
     // Validation Error - Timestamp
@@ -94,6 +97,22 @@ public enum AppMessage implements MessageI18n {
     ERROR_SECURITY_AUTH_BAD_CREDENTIALS( "app.error.security.auth.bad.credentials", "Bad credentials" ),
     /** Mensaje de error de seguridad que se utiliza cuando la {@link AccountPassword} es incorrecta */
     ERROR_SECURITY_AUTH_PASSWORD_INCORRECT( "app.error.security.auth.password.incorrect", "The password account is incorrect" ),
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+// ---| IMAGE |------------------------------------------------------------------------------------------------------ \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    // Validation Error
+    /** Mensaje de error de validación que se utiliza cuando el {@link ImageContentType} de la {@link Image} es {@code null} */
+    ERROR_VALIDATION_IMAGE_CONTENT_TYPE_REQUIRED( "app.error.validation.image.content-type.required", "Image Content Type is required" ),
+
+    // Validation Error - ImageId
+    /** Mensaje de error de validación que se utiliza cuando el valor de un {@link ImageId} no se corresponde con el formato de un {@link UUID} */
+    ERROR_VALIDATION_VO_IMAGE_ID_VALUE_INVALID( "app.error.validation.vo.image-id.value.invalid", "Value \"%s\" for ImageId is invalid UUID" ),
+
+    // Validation Error - ImageContentType
+    /** Mensaje de error de validación que se utiliza cuando el valor de un {@link ImageContentType} no se corresponde con un valor soportado. */
+    ERROR_VALIDATION_VO_IMAGE_CONTENT_TYPE_VALUE_INVALID( "app.error.validation.vo.image-content-type.value.invalid", "Value \"%s\" for ImageContentType is not invalid or not supported" ),
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| ACCOUNT |---------------------------------------------------------------------------------------------------- \\

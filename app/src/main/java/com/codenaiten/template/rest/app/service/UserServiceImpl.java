@@ -7,24 +7,39 @@ import com.codenaiten.template.rest.app.dto.command.user.FilterUserCommand;
 import com.codenaiten.template.rest.app.dto.command.user.UpdateUserCommand;
 import com.codenaiten.template.rest.app.dto.result.PageResult;
 import com.codenaiten.template.rest.app.dto.result.UserInfoResult;
+import com.codenaiten.template.rest.app.editor.ImageEditor;
 import com.codenaiten.template.rest.app.editor.UserEditor;
 import com.codenaiten.template.rest.app.entity.Account;
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.data.found.UserNotFoundByIdException;
 import com.codenaiten.template.rest.app.exception.security.AuthNotFoundException;
+import com.codenaiten.template.rest.app.factory.ImageFactory;
+import com.codenaiten.template.rest.app.file.ImageFileManager;
 import com.codenaiten.template.rest.app.mapper.UserMapper;
 import com.codenaiten.template.rest.app.policy.UserAccessPolicy;
 import com.codenaiten.template.rest.app.policy.UserMinimumAgePolicy;
 import com.codenaiten.template.rest.app.policy.UserUsernameUniquenessPolicy;
 import com.codenaiten.template.rest.app.properties.AppProperties;
+import com.codenaiten.template.rest.app.repository.ImageRepository;
 import com.codenaiten.template.rest.app.repository.UserRepository;
+import com.codenaiten.template.rest.app.vo.image.ImageContentType;
+import com.codenaiten.template.rest.app.vo.image.ImageId;
 import com.codenaiten.template.rest.app.vo.user.UserId;
+import com.codenaiten.template.rest.app.vo.user.UserName;
+import com.codenaiten.template.rest.app.vo.user.UserSurname;
+import com.codenaiten.template.rest.app.vo.user.UserUsername;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,6 +55,12 @@ public class UserServiceImpl implements UserService {
     /** Provider relacionado con la autenticación de un usuario */
     private final AuthenticationProvider authenticationProvider;
 
+    /** Manager relacionado con las operaciones relacionadas con el manejo de archivos de imagenes */
+    private final ImageFileManager imageFileManager;
+
+    /** Repository relacionado con las entidades de tipo {@link Image} */
+    private final ImageRepository imageRepository;
+
     /** Repository relacionado con las entidades de tipo {@link User} */
     private final UserRepository userRepository;
 
@@ -47,6 +68,12 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
+
+    /** Factory para crear entidades de tipo {@link Image} */
+    private ImageFactory imageFactory;
+
+    /** Editor para actualizar entidades de tipo {@link Image} */
+    private ImageEditor imageEditor;
 
     /** Editor para actualizar entidades de tipo {@link User} */
     private UserEditor userEditor;
@@ -64,6 +91,10 @@ public class UserServiceImpl implements UserService {
      */
     @PostConstruct
     public void init(){
+        // ImageFactory & ImageEditor
+        this.imageFactory = new ImageFactory();
+        this.imageEditor = new ImageEditor();
+
         // UserEditor
         var userUsernameUniquenessPolicy = new UserUsernameUniquenessPolicy( this.userRepository );
         var userMinimumAgePolicy = new UserMinimumAgePolicy( this.appProperties );
@@ -157,6 +188,8 @@ public class UserServiceImpl implements UserService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
+    @SneakyThrows( IOException.class )
+    @Transactional( rollbackOn = Exception.class )
     public UserInfoResult update( final UserId id, final UpdateUserCommand command ) {
         // Step 01: Get authenticated user
         final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
@@ -165,41 +198,99 @@ public class UserServiceImpl implements UserService {
         // Step 02: Check if current user has write access
         this.userAccessPolicy.checkWrite( requester, user );
 
-        // Step 03: Update user
-        final UserEditor.Editor editor = this.userEditor.update( user );
-        editor.username( command.username() ).name( command.name() ).surname( command.surname() ).birthdate( command.birthdate() );
+        // Step 03: Get provided data
+        final byte[] bytes = command.image();
+        final ImageContentType contentType = command.imageContentType();
+        final UserUsername username = command.username();
+        final UserName name = command.name();
+        final UserSurname surname = command.surname();
+        final LocalDate birthdate = command.birthdate();
 
-        // Step 04: Check if editor has changes
-        if( editor.hasChanges() ){ // If editor has changes
+        // Step 04: Update image if exists
+        Image image = user.getImage().orElse( null );
+        if( Objects.nonNull( bytes ) && bytes.length > 0 ){
+            image = Optional.ofNullable( image ).orElse( this.imageFactory.create( contentType ).build() );
+            this.imageEditor.update( image ).contentType( contentType ).apply();
+            this.imageRepository.save( image );
+
+            // Update image file
+            this.imageFileManager.write( new ImageId( image.getId() ), bytes );
+        }
+
+        // Step 05: Update user
+        final UserEditor.Editor userEditor = this.userEditor.update( user );
+        userEditor.image( image ).username( username ).name( name ).surname( surname ).birthdate( birthdate );
+
+        // Step 06: Check if user editor has changes
+        if( userEditor.hasChanges() ){ // If editor has changes
             // Apply changes and save new data
-            editor.apply();
+            userEditor.apply();
             this.userRepository.save( user );
         }
 
-        // Step 05: Convert to Result and return
+        // Step 07: Check if image must be deleted
+        if(( Objects.isNull( bytes ) || bytes.length == 0 ) && Objects.nonNull( image )){ // If image must be deleted
+            // Delete image
+            this.imageRepository.delete( image );
+            final ImageId imageId = new ImageId( image.getId() );
+            final File file = this.imageFileManager.get( imageId );
+            this.imageFileManager.delete( file );
+        }
+
+        // Step 08: Convert to Result and return
         return this.userMapper.toInfoResult( user );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
+    @SneakyThrows( IOException.class )
+    @Transactional( rollbackOn = Exception.class )
     public UserInfoResult update( final UpdateUserCommand command ){
         // Step 01: Get authenticated user
         final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
         final User user = requester.getOwner();
 
-        // Step 02: Update user
-        final UserEditor.Editor editor = this.userEditor.update( user );
-        editor.username( command.username() ).name( command.name() ).surname( command.surname() ).birthdate( command.birthdate() );
+        // Step 02: Get provided data
+        final byte[] bytes = command.image();
+        final ImageContentType contentType = command.imageContentType();
+        final UserUsername username = command.username();
+        final UserName name = command.name();
+        final UserSurname surname = command.surname();
+        final LocalDate birthdate = command.birthdate();
 
-        // Step 03: Check if editor has changes
-        if( editor.hasChanges() ){ // If editor has changes
+        // Step 03: Update image if exists
+        Image image = user.getImage().orElse( null );
+        if( Objects.nonNull( bytes ) && bytes.length > 0 ){
+            image = Optional.ofNullable( image ).orElse( this.imageFactory.create( contentType ).build() );
+            this.imageEditor.update( image ).contentType( contentType ).apply();
+            this.imageRepository.save( image );
+
+            // Update image file
+            this.imageFileManager.write( new ImageId( image.getId() ), bytes );
+        }
+
+        // Step 04: Update user
+        final UserEditor.Editor userEditor = this.userEditor.update( user );
+        userEditor.image( image ).username( username ).name( name ).surname( surname ).birthdate( birthdate );
+
+        // Step 05: Check if user editor has changes
+        if( userEditor.hasChanges() ){ // If editor has changes
             // Apply changes and save new data
-            editor.apply();
+            userEditor.apply();
             this.userRepository.save( user );
         }
 
-        // Step 04: Convert to Result and return
+        // Step 06: Check if image must be deleted
+        if(( Objects.isNull( bytes ) || bytes.length == 0 ) && Objects.nonNull( image )){ // If image must be deleted
+            // Delete image
+            this.imageRepository.delete( image );
+            final ImageId imageId = new ImageId( image.getId() );
+            final File file = this.imageFileManager.get( imageId );
+            this.imageFileManager.delete( file );
+        }
+
+        // Step 07: Convert to Result and return
         return this.userMapper.toInfoResult( user );
     }
 

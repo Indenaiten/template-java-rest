@@ -140,7 +140,7 @@ public class AccountEditor {
                 throw new ValidationException( AppMessage.ERROR_VALIDATION_ACCOUNT_EMAIL_REQUIRED );
 
             // Step 02: Check if username is unique
-            AccountEditor.this.accountEmailUniquenessPolicy.check( email );
+            if( !Objects.equals( email.value(), this.email )) AccountEditor.this.accountEmailUniquenessPolicy.check( email );
 
             // Step 03: Set new email
             this.email = email.value();

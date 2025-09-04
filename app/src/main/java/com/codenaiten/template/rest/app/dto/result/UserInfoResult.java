@@ -34,6 +34,9 @@ public class UserInfoResult implements Serializable {
     /** El {@link UserId} único del {@link User} */
     private final UUID id;
 
+    /** El {@link ImageInfoResult} del {@link User} */
+    private final ImageInfoResult image;
+
     /** El {@link UserUsername} único del {@link User} */
     private final String username;
 

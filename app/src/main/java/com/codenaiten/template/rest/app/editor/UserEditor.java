@@ -1,6 +1,7 @@
 package com.codenaiten.template.rest.app.editor;
 
 import com.codenaiten.template.rest.app.AppMessage;
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
 import com.codenaiten.template.rest.app.policy.UserMinimumAgePolicy;
@@ -58,6 +59,9 @@ public class UserEditor {
 
     // -------------------------------------------------------------------------------------------------------------- \\
 
+        /** Información de la {@link Image} de perfil que se va a actualizar en la instancia del {@link User} */
+        private Image image;
+
         /** Información del {@link UserUsername} que se va a actualizar en la instancia del {@link User} */
         private String username;
 
@@ -89,6 +93,18 @@ public class UserEditor {
     // -------------------------------------------------------------------------------------------------------------- \\
 
         /**
+         * Permite asignar un nuevo {@link Image} en el {@link User} proporcionado en el {@link Editor}.
+         *
+         * @param image {@link Image} que representa la nueva imagen de perfil del {@link User}.
+         *
+         * @return {@link Editor} con la nueva {@link Image} de perfil asignada.
+         */
+        public Editor image( final Image image ){
+            this.image = image;
+            return this;
+        }
+
+        /**
          * Permite asignar un nuevo {@link UserUsername} en el {@link User} proporcionado en el {@link Editor}.
          *
          * @param username {@link UserUsername} que representa el nuevo username del {@link User}.
@@ -101,7 +117,7 @@ public class UserEditor {
                 throw new ValidationException( AppMessage.ERROR_VALIDATION_USER_USERNAME_REQUIRED );
 
             // Step 02: Check if username is unique
-            UserEditor.this.userUsernameUniquenessPolicy.check( username );
+            if( !Objects.equals( username.value(), this.username )) UserEditor.this.userUsernameUniquenessPolicy.check( username );
 
             // Step 03: Set new username
             this.username = username.value();
@@ -166,7 +182,8 @@ public class UserEditor {
          * @return {@code true} si hay cambios, {@code false} en caso contrario.
          */
         public boolean hasChanges() {
-            return !Objects.equals( this.username, this.user.getUsername() ) ||
+            return !Objects.equals( this.image, this.user.getImage().orElse( null )) ||
+                   !Objects.equals( this.username, this.user.getUsername() ) ||
                    !Objects.equals( this.name, this.user.getName() ) ||
                    !Objects.equals( this.surname, this.user.getSurname().orElse( null )) ||
                    !Objects.equals( this.birthdate, this.user.getBirthdate() );
@@ -179,6 +196,7 @@ public class UserEditor {
          */
         public void apply(){
             if( this.hasChanges() ){
+                this.user.setImage( this.image );
                 this.user.setUsername( this.username );
                 this.user.setName( this.name );
                 this.user.setSurname( this.surname );

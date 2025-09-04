@@ -7,27 +7,34 @@ import com.codenaiten.template.rest.app.dto.command.auth.RegisterCommand;
 import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
 import com.codenaiten.template.rest.app.dto.result.LoginResult;
 import com.codenaiten.template.rest.app.entity.Account;
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.InvalidRefreshTokenException;
 import com.codenaiten.template.rest.app.exception.data.found.AccountNotFoundByIdException;
 import com.codenaiten.template.rest.app.exception.security.AuthNotFoundException;
 import com.codenaiten.template.rest.app.factory.AccountFactory;
+import com.codenaiten.template.rest.app.factory.ImageFactory;
 import com.codenaiten.template.rest.app.factory.UserFactory;
+import com.codenaiten.template.rest.app.file.ImageFileManager;
 import com.codenaiten.template.rest.app.mapper.AccountMapper;
 import com.codenaiten.template.rest.app.policy.*;
 import com.codenaiten.template.rest.app.properties.AppProperties;
 import com.codenaiten.template.rest.app.properties.LocaleProperties;
 import com.codenaiten.template.rest.app.repository.AccountRepository;
+import com.codenaiten.template.rest.app.repository.ImageRepository;
 import com.codenaiten.template.rest.app.repository.UserRepository;
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
+import com.codenaiten.template.rest.app.vo.image.ImageContentType;
+import com.codenaiten.template.rest.app.vo.image.ImageId;
 import com.codenaiten.template.rest.app.vo.user.UserName;
 import com.codenaiten.template.rest.app.vo.user.UserSurname;
 import com.codenaiten.template.rest.app.vo.user.UserUsername;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -36,9 +43,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -64,22 +73,31 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     /** Manager relacionado con las operaciones relacionadas con el cifrado de contraseñas */
     private final PasswordEncoderManager passwordEncoderManager;
 
-    /** Repository relacionado con las entidades de tipo {@link Account} */
-    private final AccountRepository accountRepository;
+    /** Manager relacionado con las operaciones relacionadas con el manejo de archivos de imagenes */
+    private final ImageFileManager imageFileManager;
+
+    /** Repository relacionado con las entidades de tipo {@link Image} */
+    private final ImageRepository imageRepository;
 
     /** Repository relacionado con las entidades de tipo {@link User} */
     private final UserRepository userRepository;
+
+    /** Repository relacionado con las entidades de tipo {@link Account} */
+    private final AccountRepository accountRepository;
 
     /** Mapper principal de objetos relacionados con las {@link Account} */
     private final AccountMapper accountMapper;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    /** Factory para crear entidades de tipo {@link Account} */
-    private AccountFactory accountFactory;
+    /** Factory para crear entidades de tipo {@link Image} */
+    private ImageFactory imageFactory;
 
     /** Factory para crear entidades de tipo {@link User} */
     private UserFactory userFactory;
+
+    /** Factory para crear entidades de tipo {@link Account} */
+    private AccountFactory accountFactory;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| INITIALIZER |------------------------------------------------------------------------------------------------ \\
@@ -91,16 +109,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      */
     @PostConstruct
     public void init(){
-        // AccountFactory
-        var supportedLanguagePolicy = new LanguageSupportedPolicy( this.localeProperties );
-        var accountEmailUniquenessPolicy = new AccountEmailUniquenessPolicy( this.accountRepository );
-        var assignAccountRolePolicy = new AssignAccountRolePolicy( this.accountRepository );
-        this.accountFactory = new AccountFactory( supportedLanguagePolicy, accountEmailUniquenessPolicy, assignAccountRolePolicy, this.passwordEncoderManager );
+        // ImageFactory
+        this.imageFactory = new ImageFactory();
 
         // UserFactory
         var userUsernameUniquenessPolicy = new UserUsernameUniquenessPolicy( this.userRepository );
         var userMinimumAgePolicy = new UserMinimumAgePolicy( this.appProperties );
         this.userFactory = new UserFactory( userUsernameUniquenessPolicy, userMinimumAgePolicy );
+
+        // AccountFactory
+        var supportedLanguagePolicy = new LanguageSupportedPolicy( this.localeProperties );
+        var accountEmailUniquenessPolicy = new AccountEmailUniquenessPolicy( this.accountRepository );
+        var assignAccountRolePolicy = new AssignAccountRolePolicy( this.accountRepository );
+        this.accountFactory = new AccountFactory( supportedLanguagePolicy, accountEmailUniquenessPolicy, assignAccountRolePolicy, this.passwordEncoderManager );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -108,9 +129,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    @Transactional
+    @SneakyThrows( IOException.class )
+    @Transactional( rollbackOn = IOException.class)
     public AccountInfoResult register( final RegisterCommand command ) {
         // Step 01: Get provided data
+        final byte[] bytes = command.image();
+        final ImageContentType contentType = command.imageContentType();
+        final Locale lang = command.lang();
         final UserUsername username = command.username();
         final Email email = command.email();
         final AccountPassword password = command.password();
@@ -118,15 +143,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final UserSurname surname = command.surname();
         final LocalDate birthdate = command.birthdate();
 
-        // Step 02: Create user and account
-        final User user = this.userFactory.create( username, name, birthdate ).surname( surname ).build();
-        final Account account = this.accountFactory.create( user, email, password ).lang( command.lang() ).build();
+        // Step 02: Create image, user and account
+        Image image = null;
+        if( Objects.nonNull( bytes ) && bytes.length > 0 ) image = this.imageFactory.create( contentType ).build();
+        final User user = this.userFactory.create( username, name, birthdate ).image( image ).surname( surname ).build();
+        final Account account = this.accountFactory.create( user, email, password ).lang( lang ).build();
 
-        // Step 03: Save user and account
+        // Step 03: Save image, user and account
+        if( Objects.nonNull( image )) this.imageRepository.save( image );
         this.userRepository.save( user );
         this.accountRepository.save( account );
 
-        // Step 04: Return result
+        // Step 04: Save image file if exists image
+        if( Objects.nonNull( image )) this.imageFileManager.write( new ImageId( image.getId() ), bytes );
+
+        // Step 05: Return result
         return this.accountMapper.toInfoResult( account );
     }
 

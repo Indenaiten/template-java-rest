@@ -3,15 +3,15 @@ package com.codenaiten.template.rest.app.vo.account;
 import com.codenaiten.template.rest.app.AppMessage;
 import com.codenaiten.template.rest.app.entity.Account;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
-import com.codenaiten.template.rest.app.vo.ValueObject;
+import com.codenaiten.template.rest.app.vo.BaseValueObject;
 
 /**
  * Value Object que representa la contraseña de una {@link Account}.
  *
- * @see ValueObject
+ * @see BaseValueObject
  * @see String
  */
-public class AccountPassword extends ValueObject<String> {
+public class AccountPassword extends BaseValueObject<String> {
 
     /** Longitud mínima de la contraseña de la cuenta de un usuario */
     public static final int MIN_SIZE = 8;

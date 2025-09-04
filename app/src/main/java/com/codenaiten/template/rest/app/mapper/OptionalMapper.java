@@ -1,10 +1,11 @@
 package com.codenaiten.template.rest.app.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.Optional;
 
-@Mapper( componentModel = "spring" )
+@Mapper( componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE )
 public interface OptionalMapper {
 
 // ------------------------------------------------------------------------------------------------------------------ \\

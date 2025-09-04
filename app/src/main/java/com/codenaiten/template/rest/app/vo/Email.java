@@ -6,10 +6,10 @@ import com.codenaiten.template.rest.app.exception.validation.ValidationException
 /**
  * Value Object que representa un correo electrónico.
  *
- * @see ValueObject
+ * @see BaseValueObject
  * @see String
  */
-public class Email extends ValueObject<String>{
+public class Email extends BaseValueObject<String> {
 
     /** Longitud mínima del correo electrónico */
     public static final int MIN_SIZE = 6;

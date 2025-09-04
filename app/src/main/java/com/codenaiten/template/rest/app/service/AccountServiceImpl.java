@@ -11,29 +11,43 @@ import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
 import com.codenaiten.template.rest.app.dto.result.PageResult;
 import com.codenaiten.template.rest.app.editor.AccountEditor;
 import com.codenaiten.template.rest.app.entity.Account;
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.exception.data.found.AccountNotFoundByIdException;
 import com.codenaiten.template.rest.app.exception.security.AuthNotFoundException;
 import com.codenaiten.template.rest.app.exception.security.IncorrectPasswordException;
 import com.codenaiten.template.rest.app.factory.AccountFactory;
+import com.codenaiten.template.rest.app.factory.ImageFactory;
 import com.codenaiten.template.rest.app.factory.UserFactory;
+import com.codenaiten.template.rest.app.file.ImageFileManager;
 import com.codenaiten.template.rest.app.mapper.AccountMapper;
 import com.codenaiten.template.rest.app.policy.*;
 import com.codenaiten.template.rest.app.properties.AppProperties;
 import com.codenaiten.template.rest.app.properties.LocaleProperties;
 import com.codenaiten.template.rest.app.repository.AccountRepository;
+import com.codenaiten.template.rest.app.repository.ImageRepository;
 import com.codenaiten.template.rest.app.repository.UserRepository;
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
 import com.codenaiten.template.rest.app.vo.account.AccountRole;
+import com.codenaiten.template.rest.app.vo.image.ImageContentType;
+import com.codenaiten.template.rest.app.vo.image.ImageId;
+import com.codenaiten.template.rest.app.vo.user.UserName;
+import com.codenaiten.template.rest.app.vo.user.UserSurname;
+import com.codenaiten.template.rest.app.vo.user.UserUsername;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -56,6 +70,12 @@ public class AccountServiceImpl implements AccountService {
     /** Manager relacionado con las operaciones relacionadas con el cifrado de contraseñas */
     private final PasswordEncoderManager passwordEncoderManager;
 
+    /** Manager relacionado con las operaciones relacionadas con el manejo de archivos de imagenes */
+    private final ImageFileManager imageFileManager;
+
+    /** Repository relacionado con las entidades de tipo {@link Image} */
+    private final ImageRepository imageRepository;
+
     /** Repository relacionado con las entidades de tipo {@link Account} */
     private final AccountRepository accountRepository;
 
@@ -67,14 +87,17 @@ public class AccountServiceImpl implements AccountService {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    /** Factory para crear entidades de tipo {@link User} */
-    private UserFactory userFactory;
+    /** Factory para crear entidades de tipo {@link Image} */
+    private ImageFactory imageFactory;
+
+    /** Factory de entidades de tipo {@link Account} */
+    private AccountEditor accountEditor;
 
     /** Factory para crear entidades de tipo {@link Account} */
     private AccountFactory accountFactory;
 
-    /** Factory de entidades de tipo {@link Account} */
-    private AccountEditor accountEditor;
+    /** Factory para crear entidades de tipo {@link User} */
+    private UserFactory userFactory;
 
     /** Policy relacionado con las políticas de acceso de las {@link Account} */
     private AccountAccessPolicy accountAccessPolicy;
@@ -89,10 +112,8 @@ public class AccountServiceImpl implements AccountService {
      */
     @PostConstruct
     public void init(){
-        // UserFactory
-        var userUsernameUniquenessPolicy = new UserUsernameUniquenessPolicy( this.userRepository );
-        var userMinimumAgePolicy = new UserMinimumAgePolicy( this.appProperties );
-        this.userFactory = new UserFactory( userUsernameUniquenessPolicy, userMinimumAgePolicy );
+        // ImageFactory
+        this.imageFactory = new ImageFactory();
 
         // AccountFactory, AccountEditor
         var supportedLanguagePolicy = new LanguageSupportedPolicy( this.localeProperties );
@@ -100,6 +121,11 @@ public class AccountServiceImpl implements AccountService {
         var assignAccountRolePolicy = new AssignAccountRolePolicy( this.accountRepository );
         this.accountFactory = new AccountFactory( supportedLanguagePolicy, accountEmailUniquenessPolicy, assignAccountRolePolicy, this.passwordEncoderManager );
         this.accountEditor = new AccountEditor( supportedLanguagePolicy, accountEmailUniquenessPolicy, assignAccountRolePolicy, this.passwordEncoderManager );
+
+        // UserFactory
+        var userUsernameUniquenessPolicy = new UserUsernameUniquenessPolicy( this.userRepository );
+        var userMinimumAgePolicy = new UserMinimumAgePolicy( this.appProperties );
+        this.userFactory = new UserFactory( userUsernameUniquenessPolicy, userMinimumAgePolicy );
 
         // AccountAccessPolicy
         this.accountAccessPolicy = new AccountAccessPolicy();
@@ -228,6 +254,8 @@ public class AccountServiceImpl implements AccountService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
+    @SneakyThrows( IOException.class )
+    @Transactional( rollbackFor = IOException.class )
     public AccountInfoResult create( final CreateAccountCommand command ){
         // Step 01: Get authenticated account
         final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
@@ -235,22 +263,39 @@ public class AccountServiceImpl implements AccountService {
         // Step 02: Check if current account has create access
         this.accountAccessPolicy.checkCreate( requester );
 
-        // Step 03: Create user and account
-        final User user = this.userFactory.create( command.username(), command.name(), command.birthdate() ).surname( command.surname() ).build();
-        final Account account = this.accountFactory.create( user, command.email(), command.password() )
-                .role( command.role() ).lang( command.lang() ).build();
+        // Step 03: Get provided data
+        final byte[] bytes = command.image();
+        final ImageContentType contentType = command.imageContentType();
+        final Locale lang = command.lang();
+        final AccountRole role = command.role();
+        final UserUsername username = command.username();
+        final Email email = command.email();
+        final AccountPassword password = command.password();
+        final UserName name = command.name();
+        final UserSurname surname = command.surname();
+        final LocalDate birthdate = command.birthdate();
 
-        // Step 04: Save user and account
+        // Step 04: Create image, user and account
+        Image image = null;
+        if( Objects.nonNull( bytes ) && bytes.length > 0 ) image = this.imageFactory.create( contentType ).build();
+        final User user = this.userFactory.create( username, name, birthdate ).image( image ).surname( surname ).build();
+        final Account account = this.accountFactory.create( user, email, password ).role( role ).lang( lang ).build();
+
+        // Step 05: Save image, user and account
+        if( Objects.nonNull( image )) this.imageRepository.save( image );
         this.userRepository.save( user );
         this.accountRepository.save( account );
 
-        // Step 05: Convert to Result and return
+        if( Objects.nonNull( image )) this.imageFileManager.write( new ImageId( image.getId() ), bytes );
+
+        // Step 06: Convert to Result and return
         return this.accountMapper.toInfoResult( account );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
+    @Transactional
     public AccountInfoResult update( final AccountId id, final UpdateAccountCommand command ){
         // Step 01: Get authenticated account
         final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
@@ -279,6 +324,7 @@ public class AccountServiceImpl implements AccountService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
+    @Transactional
     public AccountInfoResult updateLang( final Locale lang ){
         // Step 01: Get authenticated account
         final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
@@ -304,6 +350,7 @@ public class AccountServiceImpl implements AccountService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
+    @Transactional
     public AccountInfoResult updateEmail( final AccountPassword password, final Email newEmail ){
         // Step 01: Get authenticated account
         final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
@@ -329,6 +376,7 @@ public class AccountServiceImpl implements AccountService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
+    @Transactional
     public AccountInfoResult updatePassword( final AccountPassword password, final AccountPassword newPassword ){
         // Step 01: Get authenticated account
         final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
@@ -354,6 +402,8 @@ public class AccountServiceImpl implements AccountService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
+    @SneakyThrows( IOException.class )
+    @Transactional( rollbackFor = IOException.class )
     public AccountInfoResult delete( final AccountId id ){
         // Step 01: Get authenticated account
         final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
@@ -365,15 +415,27 @@ public class AccountServiceImpl implements AccountService {
         this.accountAccessPolicy.checkDelete( requester, account );
 
         // Step 04: Delete account
-        this.userRepository.delete( account.getOwner() );
+        final User user = account.getOwner();
+        final Optional<Image> image = user.getImage();
+        image.ifPresent( this.imageRepository::delete );
+        this.userRepository.delete( user );
 
-        // Step 05: Convert to Result and return
+        // Step 05: Delete image file if exists image
+        if( image.isPresent() ){
+            final ImageId imageId = new ImageId( image.get().getId() );
+            final File file = this.imageFileManager.get( imageId );
+            this.imageFileManager.delete( file );
+        }
+
+        // Step 06: Convert to Result and return
         return this.accountMapper.toInfoResult( account );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
+    @SneakyThrows( IOException.class )
+    @Transactional( rollbackFor = IOException.class )
     public AccountInfoResult delete( final AccountPassword password ){
         // Step 01: Get authenticated account
         final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
@@ -381,10 +443,20 @@ public class AccountServiceImpl implements AccountService {
         // Step 02: Check if account password is correct
         if( !this.passwordEncoderManager.check( password.value(), requester.getPassword() )) throw new IncorrectPasswordException();
 
-        // Step 03: Delete account
-        this.userRepository.delete( requester.getOwner() );
+        // Step 04: Delete account
+        final User user = requester.getOwner();
+        final Optional<Image> image = user.getImage();
+        image.ifPresent( this.imageRepository::delete );
+        this.userRepository.delete( user );
 
-        // Step 04: Convert to Result and return
+        // Step 05: Delete image file if exists image
+        if( image.isPresent() ){
+            final ImageId imageId = new ImageId( image.get().getId() );
+            final File file = this.imageFileManager.get( imageId );
+            this.imageFileManager.delete( file );
+        }
+
+        // Step 06: Convert to Result and return
         return this.accountMapper.toInfoResult( requester );
     }
 

@@ -15,9 +15,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -121,6 +123,33 @@ public interface UserApiRest {
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
+// ---| UPDATE USER BY ID |------------------------------------------------------------------------------------------ \\
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Operation( operationId = "update",
+            summary = "Actualiza un usuario específico",
+            description = "Permite actualizar la información de un usuario específico por su ID"
+    )
+    @ApiResponse( responseCode = "200",
+            description = "Usuario actualizado correctamente",
+            content = @Content( mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema( implementation = ApiRestResponseWithUserInfoResponse.class )
+            )
+    )
+    @AuthenticationErrors
+    @PutMapping( value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
+    ResponseEntity<ApiRestResponse<UserInfoResponse>> update(
+            @Parameter( description = "ID único del usuario", required = true )
+            @PathVariable UserId id,
+
+            @ParameterObject
+            @ModelAttribute UpdateUserRequest request,
+
+            @Parameter( description = "Imágen de perfil del usuario" )
+            @RequestPart( required = false ) MultipartFile image
+    );
+
+// ------------------------------------------------------------------------------------------------------------------ \\
 // ---| UPDATE MY USER INFO |---------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
@@ -135,34 +164,13 @@ public interface UserApiRest {
                   )
     )
     @AuthenticationErrors
-    @PutMapping( "/me" )
+    @PutMapping( value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
     ResponseEntity<ApiRestResponse<UserInfoResponse>> update(
-            @Parameter( description = "Datos para actualizar la información del usuario", required = true )
-            @RequestBody UpdateUserRequest request
-    );
+            @ParameterObject
+            @ModelAttribute UpdateUserRequest request,
 
-// ------------------------------------------------------------------------------------------------------------------ \\
-// ---| UPDATE USER BY ID |------------------------------------------------------------------------------------------ \\
-// ------------------------------------------------------------------------------------------------------------------ \\
-
-    @Operation( operationId = "update",
-                summary = "Actualiza un usuario específico",
-                description = "Permite actualizar la información de un usuario específico por su ID"
-    )
-    @ApiResponse( responseCode = "200",
-                  description = "Usuario actualizado correctamente",
-                  content = @Content( mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                      schema = @Schema( implementation = ApiRestResponseWithUserInfoResponse.class )
-                  )
-    )
-    @AuthenticationErrors
-    @PutMapping( "/{id}" )
-    ResponseEntity<ApiRestResponse<UserInfoResponse>> update(
-            @Parameter( description = "ID único del usuario", required = true )
-            @PathVariable UserId id,
-
-            @Parameter( description = "Datos para actualizar el usuario", required = true )
-            @RequestBody UpdateUserRequest request
+            @Parameter( description = "Imágen de perfil del usuario" )
+            @RequestPart( required = false ) MultipartFile image
     );
 
 // ------------------------------------------------------------------------------------------------------------------ \\

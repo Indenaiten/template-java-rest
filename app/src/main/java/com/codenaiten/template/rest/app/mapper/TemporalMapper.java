@@ -1,11 +1,14 @@
 package com.codenaiten.template.rest.app.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Optional;
 
-@Mapper( componentModel = "spring" )
+@Mapper( componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+         uses = { OptionalMapper.class })
 public interface TemporalMapper {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -20,7 +23,9 @@ public interface TemporalMapper {
      * @return {@link Long} que representa el tiempo en milisegundos.
      */
     default Long toEpochMilli( final LocalDateTime dateTime ){
-        return dateTime.atZone( ZoneId.systemDefault() ).toInstant().toEpochMilli();
+        return Optional.ofNullable( dateTime )
+                .map( value -> dateTime.atZone( ZoneId.systemDefault() ).toInstant().toEpochMilli() )
+                .orElse( null );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

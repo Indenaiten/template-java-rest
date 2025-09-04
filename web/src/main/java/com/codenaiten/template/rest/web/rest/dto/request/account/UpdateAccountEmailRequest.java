@@ -14,13 +14,12 @@ public record UpdateAccountEmailRequest(
         @NotNull
         @Size( min = AccountPassword.MIN_SIZE, max = AccountPassword.MAX_SIZE )
         @Pattern( regexp = AccountPassword.FORMAT, message = "La contraseña debe tener entre 8 y 64 caracteres, y contener al menos una letra mayúscula, una minúscula, un número y un carácter especial." )
-        AccountPassword password,
+        String password,
 
         @Schema( description = "Nuevo email de usuario", example = "newemail@maildrop.cc", requiredMode = Schema.RequiredMode.REQUIRED )
         @NotNull
         @Size( min = Email.MIN_SIZE, max = Email.MAX_SIZE )
         @Pattern( regexp = Email.FORMAT, message = "El email debe tener entre 6 y 256 caracteres y seguir el formato estándar de email." )
-        Email newEmail
-
+        String newEmail
 ) {
 }

@@ -8,10 +8,10 @@ import java.time.LocalDateTime;
 /**
  * Value Object que representa una fecha y hora de un momento determinado.
  *
- * @see ValueObject
+ * @see BaseValueObject
  * @see LocalDateTime
  */
-public class Timestamp extends ValueObject<LocalDateTime> {
+public class Timestamp extends BaseValueObject<LocalDateTime> {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 // ---| CONSTRUCTOR |------------------------------------------------------------------------------------------------ \\

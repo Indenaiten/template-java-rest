@@ -3,7 +3,7 @@ package com.codenaiten.template.rest.app.vo.account;
 import com.codenaiten.template.rest.app.AppMessage;
 import com.codenaiten.template.rest.app.entity.Account;
 import com.codenaiten.template.rest.app.exception.validation.ValidationException;
-import com.codenaiten.template.rest.app.vo.ValueObject;
+import com.codenaiten.template.rest.app.vo.BaseValueObject;
 import lombok.Getter;
 
 import java.util.List;
@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 /**
  * Value Object que representa el rol de una {@link Account}.
  *
- * @see ValueObject
+ * @see BaseValueObject
  * @see Integer
  */
 @Getter
-public class AccountRole extends ValueObject<Integer> {
+public class AccountRole extends BaseValueObject<Integer> {
 
     /** Lista de identificadores de roles soportados */
     private static final List<Integer> SUPPORTED_ROLES = List.of( 1, 2 );
