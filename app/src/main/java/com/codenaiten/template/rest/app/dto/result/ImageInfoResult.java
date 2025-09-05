@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record ImageInfoResult(
         UUID id,
+        UUID owner,
         String contentType,
         Long size,
         LocalDateTime createdAt,
