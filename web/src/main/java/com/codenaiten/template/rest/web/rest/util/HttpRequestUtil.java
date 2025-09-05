@@ -24,7 +24,7 @@ public class HttpRequestUtil {
      * @return {@link Optional} con el {@link String} que representa la IP del cliente, {@link Optional#empty()} en caso
      * contrario.
      */
-    public static Optional<String> getClientIp(final HttpServletRequest request ){
+    public static Optional<String> getClientIp( final HttpServletRequest request ){
         String result = null;
         String ip = request.getHeader( "X-Forwarded-For" ); // Detrás de proxy / load balancer
         if( Objects.nonNull( ip ) && !ip.isEmpty() && !"unknown".equalsIgnoreCase( ip )) result = ip.split( "," )[0].trim();
