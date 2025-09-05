@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -26,11 +27,16 @@ public class PasswordEncoderManagerImpl implements PasswordEncoderManager {
     }
 
     @Override
-    public boolean check( final String password, final String hash ) {
-        if( password == null ) return false;
+    public boolean matches(final String password, final String hash ) {
+        if( Objects.isNull( password )) return false;
         return Optional.ofNullable( hash )
                 .map( target -> this.passwordEncoder.matches( password, target ))
                 .orElse( false );
+    }
+
+    @Override
+    public boolean notMatches(final String password, final String hash) {
+        return !this.matches( password, hash );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

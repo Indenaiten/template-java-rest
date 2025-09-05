@@ -35,21 +35,21 @@ public class ImageServiceImpl implements ImageService {
     /** Provider relacionado con la autenticación de un usuario */
     private final AuthenticationProvider authenticationProvider;
 
-    /** Manager relacionado con las operaciones relacionadas con el manejo de archivos de imagenes */
+    /** Manager relacionado con las operaciones relacionadas con los ficheros de las imágenes */
     private final ImageFileManager imageFileManager;
 
-    /** Repository relacionado con las entidades de tipo {@link Image} */
+    /** Repository relacionado con la entidad {@link Image} */
     private final ImageRepository imageRepository;
 
-    /** Mapper principal de objetos relacionados con las {@link Image} */
+    /** Mapper relacionado con la entidad {@link Image} */
     private final ImageMapper imageMapper;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    /** Factory para crear entidades de tipo {@link Image} */
+    /** Factory para la creación de la entidad {@link Image} */
     private ImageFactory imageFactory;
 
-    /** Policy relacionado con las políticas de acceso de las {@link Image} */
+    /** Policy relacionado con las políticas de acceso a la entidad {@link Image} */
     private ImageAccessPolicy imageAccessPolicy;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -57,8 +57,7 @@ public class ImageServiceImpl implements ImageService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Inicializa las propiedades necesarias que no son beans de Spring y que pueden requerir dependencias que si son
-     * beans de Spring, después de construir la clase.
+     * Inicializa las propiedades necesarias que no son beans de Spring.
      */
     @PostConstruct
     public void init(){
@@ -76,22 +75,25 @@ public class ImageServiceImpl implements ImageService {
     @Override
     @SneakyThrows( IOException.class )
     public ImageContentResult getContent( final ImageId id ){
-        // Step 01: Get authenticated user
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
-        final User user = requester.getOwner();
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Get image by ID
-        final Image image = this.imageRepository.findById( id.value() ).orElseThrow( () -> new ImageNotFoundByIdException( id ));
+        // Step 02: Get Image by ID
+        final Image image = this.imageRepository.findById( id.value() )
+                .orElseThrow( () -> new ImageNotFoundByIdException( id ));
 
-        // Step 03: Check if current user has read access to image
+        // Step 03: // Check if Authenticated Account has Read access
         this.imageAccessPolicy.checkRead( requester, image );
 
-        // Step 04: Get image content
+        // Step 04: Create Image Info Result from Image
+        final ImageInfoResult info = this.imageMapper.toInfoResult( image );
+
+        // Step 05: Get Image content from Image File
         final File file = this.imageFileManager.get( id );
         final byte[] content = this.imageFileManager.read( file );
 
-        // Step 05: Create result and return
-        final ImageInfoResult info = this.imageMapper.toInfoResult( image );
+        // Step 06: Create Image Content Result from Image Info & Content
         return new ImageContentResult( info, content );
     }
 
@@ -101,24 +103,29 @@ public class ImageServiceImpl implements ImageService {
     @SneakyThrows( IOException.class )
     @Transactional( rollbackOn = IOException.class )
     public ImageInfoResult create( final CreateImageCommand command ){
-        // Step 01: Get authenticated user
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
+
+        // Step 02: Get Authenticated User
         final User user = requester.getOwner();
 
-        // Step 02: Get provided data
+        // Step 03: Get provided data
         final byte[] content = command.image();
         final ImageContentType contentType = command.contentType();
         final Long contentSize = command.contentSize();
 
-        // Step 03: Create image
-        final ImageId id = new ImageId( user.getId() );
-        final Image image = this.imageFactory.create( user, contentType, contentSize ).build( id );
+        // Step 04: Create Image
+        final Image image = this.imageFactory.create( user, contentType, contentSize ).build();
 
-        // Step 04: Save image
+        // Step 05: Save Image
         this.imageRepository.save( image );
+
+        // Step 06: Write File
+        final ImageId id = new ImageId( image.getId() );
         this.imageFileManager.write( id, content );
 
-        // Step 05: Convert to Result and return
+        // Step 07: Convert to Result and return
         return this.imageMapper.toInfoResult( image );
     }
 

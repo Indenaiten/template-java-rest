@@ -4,75 +4,77 @@ import com.codenaiten.template.rest.app.dto.command.auth.LoginCommand;
 import com.codenaiten.template.rest.app.dto.command.auth.RegisterCommand;
 import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
 import com.codenaiten.template.rest.app.dto.result.LoginResult;
+import com.codenaiten.template.rest.app.entity.Account;
+import com.codenaiten.template.rest.app.entity.User;
 
 import java.util.List;
 
 /**
- * Service con los casos de uso relacionados con la autenticación de usuarios en el sistema.
+ * Service con los casos de uso relacionados con la autenticación de los usuarios en el sistema.
  */
 public interface AuthenticationService {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Registra un nuevo usuario en el sistema.
+     * Registra una nueva entidad {@link Account} en el sistema.
      *
-     * @param command {@link RegisterCommand} con los datos del nuevo usuario a registrar.
+     * @param command {@link RegisterCommand} con los datos de la nueva entidad {@link Account} a registrar.
      *
-     * @return {@link AccountInfoResult} con los datos de la cuenta de usuario que ha sido creada.
+     * @return {@link AccountInfoResult} con la información de la entidad {@link Account} registrada.
      */
     AccountInfoResult register( RegisterCommand command );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Autentica un usuario en el sistema.
+     * Autentica un usuario en el sistema a partir de sus credenciales de acceso.
+     * user: {@link User#getUsername()}, {@link Account#getEmail()} o {@link User#getId()} único del usuario
+     * password: Contraseña de la {@link Account}
      *
-     * @param command {@link LoginCommand} con los datos del usuario a autenticar.
-     * @param ip {@link String} que representa la IP del cliente, puede ser {@code null} pero hará falta la misma IP
-     *           con la que se haya autenticado ({@code null} o un {@link String}) para validar correctamente los tokens
-     *           de autenticación.
+     * @param command {@link LoginCommand} con los datos de acceso del usuario.
+     * @param ip {@link String} que representa la información de la IP del cliente que realiza el acceso, puede ser
+     *        {@code null} si no se conoce la IP del cliente.
      *
-     * @return {@link LoginResult} con los datos de la respuesta de un usuario autenticado con éxito.
+     * @return {@link LoginResult} con la información de respuesta del acceso al sistema.
      */
     LoginResult login( LoginCommand command, String ip );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Actualiza los toknes de autenticación de un usuario mediante el refresh token del usuario.
+     * Actualiza los tokens de acceso de un usuario a partir de su token de refresco actual.
      *
-     * @param token {@link String} que representa el refresh token del usuario.
-     * @param ip {@link String} que representa la IP del cliente, puede ser {@code null} pero para validar correctamente
-     *           el token será necesaria la misma IP con la que se haya autenticado ({@code null} o un {@link String}).
+     * @param token {@link String} que representa el token de refresco actual del usuario.
+     * @param ip {@link String} que representa la información de la IP del cliente que realiza el acceso, puede ser
+     *           {@code null} si no se conoce la IP del cliente.
      *
-     * @return {@link LoginResult} con los datos de la respuesta de un usuario autenticado con éxito.
+     * @return {@link LoginResult} con la información de respuesta del acceso al sistema.
      */
     LoginResult refresh( String token, String ip );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Elimina la autenticación del usuario autenticación.
+     * Desloguea un usuario autenticado del sistema.
      */
     void logout();
-
-// ------------------------------------------------------------------------------------------------------------------ \\
-
-    /**
-     * Invalida todos los tokens de autenticación asociados a una lista de IPs.
-     *
-     * @param ips {@link List} con los {@link String} que representan las IPs correspondientes para invalidar los tokens
-     *            de autenticación.
-     */
-    void invalidate( List<String> ips );
 
 // ------------------------------------------------------------------------------------------------------------------ \\// ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Invalida todos los tokens de autenticación asociados al usuario autenticado.
+     * Invalida todos los tokens de acceso de un usuario autenticado del sistema.
      */
     void invalidate();
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    /**
+     * Invalida los tokens de acceso de un usuario a partir de una lista de IPs.
+     *
+     * @param ips {@link List} de {@link String} que representan las IPs de los tokens de acceso a invalidar.
+     */
+    void invalidate( List<String> ips );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 

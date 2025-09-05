@@ -7,28 +7,31 @@ import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.vo.image.ImageId;
 
 /**
- * Service con los casos de uso relacionados con las {@link Image} en el sistema.
+ * Service con los casos de uso relacionados con las entidades {@link Image}.
  */
 public interface ImageService {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Obtiene la el contenido de la {@link Image} solicitada a través de su identificador {@link ImageId}.
+     * Obtiene la información y el contenido del fichero de la entidad {@link Image} a partir de su identificador único.
      *
-     * @param id {@link ImageId} que representa el identificador de la {@link Image} solicitada.
+     * @param id {@link ImageId} que representa el identificador único de la entidad {@link Image} de la cual se van
+     *        a consultar los datos.
      *
-     * @return {@link ImageContentResult} con la información del contenido de la {@link Image} solicitada.
+     * @return {@link ImageContentResult} con la información y el contenido del fichero de la entidad {@link Image}
+     *         encontrada.
      */
     ImageContentResult getContent( ImageId id );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
+
     /**
-     * Crea una nueva {@link Image} en el sistema.
+     * Crea una nueva entidad {@link Image} en el sistema.
      *
-     * @param command {@link CreateImageCommand} con los datos de la nueva {@link Image} a crear.
+     * @param command {@link CreateImageCommand} con los datos de la nueva entidad {@link Image} a crear.
      *
-     * @return {@link ImageInfoResult} con los datos de la nueva {@link Image} que se ha creado.
+     * @return {@link ImageInfoResult} con la información de la entidad {@link Image} creada.
      */
     ImageInfoResult create( CreateImageCommand command );
 

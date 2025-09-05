@@ -181,7 +181,7 @@ public class UserRestController implements UserApiRest{
     @Override
     public ResponseEntity<byte[]> viewImageProfileById( final UserId id ){
         // Step 01: Run use case
-        final ImageContentResult result = this.userService.image( id );
+        final ImageContentResult result = this.userService.getImageProfile( id );
 
         // Step 02: Return response
         final ImageInfoResult info = result.getInfo();
@@ -196,7 +196,7 @@ public class UserRestController implements UserApiRest{
     @Override
     public ResponseEntity<byte[]> viewMyImageProfile(){
         // Step 01: Run use case
-        final ImageContentResult result = this.userService.image();
+        final ImageContentResult result = this.userService.getImageProfile();
 
         // Step 02: Return response
         final ImageInfoResult info = result.getInfo();

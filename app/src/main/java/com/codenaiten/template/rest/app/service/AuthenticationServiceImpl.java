@@ -46,16 +46,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    /** Properties con información relacionada con la configuración de la aplicación */
+    /** Properties con información relacionada con los detalles de la aplicación */
     private final AppProperties appProperties;
 
-    /** Properties con información relacionada con la configuración del lenguaje del sistema */
+    /** Properties con información relacionada con los detalles del lenguaje del sistema */
     private final LocaleProperties localeProperties;
 
     /** Provider relacionado con la autenticación de un usuario */
     private final AuthenticationProvider authenticationProvider;
 
-    /** Manager relacionado con las operaciones relacionados con los tokens de autenticación */
+    /** Manager relacionado con las operaciones relacionadas con los tokens de autenticación */
     private final TokenJwtManager tokenJwtManager;
 
     /** Manager relacionado con las operaciones relacionadas con la autenticación de los usuarios en el sistema */
@@ -64,21 +64,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     /** Manager relacionado con las operaciones relacionadas con el cifrado de contraseñas */
     private final PasswordEncoderManager passwordEncoderManager;
 
-    /** Repository relacionado con las entidades de tipo {@link User} */
+    /** Repository relacionado con la entidad {@link User} */
     private final UserRepository userRepository;
 
-    /** Repository relacionado con las entidades de tipo {@link Account} */
+    /** Repository relacionado con la entidad {@link Account} */
     private final AccountRepository accountRepository;
 
-    /** Mapper principal de objetos relacionados con las {@link Account} */
+    /** Mapper relacionado con la entidad {@link Account} */
     private final AccountMapper accountMapper;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    /** Factory para crear entidades de tipo {@link User} */
+    /** Factory para la creación de la entidad {@link User} */
     private UserFactory userFactory;
 
-    /** Factory para crear entidades de tipo {@link Account} */
+    /** Factory para la creación de la entidad {@link Account} */
     private AccountFactory accountFactory;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -86,8 +86,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Inicializa las propiedades necesarias que no son beans de Spring y que pueden requerir dependencias que si son
-     * beans de Spring, después de construir la clase.
+     * Inicializa las propiedades necesarias que no son beans de Spring.
      */
     @PostConstruct
     public void init(){
@@ -110,7 +109,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public AccountInfoResult register( final RegisterCommand command ) {
-        // Step 01: Get provided data
+        // Step 01: Get Provided data
         final Locale lang = command.lang();
         final UserUsername username = command.username();
         final Email email = command.email();
@@ -119,15 +118,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final UserSurname surname = command.surname();
         final LocalDate birthdate = command.birthdate();
 
-        // Step 02: Create user and account
+        // Step 02: Create User & Account
         final User user = this.userFactory.create( username, name, birthdate ).surname( surname ).build();
         final Account account = this.accountFactory.create( user, email, password ).lang( lang ).build();
 
-        // Step 03: Save user and account
+        // Step 03: Save User & Account
         this.userRepository.save( user );
         this.accountRepository.save( account );
 
-        // Step 04: Return result
+        // Step 04: Convert Account & Return Result
         return this.accountMapper.toInfoResult( account );
     }
 
@@ -135,14 +134,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public LoginResult login( final LoginCommand command, final String ip ){
-        // Step 01: Get provided data
+        // Step 01: Get Provided data
         final String login = command.login().toLowerCase().trim();
         final AccountPassword password = command.password();
 
-        // Step 02: Authenticate user
+        // Step 02: Authenticate User
         final Authentication auth = this.authenticationManager.authenticate( new UsernamePasswordAuthenticationToken( login, password ));
 
-        // Step 03: Get authenticated user if authentication is successful
+        // Step 03: Create Authenticated User if Authentication is Successful
         final AuthenticatedUser authenticatedUser = Optional.ofNullable( auth )
                 .map( Authentication::getPrincipal )
                 .filter( AuthenticatedUser.class::isInstance )
@@ -153,10 +152,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final Account account = authenticatedUser.getAccount();
         final TokenInfo result = this.tokenJwtManager.create( account, ip );
 
-        // Step 05: Set Language
+        // Step 05: Set Lang in LocaleContextHolder if exists
         account.getLang().map( Locale::forLanguageTag ).ifPresent( LocaleContextHolder::setLocale );
 
-        // Step 06: Return result
+        // Step 06: Create Login Result & Return Result
         return new LoginResult( account.getId(), account.getOwner().getId(), result );
     }
 
@@ -164,17 +163,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public LoginResult refresh( final String token, final String ip ){
-        // Step 01: Validate token
+        // Step 01: Validate Token as Refresh Token
         if( !this.tokenJwtManager.validateRefreshToken( token, ip )) throw new InvalidRefreshTokenException( token );
 
-        // Step 02: Check if exitst Account ID & User ID
+        // Step 02: Get Account By ID from Token
         final AccountId id = this.tokenJwtManager.getAccountId( token );
-        final Account account = this.accountRepository.findById( id.value() ).orElseThrow( () -> new AccountNotFoundByIdException( id ));
 
-        // Step 03: Generate new Tokens from refresh token
+        // Step 03: Find Account By ID
+        final Account account = this.accountRepository.findById( id.value() )
+                .orElseThrow( () -> new AccountNotFoundByIdException( id ));
+
+        // Step 04: Generate new Tokens from Refresh Token
         final TokenInfo result = this.tokenJwtManager.refresh( token, ip );
 
-        // Step 04: Return result
+        // Step 05: Create Login Result & Return Result
         return new LoginResult( account.getId(), account.getOwner().getId(), result );
     }
 
@@ -192,26 +194,31 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public void invalidate( final List<String> ipList ){
-        // Step 01: Get Authenticated User
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+    public void invalidate() {
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
+
+        // Step 02: Get Account ID from Authenticated Account
         final AccountId id = new AccountId( requester.getId() );
 
-        // Step 02: Invalidate Tokens
-        this.tokenJwtManager.invalidate( id, ipList );
+        // Step 03: Invalidate all Tokens from Account
+        this.tokenJwtManager.invalidate( id );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public void invalidate() {
-        // Step 01: Get Authenticated User
+    public void invalidate( final List<String> ipList ){
+        // Step 01: Get Authenticated Account
         final Account requester = this.authenticationProvider.getAuthenticatedAccount()
                 .orElseThrow( AuthNotFoundException::new );
+
+        // Step 02: Get Account ID from Authenticated Account
         final AccountId id = new AccountId( requester.getId() );
 
-        // Step 02: Invalidate Tokens
-        this.tokenJwtManager.invalidate( id );
+        // Step 03: Invalidate all Tokens by IP list
+        this.tokenJwtManager.invalidate( id, ipList );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

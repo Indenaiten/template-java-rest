@@ -17,7 +17,7 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class ConfigurationServiceImpl implements ConfigurationService{
 
-    /** Properties con información relacionada con la configuración del lenguaje del sistema */
+    /** Properties con información relacionada con los detalles del lenguaje del sistema */
     private final LocaleProperties localeProperties;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -30,8 +30,7 @@ public class ConfigurationServiceImpl implements ConfigurationService{
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Inicializa las propiedades necesarias que no son beans de Spring y que pueden requerir dependencias que si son
-     * beans de Spring, después de construir la clase.
+     * Inicializa las propiedades necesarias que no son beans de Spring.
      */
     @PostConstruct
     public void init(){
@@ -45,10 +44,10 @@ public class ConfigurationServiceImpl implements ConfigurationService{
 
     @Override
     public void lang( final Locale lang ){
-        // Step 01: Check if language is supported
+        // Step 01: Check if Language is supported
         this.languageSupportedPolicy.check( lang );
 
-        // Step 02: Set new Locale
+        // Step 02: Set new Locale in LocaleContextHolder
         LocaleContextHolder.setLocale( lang );
     }
 
@@ -56,7 +55,7 @@ public class ConfigurationServiceImpl implements ConfigurationService{
 
     @Override
     public Locale getLang(){
-        // Step 01: Get current Locale
+        // Step 01: Get Current Locale
         return LocaleContextHolder.getLocale();
     }
 
@@ -64,7 +63,7 @@ public class ConfigurationServiceImpl implements ConfigurationService{
 
     @Override
     public List<Locale> getSupportedLanguages(){
-        // Step 01: Get supported languages
+        // Step 01: Get Supported Locales
         return this.localeProperties.getSupportedLocales();
     }
 

@@ -11,101 +11,111 @@ import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.vo.user.UserId;
 
 /**
- * Service con los casos de uso relacionados con los {@link User} en el sistema.
+ * Service con los casos de uso relacionados con las entidades {@link User}.
  */
 public interface UserService {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Obtiene la información del {@link User} autenticado en el sistema.
+     * Obtiene la información de la entidad {@link User} a partir de su identificador único.
      *
-     * @return {@link UserInfoResult} con la información del {@link User} autenticado.
-     */
-    UserInfoResult me();
-
-// ------------------------------------------------------------------------------------------------------------------ \\
-
-    /**
-     * Obtiene la información de un {@link User} a partir de su identificador.
+     * @param id {@link UserId} que representa el identificador único de la entidad {@link User} de la cual se van
+     *           a consultar los datos.
      *
-     * @param id {@link UserId} que representa el identificador del {@link User} del cual se van a consultar los datos.
-     *
-     * @return {@link UserInfoResult} con la información del {@link User} consultado.
+     * @return {@link UserInfoResult} con la información de la entidad {@link User} encontrada.
      */
     UserInfoResult get( UserId id );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Busca {@link User} en el sistema mediante un término de búsqueda.
+     * Obtiene la información de la entidad {@link User} del usuario autenticado.
      *
-     * @param search {@link String} con el término de búsqueda.
-     * @param pageableCommand {@link PageableCommand} con los datos relacionados con la paginación.
-     *
-     * @return {@link PageResult} con la lista de {@link UserInfoResult} resultante de la búsqueda a partir del término
-     *         de búsqueda.
+     * @return {@link UserInfoResult} con la información de la entidad {@link User} encontrada.
      */
-    PageResult<UserInfoResult> search( String search, PageableCommand pageableCommand );
+    UserInfoResult me();
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Busca {@link User} en el sistema mediante un filtro de búsqueda.
+     * Busca la información de las entidades {@link User} a partir de un término de búsqueda.
      *
-     * @param filterCommand {@link FilterUserCommand} con los datos relacionados con el filtro de la búsqueda.
-     * @param pageableCommand {@link PageableCommand} con los datos relacionados con la paginación.
+     * @param search {@link String} que representa el término de búsqueda por el cual se van a recuperar los datos de
+     *        las entidades {@link User} que hay registradas en el sistema.
+     * @param pageable {@link PageableCommand} que representa los datos de paginación que se van a utilizar para
+     *        recuperar los datos de las entidades {@link User} que hay registradas de forma paginada.
      *
-     * @return {@link PageResult} con la lista de {@link UserInfoResult} resultante de la búsqueda a partir del filtro
-     *         de búsqueda.
+     * @return {@link PageResult} de {@link UserInfoResult} con la información de las entidades {@link User} que se han
+     *         encontrado.
      */
-    PageResult<UserInfoResult> search( FilterUserCommand filterCommand, PageableCommand pageableCommand );
+    PageResult<UserInfoResult> search( String search, PageableCommand pageable );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Actualiza la información de un {@link User} a partir de su identificador.
+     * Busca la información de las entidades {@link User} a partir de un filtro de búsqueda.
      *
-     * @param id {@link UserId} que representa el identificador del {@link User} a actualizar.
-     * @param command {@link UpdateUserCommand} con los nuevos datos con los que se van actualizar los datos del {@link User}.
+     * @param filter {@link FilterUserCommand} que representa el filtro de búsqueda por el cual se va a utilizar para
+     *        recuperar los datos de las entidades {@link User} que hay registradas en el sistema.
+     * @param pageable {@link PageableCommand} que representa los datos de paginación que se van a utilizar para
+     *        recuperar los datos de las entidades {@link User} que hay registradas de forma paginada.
      *
-     * @return {@link UserInfoResult} con la información actualizada del {@link User}.
+     * @return {@link PageResult} de {@link UserInfoResult} con la información de las entidades {@link User} que se han
+     *         encontrado.
+     */
+    PageResult<UserInfoResult> search( FilterUserCommand filter, PageableCommand pageable );
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    /**
+     * Actualiza los datos de una entidad {@link User} registrada en el sistema a partir de su identificador único.
+     *
+     * @param id {@link UserId} que representa el identificador único de la entidad {@link User} que se requiere
+     *        actualizar los datos.
+     * @param command {@link UpdateUserCommand} con los nuevos datos con los que se van a actualizar los datos de la
+     *        entidad {@link User} registrada en el sistema.
+     *
+     * @return {@link UserInfoResult} con la nueva información de la entidad {@link User} actualizada.
      */
     UserInfoResult update( UserId id, UpdateUserCommand command );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Actualiza la información del {@link User} autenticado en el sistema.
+     * Actualiza los datos de la entidad {@link User} del usuario autenticado.
      *
-     * @param command {@link UpdateUserCommand} con los nuevos datos con los que se van actualizar los datos del {@link User}.
+     * @param command {@link UpdateUserCommand} con los nuevos datos con los que se van a actualizar los datos de la
+     *        entidad {@link User} del usuario autenticado.
      *
-     * @return {@link UserInfoResult} con la información actualizada del {@link User}.
+     * @return {@link UserInfoResult} con la nueva información de la entidad {@link User} actualizada.
      */
     UserInfoResult update( UpdateUserCommand command );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Obtiene la el contenido de la {@link Image} de perfil de un usuario a partir de la {@link UserId} del {@link User}
-     * a consultar.
+     * Obtiene la información y el contenido de la entidad {@link Image} que representa la imagen de perfil de una
+     * entidad {@link User} a partir del identificador único del usuario a consultar.
      *
-     * @param id {@link UserId} del {@link User} del cual se requiere recuperar el contenido de la {@link Image} de
-     *           perfil de un usuario.
+     * @param id {@link UserId} que representa el identificador único de la entidad {@link User} de la cual se van a
+     *        recuperar los datos de la {@link Image} que representa su imagen de perfil.
      *
-     * @return {@link ImageContentResult} con la información del contenido de la {@link Image} de perfil de un usuario.
+     * @return {@link ImageContentResult} con la información y el contenido de la entidad {@link Image} que representa
+     *         la imagen de perfil de la entidad {@link User} consultada.
      */
-    ImageContentResult image( UserId id );
+    ImageContentResult getImageProfile( UserId id );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Obtiene la el contenido de la {@link Image} de perfil del usuario autenticado.
+     * Obtiene la información y el contenido de la entidad {@link Image} que representa la imagen de perfil de una
+     * entidad {@link User} del usuario autenticado.
      *
-     * @return {@link ImageContentResult} con la información del contenido de la {@link Image} de perfil del usuario
-     * autenticado.
+     * @return {@link ImageContentResult} con la información y el contenido de la entidad {@link Image} que representa
+     *         la imagen de perfil de la entidad {@link User} consultada.
      */
-    ImageContentResult image();
+    ImageContentResult getImageProfile();
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 

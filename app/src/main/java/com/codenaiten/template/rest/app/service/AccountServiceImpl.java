@@ -18,7 +18,6 @@ import com.codenaiten.template.rest.app.exception.data.found.ImageNotFoundByIdEx
 import com.codenaiten.template.rest.app.exception.security.AuthNotFoundException;
 import com.codenaiten.template.rest.app.exception.security.IncorrectPasswordException;
 import com.codenaiten.template.rest.app.factory.AccountFactory;
-import com.codenaiten.template.rest.app.factory.ImageFactory;
 import com.codenaiten.template.rest.app.factory.UserFactory;
 import com.codenaiten.template.rest.app.file.ImageFileManager;
 import com.codenaiten.template.rest.app.mapper.AccountMapper;
@@ -58,10 +57,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
-    /** Properties con información relacionada con la configuración de la aplicación */
+    /** Properties con información relacionada con los detalles de la aplicación */
     private final AppProperties appProperties;
 
-    /** Properties con información relacionada con la configuración del lenguaje del sistema */
+    /** Properties con información relacionada con los detalles del lenguaje del sistema */
     private final LocaleProperties localeProperties;
 
     /** Provider relacionado con la autenticación de un usuario */
@@ -70,39 +69,36 @@ public class AccountServiceImpl implements AccountService {
     /** Manager relacionado con las operaciones relacionadas con el cifrado de contraseñas */
     private final PasswordEncoderManager passwordEncoderManager;
 
-    /** Manager relacionado con las operaciones relacionadas con el manejo de archivos de imagenes */
+    /** Manager relacionado con las operaciones relacionadas con los ficheros de las imágenes */
     private final ImageFileManager imageFileManager;
 
-    /** Repository relacionado con las entidades de tipo {@link Image} */
+    /** Repository relacionado con la entidad {@link Image} */
     private final ImageRepository imageRepository;
 
-    /** Repository relacionado con las entidades de tipo {@link Account} */
+    /** Repository relacionado con la entidad {@link Account} */
     private final AccountRepository accountRepository;
 
-    /** Repository relacionado con las entidades de tipo {@link User} */
+    /** Repository relacionado con la entidad {@link User} */
     private final UserRepository userRepository;
 
-    /** Mapper principal de objetos relacionados con las {@link Account} */
+    /** Mapper relacionado con la entidad {@link Account} */
     private final AccountMapper accountMapper;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    /** Factory para crear entidades de tipo {@link Image} */
-    private ImageFactory imageFactory;
-
-    /** Factory de entidades de tipo {@link Account} */
-    private AccountEditor accountEditor;
-
-    /** Factory para crear entidades de tipo {@link Account} */
+    /** Factory para la creación de la entidad {@link Account} */
     private AccountFactory accountFactory;
 
-    /** Factory para crear entidades de tipo {@link User} */
+    /** Factory para la creación de la entidad {@link User} */
     private UserFactory userFactory;
 
-    /** Policy relacionado con las políticas de acceso de las {@link Image} */
+    /** Editor para la actualización de la entidad {@link Account} */
+    private AccountEditor accountEditor;
+
+    /** Policy relacionado con las políticas de acceso a la entidad {@link Image} */
     private ImageAccessPolicy imageAccessPolicy;
 
-    /** Policy relacionado con las políticas de acceso de las {@link Account} */
+    /** Policy relacionado con las políticas de acceso a la entidad {@link Account} */
     private AccountAccessPolicy accountAccessPolicy;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -110,14 +106,10 @@ public class AccountServiceImpl implements AccountService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Inicializa las propiedades necesarias que no son beans de Spring y que pueden requerir dependencias que si son
-     * beans de Spring, después de construir la clase.
+     * Inicializa las propiedades necesarias que no son beans de Spring.
      */
     @PostConstruct
     public void init(){
-        // ImageFactory
-        this.imageFactory = new ImageFactory();
-
         // AccountFactory, AccountEditor
         var supportedLanguagePolicy = new LanguageSupportedPolicy( this.localeProperties );
         var accountEmailUniquenessPolicy = new AccountEmailUniquenessPolicy( this.accountRepository );
@@ -130,7 +122,7 @@ public class AccountServiceImpl implements AccountService {
         var userMinimumAgePolicy = new UserMinimumAgePolicy( this.appProperties );
         this.userFactory = new UserFactory( userUsernameUniquenessPolicy, userMinimumAgePolicy );
 
-        // ImageAccessPolicy & AccountAccessPolicy
+        // Policies
         this.imageAccessPolicy = new ImageAccessPolicy();
         this.accountAccessPolicy = new AccountAccessPolicy();
     }
@@ -140,73 +132,79 @@ public class AccountServiceImpl implements AccountService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public AccountInfoResult me() {
-        // Step 01: Get authenticated account
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
-
-        // Step 02: Convert to Result and return
-        return this.accountMapper.toInfoResult( requester );
-    }
-
-// ------------------------------------------------------------------------------------------------------------------ \\
-
-    @Override
     public AccountInfoResult get( final AccountId id ){
-        // Step 01: Get authenticated account
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Get account by ID
-        final Account account = this.accountRepository.findById( id.value() ).orElseThrow( () -> new AccountNotFoundByIdException( id ));
+        // Step 02: Get Account by ID
+        final Account account = this.accountRepository.findById( id.value() )
+                .orElseThrow( () -> new AccountNotFoundByIdException( id ));
 
-        // Step 03: Check if current account has read access
+        // Step 03: Check if Authenticated Account has Read access
         this.accountAccessPolicy.checkRead( requester, account );
 
-        // Step 04: Convert to Result and return
+        // Step 04: Convert Account & Return Result
         return this.accountMapper.toInfoResult( account );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public PageResult<AccountInfoResult> search( final String search, final PageableCommand pageableCommand){
-        // Step 01: Get authenticated account
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+    public AccountInfoResult me() {
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Check if current account has query access
-        this.accountAccessPolicy.checkQuery( requester );
-
-        // Step 03: Create pageable
-        final Pageable pageable = PageRequest.of( pageableCommand.page(), pageableCommand.size() );
-
-        // Step 04: Search accounts
-        final Page<Account> page;
-        if( Objects.nonNull( search )) page = this.accountRepository.search( search, pageable );
-        else page = this.accountRepository.findAll( pageable );
-
-        // Step 05: Convert to Result
-        final List<AccountInfoResult> content = page.getContent().stream().map( this.accountMapper::toInfoResult ).toList();
-
-        // Step 06: Create page info and return
-        return new PageResult<>( page.getTotalElements(), page.getNumber(), page.getSize(), content );
+        // Step 02: Convert Account & Return Result
+        return this.accountMapper.toInfoResult( requester );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public PageResult<AccountInfoResult> search( final FilterAccountCommand filterCommand, final PageableCommand pageableCommand ){
-        // Step 01: Get authenticated account
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+    public PageResult<AccountInfoResult> search( final String search, final PageableCommand pageable ){
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Check if current account has query access
+        // Step 02: Check if Authenticated Account has Query access
         this.accountAccessPolicy.checkQuery( requester );
 
-        // Step 03: Initialize probe and matcher
+        // Step 03: Create Pageable Request
+        final Pageable pageableRequest = PageRequest.of( pageable.page(), pageable.size() );
+
+        // Step 04: Search Accounts
+        final Page<Account> data;
+        if( Objects.nonNull( search )) data = this.accountRepository.search( search, pageableRequest );
+        else data = this.accountRepository.findAll( pageableRequest );
+
+        // Step 05: Convert Account List to Result List
+        final List<AccountInfoResult> content = data.getContent().stream()
+                .map( this.accountMapper::toInfoResult ).toList();
+
+        // Step 06: Create Page Result & Return Result
+        return new PageResult<>( data.getTotalElements(), data.getNumber(), data.getSize(), content );
+    }
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Override
+    public PageResult<AccountInfoResult> search( final FilterAccountCommand filter, final PageableCommand pageable ){
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
+
+        // Step 02: Check if Authenticated Account has Query access
+        this.accountAccessPolicy.checkQuery( requester );
+
+        // Step 03: Initialize Probe and Matcher
         final Account probe = new Account();
-        final User probeUser = new User();
+        final User userProbe = new User();
         final ExampleMatcher matcher = ExampleMatcher.matchingAll().withIgnoreNullValues().withIgnoreCase();
 
-        // Step 04: Check if filter exists
-        if( Objects.nonNull( filterCommand )){ // If filter exists
+        // Step 04: Build Probes from Filter if exists
+        if( Objects.nonNull( filter )){ // If Filter exists
             // Set Matchers
             matcher.withMatcher("lang", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
             matcher.withMatcher("role", ExampleMatcher.GenericPropertyMatchers.exact());
@@ -215,44 +213,35 @@ public class AccountServiceImpl implements AccountService {
             matcher.withMatcher("owner.name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
             matcher.withMatcher("owner.surname", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
 
-            // Set Probes from Filter
-            Optional.ofNullable( filterCommand.lang() ).ifPresent( probe::setLang );
-            Optional.ofNullable( filterCommand.role() ).ifPresent( probe::setRole );
-            Optional.ofNullable( filterCommand.email() ).ifPresent( probe::setEmail );
-            Optional.ofNullable( filterCommand.username() ).ifPresent( probeUser::setUsername );
-            Optional.ofNullable( filterCommand.name() ).ifPresent( probeUser::setName );
-            Optional.ofNullable( filterCommand.surname() ).ifPresent( probeUser::setSurname );
+            // Set Probe from Filter if exists data
+            Optional.ofNullable( filter.lang() ).ifPresent( probe::setLang );
+            Optional.ofNullable( filter.role() ).ifPresent( probe::setRole );
+            Optional.ofNullable( filter.email() ).ifPresent( probe::setEmail );
 
-            // Set Owner from Filter if exists data
-            if( Objects.nonNull( probeUser.getUsername() ) ||
-                Objects.nonNull( probeUser.getName() ) ||
-                Objects.nonNull( probeUser.getSurname() )) {
-                probe.setOwner( probeUser );
-            }
+            // Set Probe for Owner from Filter if exists data
+            Optional.ofNullable( filter.username() ).ifPresent(
+                    value -> { userProbe.setUsername( value ); probe.setOwner( userProbe ); });
+            Optional.ofNullable( filter.name() ).ifPresent(
+                    value -> { userProbe.setName( value ); probe.setOwner( userProbe ); });
+            Optional.ofNullable( filter.surname() ).ifPresent(
+                    value -> { userProbe.setSurname( value ); probe.setOwner( userProbe ); });
         }
 
-        // Step 05: Create example from probe and matcher
+        // Step 05: Create Example from Probe & Matcher
         final Example<Account> example = Example.of( probe, matcher );
 
-        // Step 06: Create pageable
-        final Pageable pageable = PageRequest.of( pageableCommand.page(), pageableCommand.size() );
+        // Step 06: Create Pageable Request
+        final Pageable pageableRequest = PageRequest.of( pageable.page(), pageable.size() );
 
-        // Step 07: Search accounts with example and pageable
-        final Page<Account> page = this.accountRepository.findAll( example, pageable );
+        // Step 07: Search Accounts
+        final Page<Account> data = this.accountRepository.findAll( example, pageableRequest );
 
-        // Step 08: Convert to Result
-        final List<AccountInfoResult> content = page.getContent().stream().map( this.accountMapper::toInfoResult ).toList();
+        // Step 08: Convert Account List to Result List
+        final List<AccountInfoResult> content = data.getContent().stream()
+                .map( this.accountMapper::toInfoResult ).toList();
 
-        // Step 09: Create page info and return
-        return new PageResult<>( page.getTotalElements(), page.getNumber(), page.getSize(), content );
-    }
-
-// ------------------------------------------------------------------------------------------------------------------ \\
-
-    @Override
-    public List<AccountRole> getSupportedRoles() {
-        // Step 01: Get supported roles list
-        return AccountRole.getSupportedRoles();
+        // Step 09: Create Page Result & Return Result
+        return new PageResult<>( data.getTotalElements(), data.getNumber(), data.getSize(), content );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -260,13 +249,14 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public AccountInfoResult create( final CreateAccountCommand command ){
-        // Step 01: Get authenticated account
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Check if current account has create access
+        // Step 02: Check if Authenticated Account has Create access
         this.accountAccessPolicy.checkCreate( requester );
 
-        // Step 03: Get provided data
+        // Step 03: Get Provided data
         final Locale lang = command.lang();
         final ImageId imageId = command.image();
         final AccountRole role = command.role();
@@ -277,24 +267,25 @@ public class AccountServiceImpl implements AccountService {
         final UserSurname surname = command.surname();
         final LocalDate birthdate = command.birthdate();
 
-        // Step 04: Check if exists image if image ID is provided
-        if( Objects.nonNull( imageId )){
+        // Step 04: Check if Image ID is provided, if provided check if exists Image
+        if( Objects.nonNull( imageId )){ // If provided
+            // Get Image by ID
             final Image image = this.imageRepository.findById( imageId.value() )
                     .orElseThrow( () -> new ImageNotFoundByIdException( imageId ));
 
-            // Check if current user has read access to image
+            // Check if Authenticated Account has Read access
             this.imageAccessPolicy.checkRead( requester, image );
         }
 
-        // Step 04: Create user and account
+        // Step 04: Create User & Account
         final User user = this.userFactory.create( username, name, birthdate ).surname( surname ).image( imageId ).build();
         final Account account = this.accountFactory.create( user, email, password ).role( role ).lang( lang ).build();
 
-        // Step 05: Save user and account
+        // Step 05: Save User & Account
         this.userRepository.save( user );
         this.accountRepository.save( account );
 
-        // Step 06: Convert to Result and return
+        // Step 06: Convert Account & Return Result
         return this.accountMapper.toInfoResult( account );
     }
 
@@ -303,27 +294,35 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public AccountInfoResult update( final AccountId id, final UpdateAccountCommand command ){
-        // Step 01: Get authenticated account
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Get account by ID
-        final Account account = this.accountRepository.findById( id.value() ).orElseThrow( () -> new AccountNotFoundByIdException( id ));
+        // Step 02: Get Account by ID
+        final Account account = this.accountRepository.findById( id.value() )
+                .orElseThrow( () -> new AccountNotFoundByIdException( id ));
 
-        // Step 03: Check if current account has write access
+        // Step 03: Check if Authenticated Account has Write access
         this.accountAccessPolicy.checkWrite( requester, account );
 
-        // Step 04: Update account
-        final AccountEditor.Editor editor = this.accountEditor.update( account );
-        editor.lang( command.lang() ).role( command.role() ).email( command.email() ).password( command.password() );
+        // Step 04: Get Provided data
+        final Locale lang = command.lang();
+        final AccountRole role = command.role();
+        final Email email = command.email();
+        final AccountPassword password = command.password();
 
-        // Step 05: Check if editor has changes
-        if( editor.hasChanges() ){ // If editor has changes
-            // Apply changes and save new data
+        // Step 05: Update Account
+        final AccountEditor.Editor editor = this.accountEditor.update( account );
+        editor.lang( lang ).role( role ).email( email ).password( password );
+
+        // Step 06: Check if Account Editor has changes
+        if( editor.hasChanges() ){ // If Account Editor has changes
+            // Apply changes & Save Account
             editor.apply();
             this.accountRepository.save( account );
         }
 
-        // Step 06: Convert to Result and return
+        // Step 07: Convert Account & Return Result
         return this.accountMapper.toInfoResult( account );
     }
 
@@ -332,24 +331,25 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public AccountInfoResult updateLang( final Locale lang ){
-        // Step 01: Get authenticated account
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Update lang account
+        // Step 02: Update Lang Account
         final AccountEditor.Editor editor = this.accountEditor.update( requester );
         editor.lang( lang );
 
-        // Step 03: Check if editor has changes
-        if( editor.hasChanges() ){ // If editor has changes
-            // Apply changes and save new data
+        // Step 03: Check if Account Editor has changes
+        if( editor.hasChanges() ){ // If Account Editor has changes
+            // Apply changes & Save Account
             editor.apply();
             this.accountRepository.save( requester );
 
-            // Set lang in LocaleContextHolder
-            requester.getLang().map( Locale::forLanguageTag ).ifPresent( LocaleContextHolder::setLocale );
+            // Set Lang in LocaleContextHolder
+            LocaleContextHolder.setLocale( lang );
         }
 
-        // Step 04: Convert to Result and return
+        // Step 04: Convert Account & Return Result
         return this.accountMapper.toInfoResult( requester );
     }
 
@@ -358,24 +358,26 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public AccountInfoResult updateEmail( final AccountPassword password, final Email newEmail ){
-        // Step 01: Get authenticated account
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Check if account password is correct
-        if( !this.passwordEncoderManager.check( password.value(), requester.getPassword() )) throw new IncorrectPasswordException();
+        // Step 02: Check if Account Password is correct
+        if( this.passwordEncoderManager.notMatches( password.value(), requester.getPassword() ))
+            throw new IncorrectPasswordException();
 
-        // Step 03: Update email account
+        // Step 03: Update Email Account
         final AccountEditor.Editor editor = this.accountEditor.update( requester );
         editor.email( newEmail );
 
-        // Step 04: Check if editor has changes
-        if( editor.hasChanges() ){ // If editor has changes
-            // Apply changes and save new data
+        // Step 04: Check if Account Editor has changes
+        if( editor.hasChanges() ){ // If Account Editor has changes
+            // Apply changes & Save Account
             editor.apply();
             this.accountRepository.save( requester );
         }
 
-        // Step 05: Convert to Result and return
+        // Step 05: Convert Account & Return Result
         return this.accountMapper.toInfoResult( requester );
     }
 
@@ -384,24 +386,26 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public AccountInfoResult updatePassword( final AccountPassword password, final AccountPassword newPassword ){
-        // Step 01: Get authenticated account
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Check if account password is correct
-        if( !this.passwordEncoderManager.check( password.value(), requester.getPassword() )) throw new IncorrectPasswordException();
+        // Step 02: Check if Account Password is correct
+        if( this.passwordEncoderManager.notMatches( password.value(), requester.getPassword() ))
+            throw new IncorrectPasswordException();
 
-        // Step 03: Update password account
+        // Step 03: Update Password Account
         final AccountEditor.Editor editor = this.accountEditor.update( requester );
         editor.password( newPassword );
 
-        // Step 04: Check if editor has changes
-        if( editor.hasChanges() ){ // If editor has changes
-            // Apply changes and save new data
+        // Step 04: Check if Account Editor has changes
+        if( editor.hasChanges() ){ // If Account Editor has changes
+            // Apply changes & Save Account
             editor.apply();
             this.accountRepository.save( requester );
         }
 
-        // Step 05: Convert to Result and return
+        // Step 05: Convert Account & Return Result
         return this.accountMapper.toInfoResult( requester );
     }
 
@@ -411,28 +415,30 @@ public class AccountServiceImpl implements AccountService {
     @SneakyThrows( IOException.class )
     @Transactional( rollbackFor = IOException.class )
     public AccountInfoResult delete( final AccountId id ){
-        // Step 01: Get authenticated account
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Get account by ID
-        final Account account = this.accountRepository.findById( id.value() ).orElseThrow( () -> new AccountNotFoundByIdException( id ));
+        // Step 02: Get Account by ID
+        final Account account = this.accountRepository.findById( id.value() )
+                .orElseThrow( () -> new AccountNotFoundByIdException( id ));
 
-        // Step 03: Check if current account has delete access
+        // Step 03: Check if Authenticated Account has Delete access
         this.accountAccessPolicy.checkDelete( requester, account );
 
-        // Step 04: Get Data
+        // Step 04: Get User & ImageId data
         final User user = account.getOwner();
         final ImageId imageId = new ImageId( user.getId() );
 
-        // Step 05: Delete account
+        // Step 05: Delete User & Account
         this.userRepository.delete( user );
 
-        // Step 06: Delete Image profile
+        // Step 06: Delete Image Profile data
         this.imageRepository.deleteById( imageId.value() );
         final File file = this.imageFileManager.get( imageId );
         this.imageFileManager.delete( file );
 
-        // Step 07: Convert to Result and return
+        // Step 07: Convert Account & Return Result
         return this.accountMapper.toInfoResult( account );
     }
 
@@ -442,26 +448,36 @@ public class AccountServiceImpl implements AccountService {
     @SneakyThrows( IOException.class )
     @Transactional( rollbackFor = IOException.class )
     public AccountInfoResult delete( final AccountPassword password ){
-        // Step 01: Get authenticated account
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Check if account password is correct
-        if( !this.passwordEncoderManager.check( password.value(), requester.getPassword() )) throw new IncorrectPasswordException();
+        // Step 02: Check if Account Password is correct
+        if( this.passwordEncoderManager.notMatches( password.value(), requester.getPassword() ))
+            throw new IncorrectPasswordException();
 
-        // Step 03: Get Data
+        // Step 03: Get User & ImageId data
         final User user = requester.getOwner();
         final ImageId imageId = new ImageId( user.getId() );
 
-        // Step 04: Delete account
+        // Step 04: Delete User & Account
         this.userRepository.delete( user );
 
-        // Step 05: Delete Image profile
+        // Step 05: Delete Image Profile data
         this.imageRepository.deleteById( imageId.value() );
         final File file = this.imageFileManager.get( imageId );
         this.imageFileManager.delete( file );
 
-        // Step 06: Convert to Result and return
+        // Step 06: Convert Account & Return Result
         return this.accountMapper.toInfoResult( requester );
+    }
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Override
+    public List<AccountRole> getSupportedRoles() {
+        // Step 01: Return Supported Account Roles
+        return AccountRole.getSupportedRoles();
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

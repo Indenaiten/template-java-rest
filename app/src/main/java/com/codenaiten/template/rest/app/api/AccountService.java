@@ -7,7 +7,6 @@ import com.codenaiten.template.rest.app.dto.command.account.UpdateAccountCommand
 import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
 import com.codenaiten.template.rest.app.dto.result.PageResult;
 import com.codenaiten.template.rest.app.entity.Account;
-import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
 import com.codenaiten.template.rest.app.vo.account.AccountPassword;
@@ -17,150 +16,156 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Service con los casos de uso relacionados con los {@link Account} en el sistema.
+ * Service con los casos de uso relacionados con las entidades {@link Account}.
  */
 public interface AccountService {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Obtiene la información de la {@link Account} del {@link User} autenticado en el sistema.
+     * Obtiene la información de la entidad {@link Account} a partir de su identificador único.
      *
-     * @return {@link AccountInfoResult} con la información de la {@link Account} del {@link User} autenticado.
-     */
-    AccountInfoResult me();
-
-// ------------------------------------------------------------------------------------------------------------------ \\
-
-    /**
-     * Obtiene la información de la {@link Account} a partir de su identificador.
+     * @param id {@link AccountId} que representa el identificador único de la entidad {@link Account} de la cual se van
+     *           a consultar los datos.
      *
-     * @param id {@link AccountId} que representa el identificador de la {@link Account} de la cual se van a consultar
-     *           los datos.
-     *
-     * @return {@link AccountInfoResult} con la información de la {@link Account} consultada.
+     * @return {@link AccountInfoResult} con la información de la entidad {@link Account} encontrada.
      */
     AccountInfoResult get( AccountId id );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Busca {@link Account} en el sistema mediante un término de búsqueda.
+     * Obtiene la información de la entidad {@link Account} del usuario autenticado.
      *
-     * @param search {@link String} con el término de búsqueda.
-     * @param pageableCommand {@link PageableCommand} con los datos relacionados con la paginación.
-     *
-     * @return {@link PageResult} con la lista de {@link AccountInfoResult} resultante de la búsqueda a partir del
-     *         término de búsqueda.
+     * @return {@link AccountInfoResult} con la información de la entidad {@link Account} encontrada.
      */
-    PageResult<AccountInfoResult> search( String search, PageableCommand pageableCommand );
+    AccountInfoResult me();
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Busca {@link Account} en el sistema mediante un filtro de búsqueda.
+     * Busca la información de las entidades {@link Account} a partir de un término de búsqueda.
      *
-     * @param filterCommand {@link FilterAccountCommand} con los datos relacionados con el filtro de la búsqueda.
-     * @param pageableCommand {@link PageableCommand} con los datos relacionados con la paginación.
+     * @param search {@link String} que representa el término de búsqueda por el cual se van a recuperar los datos de
+     *        las entidades {@link Account} que hay registradas en el sistema.
+     * @param pageable {@link PageableCommand} que representa los datos de paginación que se van a utilizar para
+     *        recuperar los datos de las entidades {@link Account} que hay registradas de forma paginada.
      *
-     * @return {@link PageResult} con la lista de {@link AccountInfoResult} resultante de la búsqueda a partir del
-     *         filtro de búsqueda.
+     * @return {@link PageResult} de {@link AccountInfoResult} con la información de las entidades {@link Account} que
+     *         se han encontrado.
      */
-    PageResult<AccountInfoResult> search( FilterAccountCommand filterCommand, PageableCommand pageableCommand );
+    PageResult<AccountInfoResult> search( String search, PageableCommand pageable );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Obtiene la lista de {@link AccountRole} que se pueden asignar a un {@link Account}.
+     * Busca la información de las entidades {@link Account} a partir de un filtro de búsqueda.
      *
-     * @return {@link List} con la lista de {@link AccountRole} que se pueden asignar a una {@link Account}.
+     * @param filter {@link FilterAccountCommand} que representa el filtro de búsqueda por el cual se va a utilizar para
+     *        recuperar los datos de las entidades {@link Account} que hay registradas en el sistema.
+     * @param pageable {@link PageableCommand} que representa los datos de paginación que se van a utilizar para
+     *        recuperar los datos de las entidades {@link Account} que hay registradas de forma paginada.
+     *
+     * @return {@link PageResult} de {@link AccountInfoResult} con la información de las entidades {@link Account} que
+     *         se han encontrado.
      */
-    List<AccountRole> getSupportedRoles();
+    PageResult<AccountInfoResult> search( FilterAccountCommand filter, PageableCommand pageable );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Crea un nuevo {@link Account} en el sistema.
+     * Crea una nueva entidad {@link Account} en el sistema.
      *
-     * @param command {@link CreateAccountCommand} con los datos del nuevo {@link Account} a crear.
+     * @param command {@link CreateAccountCommand} con los datos de la nueva entidad {@link Account} a crear.
      *
-     * @return {@link AccountInfoResult} con los datos del nuevo {@link Account} que se ha creado.
+     * @return {@link AccountInfoResult} con la información de la entidad {@link Account} creada.
      */
     AccountInfoResult create( CreateAccountCommand command );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Actualiza la información de una {@link Account} a partir de su identificador.
+     * Actualiza los datos de una entidad {@link Account} registrada en el sistema a partir de su identificador único.
      *
-     * @param id {@link AccountId} que representa el identificador de la {@link Account} a actualizar.
-     * @param command {@link UpdateAccountCommand} con los nuevos datos con los que se van actualizar los datos del
-     *                {@link Account}.
+     * @param id {@link AccountId} que representa el identificador único de la entidad {@link Account} que se requiere
+     *        actualizar los datos.
+     * @param command {@link UpdateAccountCommand} con los nuevos datos con los que se van a actualizar los datos de la
+     *        entidad {@link Account} registrada en el sistema.
      *
-     * @return {@link AccountInfoResult} con la información actualizada del {@link Account}.
+     * @return {@link AccountInfoResult} con la nueva información de la entidad {@link Account} actualizada.
      */
     AccountInfoResult update( AccountId id, UpdateAccountCommand command );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Actualiza el {@link Locale} de la {@link Account} del {@link User} autenticado en el sistema.
+     * Actualiza el idioma de la entidad {@link Account} del usuario autenticado.
      *
-     * @param lang {@link Locale} que representa el nuevo {@link Locale} que se va a establecer en la {@link Account}.
+     * @param lang {@link Locale} que representa el idioma a establecer en la entidad {@link Account} del usuario
+     *        autenticado.
      *
-     * @return {@link AccountInfoResult} con la información actualizada del {@link Account}.
+     * @return {@link AccountInfoResult} con la nueva información de la entidad {@link Account} actualizada.
      */
     AccountInfoResult updateLang( Locale lang );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Actualiza el {@link Email} de la {@link Account} del {@link User} autenticado en el sistema.
+     * Actualiza el correo electrónico de la entidad {@link Account} del usuario autenticado.
      *
-     * @param password {@link AccountPassword} que representa la contraseña de la {@link Account} para confirmar la
-     *                 acción.
-     * @param newEmail {@link Email} que representa el nuevo {@link Email} que se va a establecer en la {@link Account}.
+     * @param password {@link AccountPassword} de la entidad {@link Account} del usuario autenticado para validar que es
+     *        el usuario propietario de la cuenta quien esta realizando la acción.
+     * @param newEmail {@link Email} de la entidad {@link Account} que se va a establecer como nuevo correo electrónico.
      *
-     * @return {@link AccountInfoResult} con la información actualizada del {@link Account}.
+     * @return {@link AccountInfoResult} con la nueva información de la entidad {@link Account} actualizada.
      */
     AccountInfoResult updateEmail( AccountPassword password, Email newEmail );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Actualiza el {@link AccountPassword} de la {@link Account} del {@link User} autenticado en el sistema.
+     * Actualiza la contraseña de la entidad {@link Account} del usuario autenticado.
      *
-     * @param password {@link AccountPassword} que representa la contraseña de la {@link Account} para confirmar la
-     *                 acción.
-     * @param newPassword {@link AccountPassword} que representa el nuevo {@link AccountPassword} que se va a establecer
-     *                    en la {@link Account}.
+     * @param password {@link AccountPassword} de la entidad {@link Account} del usuario autenticado para validar que es
+     *        el usuario propietario de la cuenta quien esta realizando la acción.
+     * @param password {@link AccountPassword} de la entidad {@link Account} que se va a establecer como nueva contraseña.
      *
-     * @return {@link AccountInfoResult} con la información actualizada del {@link Account}.
+     * @return {@link AccountInfoResult} con la nueva información de la entidad {@link Account} actualizada.
      */
     AccountInfoResult updatePassword( AccountPassword password, AccountPassword newPassword );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Elimina la {@link Account} a partir de su identificador.
+     * Elimina la entidad {@link Account} registrada en el sistema mediante su identificador único.
      *
-     * @param id {@link AccountId} que representa el identificador de la {@link Account} a eliminar.
+     * @param id {@link AccountId} que representa el identificador único de la entidad {@link Account} que se requiere
+     *        eliminar del sistema.
      *
-     * @return {@link AccountInfoResult} con la información de la {@link Account} eliminada.
+     * @return {@link AccountInfoResult} con la información de la entidad {@link Account} eliminada.
      */
     AccountInfoResult delete( AccountId id );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Elimina la {@link Account} del {@link User} autenticado en el sistema.
+     * Elimina la entidad {@link Account} del usuario autenticado.
      *
-     * @param password {@link AccountPassword} que representa la contraseña de la {@link Account} para confirmar la
-     *                 acción.
+     * @param password {@link AccountPassword} de la entidad {@link Account} del usuario autenticado para validar que es
+     *        el usuario propietario de la cuenta quien esta realizando la acción.
      *
-     * @return {@link AccountInfoResult} con la información de la {@link Account} eliminada.
+     * @return {@link AccountInfoResult} con la información de la entidad {@link Account} eliminada.
      */
     AccountInfoResult delete( AccountPassword password );
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    /**
+     * Obtiene la lista con los roles que se pueden asignar a una entidad {@link Account}.
+     *
+     * @return {@link List} de {@link AccountRole} que se pueden asignar a una entidad {@link Account}.
+     */
+    List<AccountRole> getSupportedRoles();
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 

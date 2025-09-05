@@ -52,36 +52,36 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    /** Properties con información relacionada con la configuración de la aplicación */
+    /** Properties con información relacionada con los detalles de la aplicación */
     private final AppProperties appProperties;
 
     /** Provider relacionado con la autenticación de un usuario */
     private final AuthenticationProvider authenticationProvider;
 
-    /** Manager relacionado con las operaciones relacionadas con el manejo de archivos de imagenes */
+    /** Manager relacionado con las operaciones relacionadas con los ficheros de las imágenes */
     private final ImageFileManager imageFileManager;
 
-    /** Repository relacionado con las entidades de tipo {@link Image} */
+    /** Repository relacionado con la entidad {@link Image} */
     private final ImageRepository imageRepository;
 
-    /** Repository relacionado con las entidades de tipo {@link User} */
+    /** Repository relacionado con la entidad {@link User} */
     private final UserRepository userRepository;
 
-    /** Mapper principal de objetos relacionados con las {@link Image} */
+    /** Mapper relacionado con la entidad {@link Image} */
     private final ImageMapper imageMapper;
 
-    /** Mapper principal de objetos relacionados con los {@link User} */
+    /** Mapper relacionado con la entidad {@link User} */
     private final UserMapper userMapper;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    /** Editor para actualizar entidades de tipo {@link User} */
+    /** Editor para la actualización de la entidad {@link User} */
     private UserEditor userEditor;
 
-    /** Policy relacionado con las políticas de acceso de las {@link Image} */
+    /** Policy relacionado con las políticas de acceso a la entidad {@link Image} */
     private ImageAccessPolicy imageAccessPolicy;
 
-    /** Policy relacionado con las políticas de acceso de los {@link User} */
+    /** Policy relacionado con las políticas de acceso a la entidad {@link User} */
     private UserAccessPolicy userAccessPolicy;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -89,8 +89,7 @@ public class UserServiceImpl implements UserService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Inicializa las propiedades necesarias que no son beans de Spring y que pueden requerir dependencias que si son
-     * beans de Spring, después de construir la clase.
+     * Inicializa las propiedades necesarias que no son beans de Spring.
      */
     @PostConstruct
     public void init(){
@@ -99,7 +98,7 @@ public class UserServiceImpl implements UserService {
         var userMinimumAgePolicy = new UserMinimumAgePolicy( this.appProperties );
         this.userEditor = new UserEditor( userUsernameUniquenessPolicy, userMinimumAgePolicy );
 
-        // ImageAccessPolicy & UserAccessPolicy
+        // Policies
         this.imageAccessPolicy = new ImageAccessPolicy();
         this.userAccessPolicy = new UserAccessPolicy();
     }
@@ -109,80 +108,82 @@ public class UserServiceImpl implements UserService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public UserInfoResult me() {
-        // Step 01: Get authenticated user
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
-        final User user = requester.getOwner();
-
-        // Step 02: Convert to Result and return
-        return this.userMapper.toInfoResult( user );
-    }
-
-// ------------------------------------------------------------------------------------------------------------------ \\
-
-    @Override
     public UserInfoResult get( final UserId id ) {
         // Step 01: Find User by ID
-        final User user = this.userRepository.findById( id.value() ).orElseThrow( () -> new UserNotFoundByIdException( id ));
+        final User user = this.userRepository.findById( id.value() )
+                .orElseThrow( () -> new UserNotFoundByIdException( id ));
 
-        // Step 02: Convert to Result and return
+        // Step 02: Convert User & Return Result
         return this.userMapper.toInfoResult( user );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public PageResult<UserInfoResult> search( final String search, final PageableCommand pageableCommand ){
-        // Step 01: Create pageable
-        final Pageable pageable = PageRequest.of( pageableCommand.page(), pageableCommand.size() );
+    public UserInfoResult me() {
+        // Step 01: Get Authenticated User
+        final User requester = this.authenticationProvider.getAuthenticatedAccount()
+                .map( Account::getOwner )
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Search users
+        // Step 02: Convert User & Return Result
+        return this.userMapper.toInfoResult( requester );
+    }
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+    @Override
+    public PageResult<UserInfoResult> search( final String search, final PageableCommand pageable ){
+        // Step 01: Create Pageable Request
+        final Pageable pageableRequest = PageRequest.of( pageable.page(), pageable.size() );
+
+        // Step 02: Search Users
         final Page<User> page;
-        if( Objects.nonNull( search )) page = this.userRepository.search( search, pageable );
-        else page = this.userRepository.findAll( pageable );
+        if( Objects.nonNull( search )) page = this.userRepository.search( search, pageableRequest );
+        else page = this.userRepository.findAll( pageableRequest );
 
-        // Step 03: Convert to Result
+        // Step 03: Convert User List to Result List
         final List<UserInfoResult> content = page.getContent().stream().map( this.userMapper::toInfoResult ).toList();
 
-        // Step 04: Create page info and return
+        // Step 04: Create Page Result & Return Result
         return new PageResult<>( page.getTotalElements(), page.getNumber(), page.getSize(), content );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public PageResult<UserInfoResult> search( final FilterUserCommand filterCommand, final PageableCommand pageableCommand ){
-        // Step 01: Create pageable
-        final Pageable pageable = PageRequest.of( pageableCommand.page(), pageableCommand.size() );
-
-        // Step 02: Initialize probe and matcher
+    public PageResult<UserInfoResult> search( final FilterUserCommand filter, final PageableCommand pageable ){
+        // Step 01: Initialize Probe and Matcher
         final User probe = new User();
         final ExampleMatcher matcher = ExampleMatcher.matchingAll().withIgnoreNullValues().withIgnoreCase();
 
-        // Step 03: Check if filter exists
-        if( Objects.nonNull( filterCommand )){ // If filter exists
+        // Step 02: Build Probes from Filter if exists
+        if( Objects.nonNull( filter )){ // If Filter exists
             // Set Matchers
             matcher.withMatcher("username", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase() );
             matcher.withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase() );
             matcher.withMatcher("surname", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase() );
 
-            // Set Probes from Filter
-            Optional.ofNullable( filterCommand.username() ).ifPresent( probe::setUsername );
-            Optional.ofNullable( filterCommand.name() ).ifPresent( probe::setName );
-            Optional.ofNullable( filterCommand.surname() ).ifPresent( probe::setSurname );
+            // Set Probe from Filter if exists data
+            Optional.ofNullable( filter.username() ).ifPresent( probe::setUsername );
+            Optional.ofNullable( filter.name() ).ifPresent( probe::setName );
+            Optional.ofNullable( filter.surname() ).ifPresent( probe::setSurname );
         }
 
-        // Step 04: Create example from probe and matcher
+        // Step 03: Create Example from Probe & Matcher
         final Example<User> example = Example.of( probe, matcher );
 
-        // Step 05: Search users with example and pageable
-        final Page<User> page = this.userRepository.findAll( example, pageable );
+        // Step 04: Create Pageable Request
+        final Pageable pageableRequest = PageRequest.of( pageable.page(), pageable.size() );
 
-        // Step 06: Convert to Result
-        final List<UserInfoResult> content = page.getContent().stream().map( this.userMapper::toInfoResult ).toList();
+        // Step 05: Search Users
+        final Page<User> data = this.userRepository.findAll( example, pageableRequest );
 
-        // Step 07: Create page info and return
-        return new PageResult<>( page.getTotalElements(), page.getNumber(), page.getSize(), content );
+        // Step 06: Convert User List to Result List
+        final List<UserInfoResult> content = data.getContent().stream().map( this.userMapper::toInfoResult ).toList();
+
+        // Step 07: Create Page Result & Return Result
+        return new PageResult<>( data.getTotalElements(), data.getNumber(), data.getSize(), content );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -190,41 +191,45 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserInfoResult update( final UserId id, final UpdateUserCommand command ) {
-        // Step 01: Get authenticated user
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
+
+        // Step 02: Get Authenticated User
         final User user = requester.getOwner();
 
-        // Step 02: Check if current user has write access
+        // Step 03: Check if Authenticated Account has Write access
         this.userAccessPolicy.checkWrite( requester, user );
 
-        // Step 03: Get provided data
+        // Step 04: Get Provided data
         final ImageId imageId = command.image();
         final UserUsername username = command.username();
         final UserName name = command.name();
         final UserSurname surname = command.surname();
         final LocalDate birthdate = command.birthdate();
 
-        // Step 04: Check if exists image if image ID is provided
-        if( Objects.nonNull( imageId )){
+        // Step 05: Check if Image ID is provided, if provided check if exists Image
+        if( Objects.nonNull( imageId )){ // If provided
+            // Get Image by ID
             final Image image = this.imageRepository.findById( imageId.value() )
                     .orElseThrow( () -> new ImageNotFoundByIdException( imageId ));
 
-            // Check if current user has read access to image
+            // Check if Authenticated Account has Read access
             this.imageAccessPolicy.checkRead( requester, image );
         }
 
-        // Step 05: Update user
+        // Step 06: Update User
         final UserEditor.Editor editor = this.userEditor.update( user );
         editor.image( imageId ).username( username ).name( name ).surname( surname ).birthdate( birthdate );
 
-        // Step 06: Save user changes
-        if( editor.hasChanges() ){ // If editor has changes
-            // Apply changes and save new data
+        // Step 07: Check if User Editor has changes
+        if( editor.hasChanges() ){ // If User Editor has changes
+            // Apply changes & Save User
             editor.apply();
             this.userRepository.save( user );
         }
 
-        // Step 07: Convert to Result and return
+        // Step 08: Convert User & Return Result
         return this.userMapper.toInfoResult( user );
     }
 
@@ -233,38 +238,42 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserInfoResult update( final UpdateUserCommand command ){
-        // Step 01: Get authenticated user
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
+
+        // Step 02: Get Authenticated User
         final User user = requester.getOwner();
 
-        // Step 02: Get provided data
+        // Step 03: Get Provided data
         final ImageId imageId = command.image();
         final UserUsername username = command.username();
         final UserName name = command.name();
         final UserSurname surname = command.surname();
         final LocalDate birthdate = command.birthdate();
 
-        // Step 03: Check if exists image if image ID is provided
-        if( Objects.nonNull( imageId )){
+        // Step 04: Check if Image ID is provided, if provided check if exists Image
+        if( Objects.nonNull( imageId )){ // If provided
+            // Get Image by ID
             final Image image = this.imageRepository.findById( imageId.value() )
                     .orElseThrow( () -> new ImageNotFoundByIdException( imageId ));
 
-            // Check if current user has read access to image
+            // Check if Authenticated Account has Read access
             this.imageAccessPolicy.checkRead( requester, image );
         }
 
-        // Step 04: Update user
+        // Step 05: Update User
         final UserEditor.Editor editor = this.userEditor.update( user );
         editor.image( imageId ).username( username ).name( name ).surname( surname ).birthdate( birthdate );
 
-        // Step 04: Save user changes
-        if( editor.hasChanges() ){ // If editor has changes
-            // Apply changes and save new data
+        // Step 06: Check if User Editor has changes
+        if( editor.hasChanges() ){ // If User Editor has changes
+            // Apply changes & Save User
             editor.apply();
             this.userRepository.save( user );
         }
 
-        // Step 05: Convert to Result and return
+        // Step 05: Convert User & Return Result
         return this.userMapper.toInfoResult( user );
     }
 
@@ -272,29 +281,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @SneakyThrows( IOException.class )
-    public ImageContentResult image( final UserId id ){
-        // Step 01: Get authenticated user
-        final Account requester = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
+    public ImageContentResult getImageProfile(final UserId id ){
+        // Step 01: Get Authenticated Account
+        final Account requester = this.authenticationProvider.getAuthenticatedAccount()
+                .orElseThrow( AuthNotFoundException::new );
 
         // Step 02: Find User by ID
-        final User user = this.userRepository.findById( id.value() ).orElseThrow( () -> new UserNotFoundByIdException( id ));
+        final User user = this.userRepository.findById( id.value() )
+                .orElseThrow( () -> new UserNotFoundByIdException( id ));
 
-        // Step 03: Check if current user has image profile
-        if( user.getImage().isEmpty() ) throw new UserImageProfileNotExistsException( new UserId( requester.getId() ));
+        // Step 03: Check if Authenticated User has Image Profile
+        if( user.getImage().isEmpty() )
+            throw new UserImageProfileNotExistsException( new UserId( requester.getId() ));
 
-        // Step 04: Get Image Profile
+        // Step 04: Create Image Info Result from Image
         final ImageId imageId = new ImageId( user.getId() );
         final Image image = this.imageRepository.findById( imageId.value() )
                 .orElseThrow( () -> new ImageNotFoundByIdException( imageId ));
 
-        // Step 05: Convert to Result and return
+        // Step 05: Create Image Info Result from Image
         final ImageInfoResult info = this.imageMapper.toInfoResult( image );
 
-        // Step 06: Get Image content
+        // Step 06: Get Image content from Image File
         final File file = this.imageFileManager.get( imageId );
         final byte[] content = this.imageFileManager.read( file );
 
-        // Step 07: Create result and return
+        // Step 07: Create Image Content Result from Image Info & Content
         return new ImageContentResult( info, content );
     }
 
@@ -302,27 +314,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @SneakyThrows( IOException.class )
-    public ImageContentResult image(){
-        // Step 01: Get authenticated user
-        final Account requesterAccount = this.authenticationProvider.getAuthenticatedAccount().orElseThrow( AuthNotFoundException::new );
-        final User requester = requesterAccount.getOwner();
+    public ImageContentResult getImageProfile(){
+        // Step 01: Get Authenticated User
+        final User requester = this.authenticationProvider.getAuthenticatedAccount()
+                .map( Account::getOwner )
+                .orElseThrow( AuthNotFoundException::new );
 
-        // Step 02: Check if current user has image profile
-        if( requester.getImage().isEmpty() ) throw new UserImageProfileNotExistsException( new UserId( requester.getId() ));
+        // Step 02: Check if Authenticated User has Image Profile
+        if( requester.getImage().isEmpty() )
+            throw new UserImageProfileNotExistsException( new UserId( requester.getId() ));
 
         // Step 03: Get Image Profile
         final ImageId imageId = new ImageId( requester.getId() );
         final Image image = this.imageRepository.findById( imageId.value() )
                 .orElseThrow( () -> new ImageNotFoundByIdException( imageId ));
 
-        // Step 04: Convert to Result and return
+        // Step 04: Create Image Info Result from Image
         final ImageInfoResult info = this.imageMapper.toInfoResult( image );
 
-        // Step 05: Get Image content
+        // Step 05: Get Image content from Image File
         final File file = this.imageFileManager.get( imageId );
         final byte[] content = this.imageFileManager.read( file );
 
-        // Step 06: Create result and return
+        // Step 06: Create Image Content Result from Image Info & Content
         return new ImageContentResult( info, content );
     }
 

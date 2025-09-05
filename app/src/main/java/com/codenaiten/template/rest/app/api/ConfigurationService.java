@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Service con los casos de uso relacionados con las configuraciones del sistema.
+ * Service con los casos de uso relacionados con la configuración del sistema.
  */
 public interface ConfigurationService {
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Establece un idioma soportado en el sistema.
+     * Actualiza el idioma del sistema.
      *
      * @param lang {@link Locale} que representa el idioma a establecer en el sistema.
      */
@@ -20,18 +20,18 @@ public interface ConfigurationService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Obtiene el idioma actual establecido en el sistema.
+     * Obtiene el idioma actual configurado en el sistema.
      *
-     * @return {@link Locale} que representa el idioma actual establecido en el sistema.
+     * @return {@link Locale} que representa el idioma actual configurado en el sistema.
      */
     Locale getLang();
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     /**
-     * Obtiene una lista con los idiomas soportados en el sistema.
+     * Obtiene la lista de idiomas soportados por el sistema.
      *
-     * @return {@link List} con los {@link Locale} que representan los idiomas soportados en el sistema.
+     * @return {@link List} de {@link Locale} que representan los idiomas soportados por el sistema.
      */
     List<Locale> getSupportedLanguages();
 
