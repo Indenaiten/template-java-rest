@@ -34,5 +34,8 @@ public record UpdateUserRequest(
         @Schema( description = "Fecha de nacimiento", example = "01/01/2000" )
         @Pattern( regexp = "\\d{2}/\\d{2}/\\d{4}", message = "La fecha de nacimiento debe estar en formato (dd/mm/yyyy)." )
         LocalDate birthdate
-) {
+){
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
 }

@@ -11,7 +11,11 @@ import java.util.Map;
 @Schema( description = "Respuesta con datos de una página con los datos de las cuentas de usuario" )
 public class ApiRestResponseWithAccountInfoPageResponse extends ApiRestResponse<List<AccountInfoResponse>> {
     public ApiRestResponseWithAccountInfoPageResponse(
-            final ApiRestCodeResponse code, final String message, final Map<String, Object> matadata, final List<AccountInfoResponse> data ) {
+            final ApiRestCodeResponse code,
+            final String message,
+            final Map<String, Object> matadata,
+            final List<AccountInfoResponse> data
+    ){
         super( code, message, matadata, data );
     }
 }

@@ -10,7 +10,11 @@ import java.util.Map;
 @Schema( description = "Respuesta con datos del login del usuario" )
 public class ApiRestResponseWithLoginResponse extends ApiRestResponse<LoginResponse> {
     public ApiRestResponseWithLoginResponse(
-            final ApiRestCodeResponse code, final String message, final Map<String, Object> metadata, final LoginResponse data ) {
+            final ApiRestCodeResponse code,
+            final String message,
+            final Map<String, Object> metadata,
+            final LoginResponse data
+    ){
         super( code, message, metadata, data );
     }
 }

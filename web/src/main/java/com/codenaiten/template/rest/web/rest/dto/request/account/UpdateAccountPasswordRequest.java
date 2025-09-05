@@ -20,5 +20,8 @@ public record UpdateAccountPasswordRequest(
         @Size( min = AccountPassword.MIN_SIZE, max = AccountPassword.MAX_SIZE )
         @Pattern( regexp = AccountPassword.FORMAT, message = "La contraseña debe tener entre 8 y 64 caracteres, y contener al menos una letra mayúscula, una minúscula, un número y un carácter especial." )
         AccountPassword newPassword
-) {
+){
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
 }

@@ -10,7 +10,11 @@ import java.util.Map;
 @Schema( description = "Respuesta con datos de un usuario" )
 public class ApiRestResponseWithUserInfoResponse extends ApiRestResponse<UserInfoResponse> {
     public ApiRestResponseWithUserInfoResponse(
-            final ApiRestCodeResponse code, final String message, final Map<String, Object> metadata, final UserInfoResponse data ) {
+            final ApiRestCodeResponse code,
+            final String message,
+            final Map<String, Object> metadata,
+            final UserInfoResponse data
+    ){
         super( code, message, metadata, data );
     }
 }

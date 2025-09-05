@@ -1,7 +1,7 @@
 package com.codenaiten.template.rest.web.rest.controller;
 
 import com.codenaiten.template.rest.app.api.UserService;
-import com.codenaiten.template.rest.app.dto.command.PageableCommand;
+import com.codenaiten.template.rest.app.dto.command.PageCommand;
 import com.codenaiten.template.rest.app.dto.command.user.FilterUserCommand;
 import com.codenaiten.template.rest.app.dto.command.user.UpdateUserCommand;
 import com.codenaiten.template.rest.app.dto.result.ImageContentResult;
@@ -87,13 +87,13 @@ public class UserRestController implements UserApiRest{
     public ResponseEntity<ApiRestResponse<List<UserInfoResponse>>> search(
             final String search, final Integer page, final Integer size ){
         // Step 01: Create command
-        final PageableCommand pageableCommand = PageableCommand.of( page, size );
+        final PageCommand pageCommand = new PageCommand( page, size );
 
         // Step 02: Run use case
-        final PageResult<UserInfoResult> result = this.userService.search( search, pageableCommand );
+        final PageResult<UserInfoResult> result = this.userService.search( search, pageCommand );
 
         // Step 03: Convert result to response
-        final List<UserInfoResponse> content = result.getContent().stream().map( this.responseMapper::toResponse ).toList();
+        final List<UserInfoResponse> content = result.content().stream().map( this.responseMapper::toResponse ).toList();
 
         // Step 04: Get i18n info message if result is empty
         final String message = !content.isEmpty() ? null : this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_USER_NOT_DATA, LogLevel.INFO );
@@ -111,14 +111,14 @@ public class UserRestController implements UserApiRest{
     public ResponseEntity<ApiRestResponse<List<UserInfoResponse>>> search(
             final FilterUserRequest filter, final Integer page, final Integer size ){
         // Step 01: Create command
-        final PageableCommand pageableCommand = PageableCommand.of( page, size );
+        final PageCommand pageCommand = new PageCommand( page, size );
         final FilterUserCommand filterCommand = this.commandMapper.toCommand( filter );
 
         // Step 02: Run use case
-        final PageResult<UserInfoResult> result = this.userService.search( filterCommand, pageableCommand );
+        final PageResult<UserInfoResult> result = this.userService.search( filterCommand, pageCommand );
 
         // Step 03: Convert result to response
-        final List<UserInfoResponse> content = result.getContent().stream().map( this.responseMapper::toResponse ).toList();
+        final List<UserInfoResponse> content = result.content().stream().map( this.responseMapper::toResponse ).toList();
 
         // Step 04: Get i18n info message if result is empty
         final String message = !content.isEmpty() ? null : this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_USER_NOT_DATA, LogLevel.INFO );
@@ -184,11 +184,11 @@ public class UserRestController implements UserApiRest{
         final ImageContentResult result = this.userService.getImageProfile( id );
 
         // Step 02: Return response
-        final ImageInfoResult info = result.getInfo();
+        final ImageInfoResult info = result.info();
         return ResponseEntity.status( HttpStatus.OK )
-                .contentType( MediaType.parseMediaType( info.getContentType() ))
-                .contentLength( info.getSize() )
-                .body( result.getBytes() );
+                .contentType( MediaType.parseMediaType( info.contentType() ))
+                .contentLength( info.size() )
+                .body( result.bytes() );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -199,11 +199,11 @@ public class UserRestController implements UserApiRest{
         final ImageContentResult result = this.userService.getImageProfile();
 
         // Step 02: Return response
-        final ImageInfoResult info = result.getInfo();
+        final ImageInfoResult info = result.info();
         return ResponseEntity.status( HttpStatus.OK )
-                .contentType( MediaType.parseMediaType( info.getContentType() ))
-                .contentLength( info.getSize() )
-                .body( result.getBytes() );
+                .contentType( MediaType.parseMediaType( info.contentType() ))
+                .contentLength( info.size() )
+                .body( result.bytes() );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

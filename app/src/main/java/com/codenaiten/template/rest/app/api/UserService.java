@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.app.api;
 
-import com.codenaiten.template.rest.app.dto.command.PageableCommand;
+import com.codenaiten.template.rest.app.dto.command.PageCommand;
 import com.codenaiten.template.rest.app.dto.command.user.FilterUserCommand;
 import com.codenaiten.template.rest.app.dto.command.user.UpdateUserCommand;
 import com.codenaiten.template.rest.app.dto.result.ImageContentResult;
@@ -43,13 +43,13 @@ public interface UserService {
      *
      * @param search {@link String} que representa el término de búsqueda por el cual se van a recuperar los datos de
      *        las entidades {@link User} que hay registradas en el sistema.
-     * @param pageable {@link PageableCommand} que representa los datos de paginación que se van a utilizar para
+     * @param pageableCommand {@link PageCommand} que representa los datos de paginación que se van a utilizar para
      *        recuperar los datos de las entidades {@link User} que hay registradas de forma paginada.
      *
      * @return {@link PageResult} de {@link UserInfoResult} con la información de las entidades {@link User} que se han
      *         encontrado.
      */
-    PageResult<UserInfoResult> search( String search, PageableCommand pageable );
+    PageResult<UserInfoResult> search( String search, PageCommand pageableCommand );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
@@ -58,13 +58,13 @@ public interface UserService {
      *
      * @param filter {@link FilterUserCommand} que representa el filtro de búsqueda por el cual se va a utilizar para
      *        recuperar los datos de las entidades {@link User} que hay registradas en el sistema.
-     * @param pageable {@link PageableCommand} que representa los datos de paginación que se van a utilizar para
+     * @param pageableCommand {@link PageCommand} que representa los datos de paginación que se van a utilizar para
      *        recuperar los datos de las entidades {@link User} que hay registradas de forma paginada.
      *
      * @return {@link PageResult} de {@link UserInfoResult} con la información de las entidades {@link User} que se han
      *         encontrado.
      */
-    PageResult<UserInfoResult> search( FilterUserCommand filter, PageableCommand pageable );
+    PageResult<UserInfoResult> search( FilterUserCommand filter, PageCommand pageableCommand );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 

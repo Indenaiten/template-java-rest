@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.app.api;
 
-import com.codenaiten.template.rest.app.dto.command.PageableCommand;
+import com.codenaiten.template.rest.app.dto.command.PageCommand;
 import com.codenaiten.template.rest.app.dto.command.account.CreateAccountCommand;
 import com.codenaiten.template.rest.app.dto.command.account.FilterAccountCommand;
 import com.codenaiten.template.rest.app.dto.command.account.UpdateAccountCommand;
@@ -48,13 +48,13 @@ public interface AccountService {
      *
      * @param search {@link String} que representa el término de búsqueda por el cual se van a recuperar los datos de
      *        las entidades {@link Account} que hay registradas en el sistema.
-     * @param pageable {@link PageableCommand} que representa los datos de paginación que se van a utilizar para
+     * @param pageableCommand {@link PageCommand} que representa los datos de paginación que se van a utilizar para
      *        recuperar los datos de las entidades {@link Account} que hay registradas de forma paginada.
      *
      * @return {@link PageResult} de {@link AccountInfoResult} con la información de las entidades {@link Account} que
      *         se han encontrado.
      */
-    PageResult<AccountInfoResult> search( String search, PageableCommand pageable );
+    PageResult<AccountInfoResult> search( String search, PageCommand pageableCommand );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
@@ -63,13 +63,13 @@ public interface AccountService {
      *
      * @param filter {@link FilterAccountCommand} que representa el filtro de búsqueda por el cual se va a utilizar para
      *        recuperar los datos de las entidades {@link Account} que hay registradas en el sistema.
-     * @param pageable {@link PageableCommand} que representa los datos de paginación que se van a utilizar para
+     * @param pageableCommand {@link PageCommand} que representa los datos de paginación que se van a utilizar para
      *        recuperar los datos de las entidades {@link Account} que hay registradas de forma paginada.
      *
      * @return {@link PageResult} de {@link AccountInfoResult} con la información de las entidades {@link Account} que
      *         se han encontrado.
      */
-    PageResult<AccountInfoResult> search( FilterAccountCommand filter, PageableCommand pageable );
+    PageResult<AccountInfoResult> search( FilterAccountCommand filter, PageCommand pageableCommand );
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 

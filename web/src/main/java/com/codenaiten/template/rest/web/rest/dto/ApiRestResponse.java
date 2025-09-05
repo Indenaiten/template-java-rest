@@ -121,12 +121,12 @@ public class ApiRestResponse<T>{
 
         public ApiResponseBuilder page( final PageResult<?> data ){
             final Map<String, Object> page = new HashMap<>();
-            page.put( "number", data.getPage() );
-            page.put( "size", data.getSize() );
-            page.put( "total", data.getTotal() );
-            page.put( "pages", data.getTotalPages() );
-            page.put( "next", data.getPage() < data.getTotalPages() - 1 );
-            page.put( "previous", data.getPage() > 0 && data.getTotalPages() > 1 );
+            page.put( "number", data.page() );
+            page.put( "size", data.size() );
+            page.put( "total", data.total() );
+            page.put( "pages", data.totalPages() );
+            page.put( "next", data.page() < data.totalPages() - 1 );
+            page.put( "previous", data.page() > 0 && data.totalPages() > 1 );
             this.metadata.put( "page", page );
             return this;
         }

@@ -22,5 +22,9 @@ public record FilterAccountRequest(
 
         @Schema( description = "Apellido del usuario", example = "Admin" )
         String surname
-) {}
+){
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
+}
 

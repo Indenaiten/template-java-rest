@@ -3,7 +3,7 @@ package com.codenaiten.template.rest.app.service;
 import com.codenaiten.template.rest.app.api.AccountService;
 import com.codenaiten.template.rest.app.authentication.AuthenticationProvider;
 import com.codenaiten.template.rest.app.authentication.PasswordEncoderManager;
-import com.codenaiten.template.rest.app.dto.command.PageableCommand;
+import com.codenaiten.template.rest.app.dto.command.PageCommand;
 import com.codenaiten.template.rest.app.dto.command.account.CreateAccountCommand;
 import com.codenaiten.template.rest.app.dto.command.account.FilterAccountCommand;
 import com.codenaiten.template.rest.app.dto.command.account.UpdateAccountCommand;
@@ -163,7 +163,7 @@ public class AccountServiceImpl implements AccountService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public PageResult<AccountInfoResult> search( final String search, final PageableCommand pageable ){
+    public PageResult<AccountInfoResult> search( final String search, final PageCommand pageableCommand ){
         // Step 01: Get Authenticated Account
         final Account requester = this.authenticationProvider.getAuthenticatedAccount()
                 .orElseThrow( AuthNotFoundException::new );
@@ -171,26 +171,26 @@ public class AccountServiceImpl implements AccountService {
         // Step 02: Check if Authenticated Account has Query access
         this.accountAccessPolicy.checkQuery( requester );
 
-        // Step 03: Create Pageable Request
-        final Pageable pageableRequest = PageRequest.of( pageable.page(), pageable.size() );
+        // Step 03: Create Pageable
+        final Pageable pageable = PageRequest.of( pageableCommand.page(), pageableCommand.size() );
 
         // Step 04: Search Accounts
         final Page<Account> data;
-        if( Objects.nonNull( search )) data = this.accountRepository.search( search, pageableRequest );
-        else data = this.accountRepository.findAll( pageableRequest );
+        if( Objects.nonNull( search )) data = this.accountRepository.search( search, pageable );
+        else data = this.accountRepository.findAll( pageable );
 
         // Step 05: Convert Account List to Result List
         final List<AccountInfoResult> content = data.getContent().stream()
                 .map( this.accountMapper::toInfoResult ).toList();
 
         // Step 06: Create Page Result & Return Result
-        return new PageResult<>( data.getTotalElements(), data.getNumber(), data.getSize(), content );
+        return PageResult.of( data.getTotalElements(), data.getNumber(), data.getSize(), content );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public PageResult<AccountInfoResult> search( final FilterAccountCommand filter, final PageableCommand pageable ){
+    public PageResult<AccountInfoResult> search( final FilterAccountCommand filter, final PageCommand pageableCommand ){
         // Step 01: Get Authenticated Account
         final Account requester = this.authenticationProvider.getAuthenticatedAccount()
                 .orElseThrow( AuthNotFoundException::new );
@@ -230,18 +230,18 @@ public class AccountServiceImpl implements AccountService {
         // Step 05: Create Example from Probe & Matcher
         final Example<Account> example = Example.of( probe, matcher );
 
-        // Step 06: Create Pageable Request
-        final Pageable pageableRequest = PageRequest.of( pageable.page(), pageable.size() );
+        // Step 06: Create Pageable
+        final Pageable pageable = PageRequest.of( pageableCommand.page(), pageableCommand.size() );
 
         // Step 07: Search Accounts
-        final Page<Account> data = this.accountRepository.findAll( example, pageableRequest );
+        final Page<Account> data = this.accountRepository.findAll( example, pageable );
 
         // Step 08: Convert Account List to Result List
         final List<AccountInfoResult> content = data.getContent().stream()
                 .map( this.accountMapper::toInfoResult ).toList();
 
         // Step 09: Create Page Result & Return Result
-        return new PageResult<>( data.getTotalElements(), data.getNumber(), data.getSize(), content );
+        return PageResult.of( data.getTotalElements(), data.getNumber(), data.getSize(), content );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

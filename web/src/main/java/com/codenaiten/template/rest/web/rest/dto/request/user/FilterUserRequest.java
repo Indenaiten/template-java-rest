@@ -13,5 +13,8 @@ public record FilterUserRequest(
 
         @Schema( description = "Apellido del usuario", example = "surname" )
         String surname
-) {
+){
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
 }

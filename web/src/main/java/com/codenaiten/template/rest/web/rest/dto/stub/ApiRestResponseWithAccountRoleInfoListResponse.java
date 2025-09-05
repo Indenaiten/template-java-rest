@@ -11,7 +11,11 @@ import java.util.Map;
 @Schema( description = "Respuesta con una lista con los datos de los roles de las cuentas de usuario" )
 public class ApiRestResponseWithAccountRoleInfoListResponse extends ApiRestResponse<List<AccountRoleInfoResponse>> {
     public ApiRestResponseWithAccountRoleInfoListResponse(
-            final ApiRestCodeResponse code, final String message, final Map<String, Object> metadata, final List<AccountRoleInfoResponse> data ){
+            final ApiRestCodeResponse code,
+            final String message,
+            final Map<String, Object> metadata,
+            final List<AccountRoleInfoResponse> data
+    ){
         super( code, message, metadata, data );
     }
 }

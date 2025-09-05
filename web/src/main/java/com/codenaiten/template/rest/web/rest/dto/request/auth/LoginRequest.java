@@ -14,5 +14,8 @@ public record LoginRequest(
         @Schema( description = "Contraseña de la cuenta del usuario", type="string", example = "Root.123", requiredMode = Schema.RequiredMode.REQUIRED  )
         @NotNull
         AccountPassword password
-) {
+){
+
+// ------------------------------------------------------------------------------------------------------------------ \\
+
 }

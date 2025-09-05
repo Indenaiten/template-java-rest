@@ -118,7 +118,7 @@ public class AuthenticationRestController implements AuthenticationApiRest {
         this.localeResolver.setLocale( this.httpServletRequest, this.httpServletResponse, LocaleContextHolder.getLocale() );
 
         // Step 07: Return response with authentication info in to cookies & headers
-        return this.responseWithTokens( wrapper, result.getTokenInfo() );
+        return this.responseWithTokens( wrapper, result.tokenInfo() );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -141,7 +141,7 @@ public class AuthenticationRestController implements AuthenticationApiRest {
         final ApiRestResponse<LoginResponse> wrapper = ApiRestResponse.success().message( message ).build( response );
 
         // Step 06: Return response with authentication info in to cookies & headers
-        return this.responseWithTokens( wrapper, result.getTokenInfo() );
+        return this.responseWithTokens( wrapper, result.tokenInfo() );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

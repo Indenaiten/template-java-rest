@@ -48,11 +48,11 @@ public class ImageRestController implements ImageApiRest {
         final ImageContentResult result = this.imageService.getContent( id );
 
         // Step 02: Return response
-        final ImageInfoResult info = result.getInfo();
+        final ImageInfoResult info = result.info();
         return ResponseEntity.status( HttpStatus.OK )
-                .contentType( MediaType.parseMediaType( info.getContentType() ))
-                .contentLength( info.getSize() )
-                .body( result.getBytes() );
+                .contentType( MediaType.parseMediaType( info.contentType() ))
+                .contentLength( info.size() )
+                .body( result.bytes() );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -69,7 +69,7 @@ public class ImageRestController implements ImageApiRest {
         final ImageInfoResponse response = this.responseMapper.toResponse( result );
 
         // Step 04: Get i18n success message
-        final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_IMAGE_CREATE, LogLevel.INFO, result.getId() );
+        final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_IMAGE_CREATE, LogLevel.INFO, result.id() );
 
         // Step 05: Build body with wrapper response
         final ApiRestResponse<ImageInfoResponse> wrapper = ApiRestResponse.success().message( message ).build( response );

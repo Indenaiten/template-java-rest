@@ -2,7 +2,7 @@ package com.codenaiten.template.rest.app.service;
 
 import com.codenaiten.template.rest.app.api.UserService;
 import com.codenaiten.template.rest.app.authentication.AuthenticationProvider;
-import com.codenaiten.template.rest.app.dto.command.PageableCommand;
+import com.codenaiten.template.rest.app.dto.command.PageCommand;
 import com.codenaiten.template.rest.app.dto.command.user.FilterUserCommand;
 import com.codenaiten.template.rest.app.dto.command.user.UpdateUserCommand;
 import com.codenaiten.template.rest.app.dto.result.ImageContentResult;
@@ -133,26 +133,26 @@ public class UserServiceImpl implements UserService {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public PageResult<UserInfoResult> search( final String search, final PageableCommand pageable ){
-        // Step 01: Create Pageable Request
-        final Pageable pageableRequest = PageRequest.of( pageable.page(), pageable.size() );
+    public PageResult<UserInfoResult> search( final String search, final PageCommand pageableCommand ){
+        // Step 01: Create Pageable
+        final Pageable pageable = PageRequest.of( pageableCommand.page(), pageableCommand.size() );
 
         // Step 02: Search Users
         final Page<User> page;
-        if( Objects.nonNull( search )) page = this.userRepository.search( search, pageableRequest );
-        else page = this.userRepository.findAll( pageableRequest );
+        if( Objects.nonNull( search )) page = this.userRepository.search( search, pageable );
+        else page = this.userRepository.findAll( pageable );
 
         // Step 03: Convert User List to Result List
         final List<UserInfoResult> content = page.getContent().stream().map( this.userMapper::toInfoResult ).toList();
 
         // Step 04: Create Page Result & Return Result
-        return new PageResult<>( page.getTotalElements(), page.getNumber(), page.getSize(), content );
+        return PageResult.of( page.getTotalElements(), page.getNumber(), page.getSize(), content );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     @Override
-    public PageResult<UserInfoResult> search( final FilterUserCommand filter, final PageableCommand pageable ){
+    public PageResult<UserInfoResult> search( final FilterUserCommand filter, final PageCommand pageableCommand ){
         // Step 01: Initialize Probe and Matcher
         final User probe = new User();
         final ExampleMatcher matcher = ExampleMatcher.matchingAll().withIgnoreNullValues().withIgnoreCase();
@@ -173,17 +173,17 @@ public class UserServiceImpl implements UserService {
         // Step 03: Create Example from Probe & Matcher
         final Example<User> example = Example.of( probe, matcher );
 
-        // Step 04: Create Pageable Request
-        final Pageable pageableRequest = PageRequest.of( pageable.page(), pageable.size() );
+        // Step 04: Create Pageable
+        final Pageable pageable = PageRequest.of( pageableCommand.page(), pageableCommand.size() );
 
         // Step 05: Search Users
-        final Page<User> data = this.userRepository.findAll( example, pageableRequest );
+        final Page<User> data = this.userRepository.findAll( example, pageable );
 
         // Step 06: Convert User List to Result List
         final List<UserInfoResult> content = data.getContent().stream().map( this.userMapper::toInfoResult ).toList();
 
         // Step 07: Create Page Result & Return Result
-        return new PageResult<>( data.getTotalElements(), data.getNumber(), data.getSize(), content );
+        return PageResult.of( data.getTotalElements(), data.getNumber(), data.getSize(), content );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\
