@@ -32,27 +32,24 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Filtro que
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class TokenJwtFilter extends OncePerRequestFilter {
 
-    /** Resolver de idioma para la respuesta HTTP */
-    private final LocaleResolver localeResolver;
-
-    /** Properties con información relacionada con los tokens de autenticación del sistema */
+    /** Properties con información relacionada con los detalles de los tokens de autenticación del sistema */
     private final TokenSecurityProperties tokenSecurityProperties;
+
+    /** Resolver para establecer las header/cookies de idioma en la respuesta HTTP */
+    private final LocaleResolver localeResolver;
 
     /** Heper relacionado con operaciones relacionadas con la seguridad */
     private final SecurityHelper securityHelper;
 
-    /** Manager relacionado con las operaciones relacionados con los tokens de autenticación */
+    /** Manager relacionado con las operaciones relacionadas con los tokens de autenticación */
     private final TokenJwtManager tokenJwtManager;
 
-    /** Service de Spring que permite cargar los detalles de un usuario */
+    /** Service de Spring que permite cargar los detalles de un usuario mediante su login */
     private final UserDetailsService userDetailsService;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -80,7 +77,7 @@ public class TokenJwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal( final HttpServletRequest request, final HttpServletResponse response,
                                      final FilterChain filterChain ) throws ServletException, IOException {
-        // Step 01: Get access token from header or cookie
+        // Step 01: Get Access Token from Header or Cookie
         final String token;
         final String authHeader = request.getHeader( HttpHeaders.AUTHORIZATION );
         final String accessTokenName = this.tokenSecurityProperties.getAccessTokenName().toLowerCase();
@@ -90,25 +87,25 @@ public class TokenJwtFilter extends OncePerRequestFilter {
                             .map( Cookie::getValue )
                             .findFirst()).orElse( null );
 
-        // Step 02: Validate token if not exists authentication in SecurityContext and token exists
+        // Step 02: Validate Token if not exists Authentication in SecurityContext and Token exists
         final String ip = HttpRequestUtil.getClientIp( request ).orElse( null );
         if( Objects.isNull( SecurityContextHolder.getContext().getAuthentication() ) && Objects.nonNull( token )){
 
-            // Step 03: Validate access token
+            // Step 03: Validate Access Token
             if( !this.tokenJwtManager.validateAccessToken( token, ip )) throw new InvalidAccessTokenException( token );
 
-            // Step 04: Load user details
+            // Step 04: Load User Details
             final UserId userId = this.tokenJwtManager.getUserId( token );
             final UserDetails userDetails = this.userDetailsService.loadUserByUsername( userId.toString() );
 
-            // Step 05: Set user details in SecurityContext
+            // Step 05: Set User Details in SecurityContext
             if( userDetails instanceof AuthenticatedUser authenticatedUser ) {
                 authenticatedUser.setToken( token );
                 final UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken( userDetails, null, userDetails.getAuthorities() );
                 auth.setDetails( new WebAuthenticationDetailsSource().buildDetails( request ));
                 SecurityContextHolder.getContext().setAuthentication( auth );
 
-                // Step 06: Set locale from account language
+                // Step 06: Set Locale from Account Language
                 final Account account = authenticatedUser.getAccount();
                 account.getLang().map( Locale::forLanguageTag ).ifPresent(locale -> {
                     if( !locale.equals( LocaleContextHolder.getLocale() )){
@@ -119,7 +116,7 @@ public class TokenJwtFilter extends OncePerRequestFilter {
             }
         }
 
-        // Continue filter chain
+        // Continue Filter Chain
         filterChain.doFilter( request, response );
     }
 
