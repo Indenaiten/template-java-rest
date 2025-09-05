@@ -46,6 +46,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -291,11 +292,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow( () -> new UserNotFoundByIdException( id ));
 
         // Step 03: Check if Authenticated User has Image Profile
-        if( user.getImage().isEmpty() )
+        final Optional<UUID> userImageProfile = user.getImage();
+        if( userImageProfile.isEmpty() )
             throw new UserImageProfileNotExistsException( new UserId( requester.getId() ));
 
-        // Step 04: Create Image Info Result from Image
-        final ImageId imageId = new ImageId( user.getId() );
+        // Step 04: Get Image Profile
+        final ImageId imageId = new ImageId( userImageProfile.get() );
         final Image image = this.imageRepository.findById( imageId.value() )
                 .orElseThrow( () -> new ImageNotFoundByIdException( imageId ));
 
@@ -321,11 +323,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow( AuthNotFoundException::new );
 
         // Step 02: Check if Authenticated User has Image Profile
-        if( requester.getImage().isEmpty() )
+        final Optional<UUID> userImageProfile = requester.getImage();
+        if( userImageProfile.isEmpty() )
             throw new UserImageProfileNotExistsException( new UserId( requester.getId() ));
 
         // Step 03: Get Image Profile
-        final ImageId imageId = new ImageId( requester.getId() );
+        final ImageId imageId = new ImageId( userImageProfile.get() );
         final Image image = this.imageRepository.findById( imageId.value() )
                 .orElseThrow( () -> new ImageNotFoundByIdException( imageId ));
 
