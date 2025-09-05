@@ -177,7 +177,7 @@ public interface UserApiRest {
                   description = "Image de perfil del usuario recuperada correctamente"
     )
     @AuthenticationErrors
-    @GetMapping( "/view/me" )
+    @GetMapping( "/me/image" )
     ResponseEntity<byte[]> viewMyImageProfile();
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -192,7 +192,7 @@ public interface UserApiRest {
                   description = "Image de perfil del usuario recuperada correctamente"
     )
     @AuthenticationErrors
-    @GetMapping( "/view/{id}" )
+    @GetMapping( "/{id}/image" )
     ResponseEntity<byte[]> viewImageProfileById(
             @Parameter( description = "ID único del usuario", required = true )
             @PathVariable UserId id
