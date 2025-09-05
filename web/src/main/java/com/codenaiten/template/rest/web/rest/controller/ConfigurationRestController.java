@@ -25,13 +25,13 @@ import java.util.Locale;
 @AllArgsConstructor
 public class ConfigurationRestController implements ConfigurationApiRest {
 
-    /** Manager de mensajes internacionalizados del sistema */
+    /** Manager de las operaciones relacionado con los mensajes internacionalizados del sistema */
     private final MessageI18nManager messageI18nManager;
 
-    /** Service de configuraciones del sistema */
+    /** Service con los casos de uso relacionados con las configuraciones del sistema.  */
     private final ConfigurationService configurationService;
 
-    /** Resolver de idioma para la respuesta HTTP */
+    /** Resolver para establecer las header/cookies de idioma en la respuesta HTTP */
     private final LocaleResolver localeResolver;
 
     /** Petición HTTP actual */
@@ -46,19 +46,19 @@ public class ConfigurationRestController implements ConfigurationApiRest {
 
     @Override
     public ResponseEntity<ApiRestResponse<Empty>> updateLang( final Locale lang ){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         this.configurationService.lang( lang );
 
-        // Step 02: Get i18n success message
+        // Step 02: Get i18n Success Message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_CONFIG_LANG, LogLevel.INFO, lang );
 
-        // Step 03: Build body with wrapper response
+        // Step 03: Build Body with Wrapper Response
         final ApiRestResponse<Empty> wrapper = ApiRestResponse.success().message( message ).build();
 
-        // Step 04: Resolve locale with current locale
+        // Step 04: Resolve Locale with Current Locale
         this.localeResolver.setLocale( this.httpServletRequest, this.httpServletResponse, LocaleContextHolder.getLocale() );
 
-        // Step 05: Return response
+        // Step 05: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -66,16 +66,16 @@ public class ConfigurationRestController implements ConfigurationApiRest {
 
     @Override
     public ResponseEntity<ApiRestResponse<String>> getLang(){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         final Locale result = this.configurationService.getLang();
 
-        // Step 02: Get i18n success message
+        // Step 02: Get i18n Success Message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_CONFIG_RETRIEVE_LANG_CONFIGURED, LogLevel.INFO );
 
-        // Step 03: Build body with wrapper response
+        // Step 03: Build Body with Wrapper Response
         final ApiRestResponse<String> wrapper = ApiRestResponse.success().message( message ).build( result.toLanguageTag() );
 
-        // Step 04: Return response
+        // Step 04: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -83,19 +83,19 @@ public class ConfigurationRestController implements ConfigurationApiRest {
 
     @Override
     public ResponseEntity<ApiRestResponse<List<String>>> getSupportedLanguages(){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         final List<Locale> result = this.configurationService.getSupportedLanguages();
 
         // Step 02: Convert result to raw data
         final List<String> data = result.stream().map( Locale::toLanguageTag ).toList();
 
-        // Step 03: Get i18n success message
+        // Step 03: Get i18n Success Message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_CONFIG_LIST_LANG_SUPPORTED, LogLevel.INFO );
 
-        // Step 04: Build body with wrapper response
+        // Step 04: Build Body with Wrapper Response
         final ApiRestResponse<List<String>> wrapper = ApiRestResponse.success().message( message ).build( data );
 
-        // Step 05: Return response
+        // Step 05: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 

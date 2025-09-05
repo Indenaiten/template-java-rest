@@ -4,6 +4,7 @@ import com.codenaiten.template.rest.app.api.ImageService;
 import com.codenaiten.template.rest.app.dto.command.account.CreateImageCommand;
 import com.codenaiten.template.rest.app.dto.result.ImageContentResult;
 import com.codenaiten.template.rest.app.dto.result.ImageInfoResult;
+import com.codenaiten.template.rest.app.entity.Image;
 import com.codenaiten.template.rest.app.i18n.MessageI18nManager;
 import com.codenaiten.template.rest.app.vo.image.ImageId;
 import com.codenaiten.template.rest.web.rest.RestMessage;
@@ -26,16 +27,16 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class ImageRestController implements ImageApiRest {
 
-    /** Manager de mensajes internacionalizados del sistema */
+    /** Manager de las operaciones relacionado con los mensajes internacionalizados del sistema */
     private final MessageI18nManager messageI18nManager;
 
-    /** Service de imágenes del sistema */
+    /** Service con los casos de uso relacionados con la entidad {@link Image} */
     private final ImageService imageService;
 
-    /** Mapper de objetos relacionados con los DTO de Request/Command */
+    /** Mapper para convertir DTO Request a DTO Command */
     private final CommandMapper commandMapper;
 
-    /** Mapper de objetos relacionados con los DTO de Result/Response */
+    /** Mapper para convertir DTO Result a DTO Response */
     private final ResponseMapper responseMapper;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -44,10 +45,10 @@ public class ImageRestController implements ImageApiRest {
 
     @Override
     public ResponseEntity<byte[]> view( final ImageId id ){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         final ImageContentResult result = this.imageService.getContent( id );
 
-        // Step 02: Return response
+        // Step 02: Return Response Entity
         final ImageInfoResult info = result.info();
         return ResponseEntity.status( HttpStatus.OK )
                 .contentType( MediaType.parseMediaType( info.contentType() ))
@@ -59,22 +60,22 @@ public class ImageRestController implements ImageApiRest {
 
     @Override
     public ResponseEntity<ApiRestResponse<ImageInfoResponse>> upload( final MultipartFile file ){
-        // Step 01: Create command
+        // Step 01: Create Command
         final CreateImageCommand command = this.commandMapper.toCommand( file );
 
-        // Step 02: Run use case
+        // Step 02: Run Use Case
         final ImageInfoResult result = this.imageService.create( command );
 
-        // Step 03: Convert result to response
+        // Step 03: Convert Result to Response
         final ImageInfoResponse response = this.responseMapper.toResponse( result );
 
-        // Step 04: Get i18n success message
+        // Step 04: Get i18n Success Message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_IMAGE_CREATE, LogLevel.INFO, result.id() );
 
-        // Step 05: Build body with wrapper response
+        // Step 05: Build Body with Wrapper Response
         final ApiRestResponse<ImageInfoResponse> wrapper = ApiRestResponse.success().message( message ).build( response );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 

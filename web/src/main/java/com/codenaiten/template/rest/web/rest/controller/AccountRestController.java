@@ -7,6 +7,7 @@ import com.codenaiten.template.rest.app.dto.command.account.FilterAccountCommand
 import com.codenaiten.template.rest.app.dto.command.account.UpdateAccountCommand;
 import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
 import com.codenaiten.template.rest.app.dto.result.PageResult;
+import com.codenaiten.template.rest.app.entity.Account;
 import com.codenaiten.template.rest.app.i18n.MessageI18nManager;
 import com.codenaiten.template.rest.app.vo.Email;
 import com.codenaiten.template.rest.app.vo.account.AccountId;
@@ -39,19 +40,19 @@ import java.util.Locale;
 @AllArgsConstructor
 public class AccountRestController implements AccountApiRest {
 
-    /** Manager de mensajes internacionalizados del sistema */
+    /** Manager de las operaciones relacionado con los mensajes internacionalizados del sistema */
     private final MessageI18nManager messageI18nManager;
 
-    /** Service de cuentas de usuario del sistema */
+    /** Service con los casos de uso relacionados con la entidad {@link Account} */
     private final AccountService accountService;
 
-    /** Mapper de objetos relacionados con los DTO de Request/Command */
+    /** Mapper para convertir DTO Request a DTO Command */
     private final CommandMapper commandMapper;
 
-    /** Mapper de objetos relacionados con los DTO de Result/Response */
+    /** Mapper para convertir DTO Result a DTO Response */
     private final ResponseMapper responseMapper;
 
-    /** Resolver de idioma para la respuesta HTTP */
+    /** Resolver para establecer las header/cookies de idioma en la respuesta HTTP */
     private final LocaleResolver localeResolver;
 
     /** Petición HTTP actual */
@@ -66,16 +67,16 @@ public class AccountRestController implements AccountApiRest {
 
     @Override
     public ResponseEntity<ApiRestResponse<AccountInfoResponse>> me(){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         final AccountInfoResult result = this.accountService.me();
 
-        // Step 02: Convert result to response
+        // Step 02: Convert Result to Response
         final AccountInfoResponse response = this.responseMapper.toResponse( result );
 
-        // Step 03: Build body with wrapper response
+        // Step 03: Build Body with Wrapper Response
         final ApiRestResponse<AccountInfoResponse> wrapper = ApiRestResponse.success().build( response );
 
-        // Step 04: Return response
+        // Step 04: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -83,16 +84,16 @@ public class AccountRestController implements AccountApiRest {
 
     @Override
     public ResponseEntity<ApiRestResponse<AccountInfoResponse>> get( final AccountId id ){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         final AccountInfoResult result = this.accountService.get( id );
 
-        // Step 02: Convert result to response
+        // Step 02: Convert Result to Response
         final AccountInfoResponse response = this.responseMapper.toResponse( result );
 
-        // Step 03: Build body with wrapper response
+        // Step 03: Build Body with Wrapper Response
         final ApiRestResponse<AccountInfoResponse> wrapper = ApiRestResponse.success().build( response );
 
-        // Step 04: Return response
+        // Step 04: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -101,22 +102,22 @@ public class AccountRestController implements AccountApiRest {
     @Override
     public ResponseEntity<ApiRestResponse<List<AccountInfoResponse>>> search(
             final String search, final Integer page, final Integer size ){
-        // Step 01: Create command
+        // Step 01: Create Command
         final PageCommand command = new PageCommand( page, size );
 
-        // Step 02: Run use case
+        // Step 02: Run Use Case
         final PageResult<AccountInfoResult> result = this.accountService.search( search, command );
 
-        // Step 03: Convert result to response
+        // Step 03: Convert Result to Response
         final List<AccountInfoResponse> content = result.content().stream().map( this.responseMapper::toResponse ).toList();
 
-        // Step 04: Get i18n info message if result is empty
+        // Step 04: Get i18n Info Message if Result is Empty
         final String message = !content.isEmpty() ? null : this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_ACCOUNT_NOT_DATA, LogLevel.INFO );
 
-        // Step 05: Build body with wrapper response
+        // Step 05: Build Body with Wrapper Response
         final ApiRestResponse<List<AccountInfoResponse>> wrapper = ApiRestResponse.success().message( message ).page( result ).build( content );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -125,23 +126,23 @@ public class AccountRestController implements AccountApiRest {
     @Override
     public ResponseEntity<ApiRestResponse<List<AccountInfoResponse>>> search(
             final FilterAccountRequest filter, final Integer page, final Integer size ){
-        // Step 01: Create command
+        // Step 01: Create Command
         final PageCommand pageCommand = new PageCommand( page, size );
         final FilterAccountCommand filterCommand = this.commandMapper.toCommand( filter );
 
-        // Step 02: Run use case
+        // Step 02: Run Use Case
         final PageResult<AccountInfoResult> result = this.accountService.search( filterCommand, pageCommand );
 
-        // Step 03: Convert result to response
+        // Step 03: Convert Result to Response
         final List<AccountInfoResponse> content = result.content().stream().map( this.responseMapper::toResponse ).toList();
 
-        // Step 04: Get i18n info message if result is empty
+        // Step 04: Get i18n Info Message if Result is Empty
         final String message = !content.isEmpty() ? null : this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_ACCOUNT_NOT_DATA, LogLevel.INFO );
 
-        // Step 05: Build body with wrapper response
+        // Step 05: Build Body with Wrapper Response
         final ApiRestResponse<List<AccountInfoResponse>> wrapper = ApiRestResponse.success().message( message ).page( result ).build( content );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -149,19 +150,19 @@ public class AccountRestController implements AccountApiRest {
 
     @Override
     public ResponseEntity<ApiRestResponse<List<AccountRoleInfoResponse>>> getSupportedAccountRoles(){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         final List<AccountRole> result = this.accountService.getSupportedRoles();
 
-        // Step 02: Convert result to response
+        // Step 02: Convert Result to Response
         final List<AccountRoleInfoResponse> data = result.stream().map( AccountRoleInfoResponse::of ).toList();
 
-        // Step 03: Get i18n success message
+        // Step 03: Get i18n Success Message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_ACCOUNT_ROLE_SUPPORTED_LIST, LogLevel.INFO );
 
-        // Step 04: Build body with wrapper response
+        // Step 04: Build Body with Wrapper Response
         final ApiRestResponse<List<AccountRoleInfoResponse>> wrapper = ApiRestResponse.success().message( message ).build( data );
 
-        // Step 05: Return response
+        // Step 05: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -169,22 +170,22 @@ public class AccountRestController implements AccountApiRest {
 
     @Override
     public ResponseEntity<ApiRestResponse<AccountInfoResponse>> create( final CreateAccountRequest request ){
-        // Step 01: Create command
+        // Step 01: Create Command
         final CreateAccountCommand command = this.commandMapper.toCommand( request );
 
-        // Step 02: Run use case
+        // Step 02: Run Use Case
         final AccountInfoResult result = this.accountService.create( command );
 
-        // Step 03: Convert result to response
+        // Step 03: Convert Result to Response
         final AccountInfoResponse response = this.responseMapper.toResponse( result );
 
-        // Step 04: Get i18n success message
+        // Step 04: Get i18n Success Message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_ACCOUNT_CREATE, LogLevel.INFO, result.id() );
 
-        // Step 05: Build body with wrapper response
+        // Step 05: Build Body with Wrapper Response
         final ApiRestResponse<AccountInfoResponse> wrapper = ApiRestResponse.success().message( message ).build( response );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -193,22 +194,22 @@ public class AccountRestController implements AccountApiRest {
     @Override
     public ResponseEntity<ApiRestResponse<AccountInfoResponse>> update(
             final AccountId id, final UpdateAccountRequest request ){
-        // Step 01: Create command
+        // Step 01: Create Command
         final UpdateAccountCommand command = this.commandMapper.toCommand( request );
 
-        // Step 02: Run use case
+        // Step 02: Run Use Case
         final AccountInfoResult result = this.accountService.update( id, command );
 
-        // Step 03: Convert result to response
+        // Step 03: Convert Result to Response
         final AccountInfoResponse response = this.responseMapper.toResponse( result );
 
-        // Step 04: Get i18n success message
+        // Step 04: Get i18n Success Message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_ACCOUNT_UPDATE, LogLevel.INFO, id );
 
-        // Step 05: Build body with wrapper response
+        // Step 05: Build Body with Wrapper Response
         final ApiRestResponse<AccountInfoResponse> wrapper = ApiRestResponse.success().message( message ).build( response );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -216,22 +217,22 @@ public class AccountRestController implements AccountApiRest {
 
     @Override
     public ResponseEntity<ApiRestResponse<AccountInfoResponse>> updateLang( final Locale lang ){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         final AccountInfoResult result = this.accountService.updateLang( lang );
 
-        // Step 02: Convert result to response
+        // Step 02: Convert Result to Response
         final AccountInfoResponse response = this.responseMapper.toResponse( result );
 
-        // Step 03: Get i18n success message
+        // Step 03: Get i18n Success Message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_ACCOUNT_UPDATE_LANG, LogLevel.INFO, result.id(), lang );
 
-        // Step 04: Build body with wrapper response
+        // Step 04: Build Body with Wrapper Response
         final ApiRestResponse<AccountInfoResponse> wrapper = ApiRestResponse.success().message( message ).build( response );
 
-        // Step 05: Resolve locale with current locale
+        // Step 05: Resolve Locale with Current Locale
         this.localeResolver.setLocale( this.httpServletRequest, this.httpServletResponse, LocaleContextHolder.getLocale() );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -243,19 +244,19 @@ public class AccountRestController implements AccountApiRest {
         final AccountPassword password = request.password();
         final Email email = request.newEmail();
 
-        // Step 02: Run use case
+        // Step 02: Run Use Case
         final AccountInfoResult result = this.accountService.updateEmail( password, email );
 
-        // Step 03: Convert result to response
+        // Step 03: Convert Result to Response
         final AccountInfoResponse response = this.responseMapper.toResponse( result );
 
-        // Step 04: Get i18n success message
+        // Step 04: Get i18n Success Message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_ACCOUNT_UPDATE_EMAIL, LogLevel.INFO, result.id(), email );
 
-        // Step 05: Build body with wrapper response
+        // Step 05: Build Body with Wrapper Response
         final ApiRestResponse<AccountInfoResponse> wrapper = ApiRestResponse.success().message( message ).build( response );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -267,19 +268,19 @@ public class AccountRestController implements AccountApiRest {
         final AccountPassword password = request.password();
         final AccountPassword newPassword = request.newPassword();
 
-        // Step 02: Run use case
+        // Step 02: Run Use Case
         final AccountInfoResult result = this.accountService.updatePassword( password, newPassword );
 
-        // Step 03: Convert result to response
+        // Step 03: Convert Result to Response
         final AccountInfoResponse response = this.responseMapper.toResponse( result );
 
-        // Step 04: Get i18n success message
+        // Step 04: Get i18n Success Message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_ACCOUNT_UPDATE_PASSWORD, LogLevel.INFO, result.id() );
 
-        // Step 05: Build body with wrapper response
+        // Step 05: Build Body with Wrapper Response
         final ApiRestResponse<AccountInfoResponse> wrapper = ApiRestResponse.success().message( message ).build( response );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -287,19 +288,19 @@ public class AccountRestController implements AccountApiRest {
 
     @Override
     public ResponseEntity<ApiRestResponse<AccountInfoResponse>> delete( final AccountId id ){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         final AccountInfoResult result = this.accountService.delete( id );
 
-        // Step 02: Convert result to response
+        // Step 02: Convert Result to Response
         final AccountInfoResponse response = this.responseMapper.toResponse( result );
 
-        // Step 03: Get i18n success message
+        // Step 03: Get i18n Success Message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_ACCOUNT_DELETE_BY_ID, LogLevel.INFO, id );
 
-        // Step 04: Build body with wrapper response
+        // Step 04: Build Body with Wrapper Response
         final ApiRestResponse<AccountInfoResponse> wrapper = ApiRestResponse.success().message( message ).build( response );
 
-        // Step 05: Return response
+        // Step 05: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -310,19 +311,19 @@ public class AccountRestController implements AccountApiRest {
         // Step 01: Get data from request
         final AccountPassword password = request.password();
 
-        // Step 02: Run use case
+        // Step 02: Run Use Case
         final AccountInfoResult result = this.accountService.delete( password );
 
-        // Step 03: Convert result to response
+        // Step 03: Convert Result to Response
         final AccountInfoResponse response = this.responseMapper.toResponse( result );
 
-        // Step 04: Get i18n success message
+        // Step 04: Get i18n Success Message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_ACCOUNT_DELETE, LogLevel.INFO );
 
-        // Step 05: Build body with wrapper response
+        // Step 05: Build Body with Wrapper Response
         final ApiRestResponse<AccountInfoResponse> wrapper = ApiRestResponse.success().message( message ).build( response );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 

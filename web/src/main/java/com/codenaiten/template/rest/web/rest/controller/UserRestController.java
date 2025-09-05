@@ -8,6 +8,7 @@ import com.codenaiten.template.rest.app.dto.result.ImageContentResult;
 import com.codenaiten.template.rest.app.dto.result.ImageInfoResult;
 import com.codenaiten.template.rest.app.dto.result.PageResult;
 import com.codenaiten.template.rest.app.dto.result.UserInfoResult;
+import com.codenaiten.template.rest.app.entity.User;
 import com.codenaiten.template.rest.app.i18n.MessageI18nManager;
 import com.codenaiten.template.rest.app.vo.user.UserId;
 import com.codenaiten.template.rest.web.rest.RestMessage;
@@ -33,16 +34,16 @@ import java.util.List;
 @AllArgsConstructor
 public class UserRestController implements UserApiRest{
 
-    /** Manager de mensajes internacionalizados del sistema */
+    /** Manager de las operaciones relacionado con los mensajes internacionalizados del sistema */
     private final MessageI18nManager messageI18nManager;
 
-    /** Service de usuarios del sistema */
+    /** Service con los casos de uso relacionados con la entidad {@link User} */
     private final UserService userService;
 
-    /** Mapper de objetos relacionados con los DTO de Request/Command */
+    /** Mapper para convertir DTO Request a DTO Command */
     private final CommandMapper commandMapper;
 
-    /** Mapper de objetos relacionados con los DTO de Result/Response */
+    /** Mapper para convertir DTO Result a DTO Response */
     private final ResponseMapper responseMapper;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
@@ -51,16 +52,16 @@ public class UserRestController implements UserApiRest{
 
     @Override
     public ResponseEntity<ApiRestResponse<UserInfoResponse>> me(){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         final UserInfoResult result = this.userService.me();
 
-        // Step 02: Convert result to response
+        // Step 02: Convert Result to Response
         final UserInfoResponse response = this.responseMapper.toResponse( result );
 
-        // Step 03: Build body with wrapper response
+        // Step 03: Build Body with Wrapper Response
         final ApiRestResponse<UserInfoResponse> wrapper = ApiRestResponse.success().build( response );
 
-        // Step 04: Return response
+        // Step 04: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -68,16 +69,16 @@ public class UserRestController implements UserApiRest{
 
     @Override
     public ResponseEntity<ApiRestResponse<UserInfoResponse>> get( final UserId id ){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         final UserInfoResult result = this.userService.get( id );
 
-        // Step 02: Convert result to response
+        // Step 02: Convert Result to Response
         final UserInfoResponse response = this.responseMapper.toResponse( result );
 
-        // Step 03: Build body with wrapper response
+        // Step 03: Build Body with Wrapper Response
         final ApiRestResponse<UserInfoResponse> wrapper = ApiRestResponse.success().build( response );
 
-        // Step 04: Return response
+        // Step 04: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -86,22 +87,22 @@ public class UserRestController implements UserApiRest{
     @Override
     public ResponseEntity<ApiRestResponse<List<UserInfoResponse>>> search(
             final String search, final Integer page, final Integer size ){
-        // Step 01: Create command
+        // Step 01: Create Command
         final PageCommand pageCommand = new PageCommand( page, size );
 
-        // Step 02: Run use case
+        // Step 02: Run Use Case
         final PageResult<UserInfoResult> result = this.userService.search( search, pageCommand );
 
-        // Step 03: Convert result to response
+        // Step 03: Convert Result to Response
         final List<UserInfoResponse> content = result.content().stream().map( this.responseMapper::toResponse ).toList();
 
-        // Step 04: Get i18n info message if result is empty
+        // Step 04: Get i18n Info Message if Result is Empty
         final String message = !content.isEmpty() ? null : this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_USER_NOT_DATA, LogLevel.INFO );
 
-        // Step 05: Build body with wrapper response
+        // Step 05: Build Body with Wrapper Response
         final ApiRestResponse<List<UserInfoResponse>> wrapper = ApiRestResponse.success().message( message ).page( result ).build( content );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -110,23 +111,23 @@ public class UserRestController implements UserApiRest{
     @Override
     public ResponseEntity<ApiRestResponse<List<UserInfoResponse>>> search(
             final FilterUserRequest filter, final Integer page, final Integer size ){
-        // Step 01: Create command
+        // Step 01: Create Command
         final PageCommand pageCommand = new PageCommand( page, size );
         final FilterUserCommand filterCommand = this.commandMapper.toCommand( filter );
 
-        // Step 02: Run use case
+        // Step 02: Run Use Case
         final PageResult<UserInfoResult> result = this.userService.search( filterCommand, pageCommand );
 
-        // Step 03: Convert result to response
+        // Step 03: Convert Result to Response
         final List<UserInfoResponse> content = result.content().stream().map( this.responseMapper::toResponse ).toList();
 
-        // Step 04: Get i18n info message if result is empty
+        // Step 04: Get i18n Info Message if Result is Empty
         final String message = !content.isEmpty() ? null : this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_USER_NOT_DATA, LogLevel.INFO );
 
-        // Step 05: Build body with wrapper response
+        // Step 05: Build Body with Wrapper Response
         final ApiRestResponse<List<UserInfoResponse>> wrapper = ApiRestResponse.success().message( message ).page( result ).build( content );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -134,22 +135,22 @@ public class UserRestController implements UserApiRest{
 
     @Override
     public ResponseEntity<ApiRestResponse<UserInfoResponse>> update( final UserId id, final UpdateUserRequest request ){
-        // Step 01: Create command
+        // Step 01: Create Command
         final UpdateUserCommand command = this.commandMapper.toCommand( request );
 
-        // Step 02: Run use case
+        // Step 02: Run Use Case
         final UserInfoResult result = this.userService.update( id, command );
 
-        // Step 03: Convert result to response
+        // Step 03: Convert Result to Response
         final UserInfoResponse response = this.responseMapper.toResponse( result );
 
         // Step 04: Get i18n info message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_USER_UPDATE_BY_ID, LogLevel.INFO, id );
 
-        // Step 05: Build body with wrapper response
+        // Step 05: Build Body with Wrapper Response
         final ApiRestResponse<UserInfoResponse> wrapper = ApiRestResponse.success().message( message ).build( response );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -157,22 +158,22 @@ public class UserRestController implements UserApiRest{
 
     @Override
     public ResponseEntity<ApiRestResponse<UserInfoResponse>> update( final UpdateUserRequest request ){
-        // Step 01: Create command
+        // Step 01: Create Command
         final UpdateUserCommand command = this.commandMapper.toCommand( request );
 
-        // Step 02: Run use case
+        // Step 02: Run Use Case
         final UserInfoResult result = this.userService.update( command );
 
-        // Step 03: Convert result to response
+        // Step 03: Convert Result to Response
         final UserInfoResponse response = this.responseMapper.toResponse( result );
 
         // Step 04: Get i18n info message
         final String message = this.messageI18nManager.getMessageAndLogger( RestMessage.SUCCESS_USER_UPDATE, LogLevel.INFO );
 
-        // Step 05: Build body with wrapper response
+        // Step 05: Build Body with Wrapper Response
         final ApiRestResponse<UserInfoResponse> wrapper = ApiRestResponse.success().message( message ).build( response );
 
-        // Step 06: Return response
+        // Step 06: Return Response Entity
         return ResponseEntity.status( HttpStatus.OK ).body( wrapper );
     }
 
@@ -180,10 +181,10 @@ public class UserRestController implements UserApiRest{
 
     @Override
     public ResponseEntity<byte[]> viewImageProfileById( final UserId id ){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         final ImageContentResult result = this.userService.getImageProfile( id );
 
-        // Step 02: Return response
+        // Step 02: Return Response Entity
         final ImageInfoResult info = result.info();
         return ResponseEntity.status( HttpStatus.OK )
                 .contentType( MediaType.parseMediaType( info.contentType() ))
@@ -195,10 +196,10 @@ public class UserRestController implements UserApiRest{
 
     @Override
     public ResponseEntity<byte[]> viewMyImageProfile(){
-        // Step 01: Run use case
+        // Step 01: Run Use Case
         final ImageContentResult result = this.userService.getImageProfile();
 
-        // Step 02: Return response
+        // Step 02: Return Response Entity
         final ImageInfoResult info = result.info();
         return ResponseEntity.status( HttpStatus.OK )
                 .contentType( MediaType.parseMediaType( info.contentType() ))
