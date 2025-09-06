@@ -1,9 +1,9 @@
 package com.codenaiten.template.rest.web.rest.dto.request.user;
 
-import com.codenaiten.template.rest.app.vo.image.ImageId;
-import com.codenaiten.template.rest.app.vo.user.UserName;
-import com.codenaiten.template.rest.app.vo.user.UserSurname;
-import com.codenaiten.template.rest.app.vo.user.UserUsername;
+import com.codenaiten.template.rest.app.old.vo.image.ImageId;
+import com.codenaiten.template.rest.app.old.vo.user.UserName;
+import com.codenaiten.template.rest.app.old.vo.user.UserSurname;
+import com.codenaiten.template.rest.app.old.vo.user.UserUsername;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

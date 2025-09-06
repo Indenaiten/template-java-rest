@@ -1,14 +1,14 @@
 package com.codenaiten.template.rest.web.rest.exception;
 
-import com.codenaiten.template.rest.app.AppMessage;
-import com.codenaiten.template.rest.app.exception.*;
-import com.codenaiten.template.rest.app.exception.data.DataException;
-import com.codenaiten.template.rest.app.exception.data.found.NotFoundException;
-import com.codenaiten.template.rest.app.exception.security.SecurityException;
-import com.codenaiten.template.rest.app.exception.security.access.AccessException;
-import com.codenaiten.template.rest.app.exception.validation.ValidationException;
-import com.codenaiten.template.rest.app.i18n.MessageI18n;
-import com.codenaiten.template.rest.app.i18n.MessageI18nManager;
+import com.codenaiten.template.rest.app.old.AppMessage;
+import com.codenaiten.template.rest.app.old.exception.*;
+import com.codenaiten.template.rest.app.old.exception.data.DataException;
+import com.codenaiten.template.rest.app.old.exception.data.found.NotFoundException;
+import com.codenaiten.template.rest.app.old.exception.security.SecurityException;
+import com.codenaiten.template.rest.app.old.exception.security.access.AccessException;
+import com.codenaiten.template.rest.app.old.exception.validation.ValidationException;
+import com.codenaiten.template.rest.app.old.i18n.MessageI18n;
+import com.codenaiten.template.rest.app.old.i18n.MessageI18nManager;
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;
 import com.codenaiten.template.rest.web.rest.dto.Empty;
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException;

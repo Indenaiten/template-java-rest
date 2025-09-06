@@ -18,6 +18,7 @@
 
     <modules>
         <module>boot</module>
+        <module>core</module>
         <module>app</module>
         <module>web</module>
     </modules>
@@ -36,6 +37,12 @@
     <dependencyManagement>
         <dependencies>
             <!-- MAVEN MODULES -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>app</artifactId>

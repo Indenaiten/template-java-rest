@@ -1,6 +1,5 @@
 package com.codenaiten.template.rest.web.rest.dto.response;
 
-import com.codenaiten.template.rest.app.vo.account.AccountRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema( description = "Información del rol de la cuenta de usuario" )

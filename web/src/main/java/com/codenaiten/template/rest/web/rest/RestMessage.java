@@ -1,11 +1,11 @@
 package com.codenaiten.template.rest.web.rest;
 
-import com.codenaiten.template.rest.app.entity.Account;
-import com.codenaiten.template.rest.app.entity.Image;
-import com.codenaiten.template.rest.app.entity.User;
-import com.codenaiten.template.rest.app.i18n.MessageI18n;
-import com.codenaiten.template.rest.app.vo.account.AccountId;
-import com.codenaiten.template.rest.app.vo.user.UserId;
+import com.codenaiten.template.rest.app.old.entity.Account;
+import com.codenaiten.template.rest.app.old.entity.Image;
+import com.codenaiten.template.rest.app.old.entity.User;
+import com.codenaiten.template.rest.app.old.i18n.MessageI18n;
+import com.codenaiten.template.rest.app.old.vo.account.AccountId;
+import com.codenaiten.template.rest.app.old.vo.user.UserId;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

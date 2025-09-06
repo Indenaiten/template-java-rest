@@ -1,7 +1,7 @@
 package com.codenaiten.template.rest.web.rest.controller;
 
-import com.codenaiten.template.rest.app.api.ConfigurationService;
-import com.codenaiten.template.rest.app.i18n.MessageI18nManager;
+import com.codenaiten.template.rest.app.old.api.ConfigurationService;
+import com.codenaiten.template.rest.app.old.i18n.MessageI18nManager;
 import com.codenaiten.template.rest.web.rest.RestMessage;
 import com.codenaiten.template.rest.web.rest.api.ConfigurationApiRest;
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;

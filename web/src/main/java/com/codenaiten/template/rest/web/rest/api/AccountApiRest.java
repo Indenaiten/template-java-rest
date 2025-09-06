@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.web.rest.api;
 
-import com.codenaiten.template.rest.app.vo.account.AccountId;
+import com.codenaiten.template.rest.app.old.vo.account.AccountId;
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;
 import com.codenaiten.template.rest.web.rest.dto.request.account.*;
 import com.codenaiten.template.rest.web.rest.dto.response.AccountInfoResponse;

@@ -1,16 +1,16 @@
 package com.codenaiten.template.rest.web.rest.controller;
 
-import com.codenaiten.template.rest.app.api.UserService;
-import com.codenaiten.template.rest.app.dto.command.PageCommand;
-import com.codenaiten.template.rest.app.dto.command.user.FilterUserCommand;
-import com.codenaiten.template.rest.app.dto.command.user.UpdateUserCommand;
-import com.codenaiten.template.rest.app.dto.result.ImageContentResult;
-import com.codenaiten.template.rest.app.dto.result.ImageInfoResult;
-import com.codenaiten.template.rest.app.dto.result.PageResult;
-import com.codenaiten.template.rest.app.dto.result.UserInfoResult;
-import com.codenaiten.template.rest.app.entity.User;
-import com.codenaiten.template.rest.app.i18n.MessageI18nManager;
-import com.codenaiten.template.rest.app.vo.user.UserId;
+import com.codenaiten.template.rest.app.old.api.UserService;
+import com.codenaiten.template.rest.app.old.dto.command.PageCommand;
+import com.codenaiten.template.rest.app.old.dto.command.user.FilterUserCommand;
+import com.codenaiten.template.rest.app.old.dto.command.user.UpdateUserCommand;
+import com.codenaiten.template.rest.app.old.dto.result.ImageContentResult;
+import com.codenaiten.template.rest.app.old.dto.result.ImageInfoResult;
+import com.codenaiten.template.rest.app.old.dto.result.PageResult;
+import com.codenaiten.template.rest.app.old.dto.result.UserInfoResult;
+import com.codenaiten.template.rest.app.old.entity.User;
+import com.codenaiten.template.rest.app.old.i18n.MessageI18nManager;
+import com.codenaiten.template.rest.app.old.vo.user.UserId;
 import com.codenaiten.template.rest.web.rest.RestMessage;
 import com.codenaiten.template.rest.web.rest.api.UserApiRest;
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;

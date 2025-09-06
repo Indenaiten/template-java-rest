@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.boot.config;
 
-import com.codenaiten.template.rest.app.properties.SecurityProperties;
+import com.codenaiten.template.rest.app.old.properties.SecurityProperties;
 import com.codenaiten.template.rest.web.rest.filter.TokenJwtFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

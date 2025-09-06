@@ -1,12 +1,12 @@
 package com.codenaiten.template.rest.web.rest.controller;
 
-import com.codenaiten.template.rest.app.api.ImageService;
-import com.codenaiten.template.rest.app.dto.command.account.CreateImageCommand;
-import com.codenaiten.template.rest.app.dto.result.ImageContentResult;
-import com.codenaiten.template.rest.app.dto.result.ImageInfoResult;
-import com.codenaiten.template.rest.app.entity.Image;
-import com.codenaiten.template.rest.app.i18n.MessageI18nManager;
-import com.codenaiten.template.rest.app.vo.image.ImageId;
+import com.codenaiten.template.rest.app.old.api.ImageService;
+import com.codenaiten.template.rest.app.old.dto.command.account.CreateImageCommand;
+import com.codenaiten.template.rest.app.old.dto.result.ImageContentResult;
+import com.codenaiten.template.rest.app.old.dto.result.ImageInfoResult;
+import com.codenaiten.template.rest.app.old.entity.Image;
+import com.codenaiten.template.rest.app.old.i18n.MessageI18nManager;
+import com.codenaiten.template.rest.app.old.vo.image.ImageId;
 import com.codenaiten.template.rest.web.rest.RestMessage;
 import com.codenaiten.template.rest.web.rest.api.ImageApiRest;
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;

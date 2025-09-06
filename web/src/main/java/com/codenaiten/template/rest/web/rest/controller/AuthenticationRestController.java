@@ -1,13 +1,13 @@
 package com.codenaiten.template.rest.web.rest.controller;
 
-import com.codenaiten.template.rest.app.api.AuthenticationService;
-import com.codenaiten.template.rest.app.authentication.TokenInfo;
-import com.codenaiten.template.rest.app.dto.command.auth.LoginCommand;
-import com.codenaiten.template.rest.app.dto.command.auth.RegisterCommand;
-import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
-import com.codenaiten.template.rest.app.dto.result.LoginResult;
-import com.codenaiten.template.rest.app.i18n.MessageI18nManager;
-import com.codenaiten.template.rest.app.properties.TokenSecurityProperties;
+import com.codenaiten.template.rest.app.old.api.AuthenticationService;
+import com.codenaiten.template.rest.app.old.authentication.TokenInfo;
+import com.codenaiten.template.rest.app.old.dto.command.auth.LoginCommand;
+import com.codenaiten.template.rest.app.old.dto.command.auth.RegisterCommand;
+import com.codenaiten.template.rest.app.old.dto.result.AccountInfoResult;
+import com.codenaiten.template.rest.app.old.dto.result.LoginResult;
+import com.codenaiten.template.rest.app.old.i18n.MessageI18nManager;
+import com.codenaiten.template.rest.app.old.properties.TokenSecurityProperties;
 import com.codenaiten.template.rest.web.rest.RestMessage;
 import com.codenaiten.template.rest.web.rest.api.AuthenticationApiRest;
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;

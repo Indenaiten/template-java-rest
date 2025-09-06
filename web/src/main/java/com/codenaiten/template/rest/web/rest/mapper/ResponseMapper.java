@@ -1,11 +1,11 @@
 package com.codenaiten.template.rest.web.rest.mapper;
 
-import com.codenaiten.template.rest.app.dto.result.AccountInfoResult;
-import com.codenaiten.template.rest.app.dto.result.ImageInfoResult;
-import com.codenaiten.template.rest.app.dto.result.LoginResult;
-import com.codenaiten.template.rest.app.dto.result.UserInfoResult;
-import com.codenaiten.template.rest.app.mapper.OptionalMapper;
-import com.codenaiten.template.rest.app.mapper.TemporalMapper;
+import com.codenaiten.template.rest.app.old.dto.result.AccountInfoResult;
+import com.codenaiten.template.rest.app.old.dto.result.ImageInfoResult;
+import com.codenaiten.template.rest.app.old.dto.result.LoginResult;
+import com.codenaiten.template.rest.app.old.dto.result.UserInfoResult;
+import com.codenaiten.template.rest.app.old.mapper.OptionalMapper;
+import com.codenaiten.template.rest.app.old.mapper.TemporalMapper;
 import com.codenaiten.template.rest.web.rest.dto.response.AccountInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.response.ImageInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.response.LoginResponse;

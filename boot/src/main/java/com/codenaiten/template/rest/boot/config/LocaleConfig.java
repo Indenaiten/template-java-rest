@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.boot.config;
 
-import com.codenaiten.template.rest.app.properties.LocaleProperties;
+import com.codenaiten.template.rest.app.old.properties.LocaleProperties;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

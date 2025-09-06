@@ -15,6 +15,12 @@
     <packaging>jar</packaging>
 
     <dependencies>
+        <!-- MAVEN MODULES -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
+
         <!-- SPRINGBOOT -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

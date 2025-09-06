@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.web.rest.api;
 
-import com.codenaiten.template.rest.app.vo.image.ImageId;
+import com.codenaiten.template.rest.app.old.vo.image.ImageId;
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;
 import com.codenaiten.template.rest.web.rest.dto.response.ImageInfoResponse;
 import com.codenaiten.template.rest.web.rest.dto.stub.ApiRestResponseWithUserInfoResponse;

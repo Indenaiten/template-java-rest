@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.web.rest.api;
 
-import com.codenaiten.template.rest.app.vo.user.UserId;
+import com.codenaiten.template.rest.app.old.vo.user.UserId;
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;
 import com.codenaiten.template.rest.web.rest.dto.request.user.FilterUserRequest;
 import com.codenaiten.template.rest.web.rest.dto.request.user.UpdateUserRequest;

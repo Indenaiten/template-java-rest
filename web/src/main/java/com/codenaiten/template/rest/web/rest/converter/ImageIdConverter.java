@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.web.rest.converter;
 
-import com.codenaiten.template.rest.app.vo.image.ImageId;
+import com.codenaiten.template.rest.app.old.vo.image.ImageId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;

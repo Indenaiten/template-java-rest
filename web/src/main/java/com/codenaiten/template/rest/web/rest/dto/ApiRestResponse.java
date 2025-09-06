@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.web.rest.dto;
 
-import com.codenaiten.template.rest.app.dto.result.PageResult;
+import com.codenaiten.template.rest.app.old.dto.result.PageResult;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

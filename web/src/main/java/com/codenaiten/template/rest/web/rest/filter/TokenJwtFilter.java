@@ -1,12 +1,12 @@
 package com.codenaiten.template.rest.web.rest.filter;
 
-import com.codenaiten.template.rest.app.authentication.AuthenticatedUser;
-import com.codenaiten.template.rest.app.authentication.SecurityHelper;
-import com.codenaiten.template.rest.app.authentication.TokenJwtManager;
-import com.codenaiten.template.rest.app.entity.Account;
-import com.codenaiten.template.rest.app.exception.InvalidAccessTokenException;
-import com.codenaiten.template.rest.app.properties.TokenSecurityProperties;
-import com.codenaiten.template.rest.app.vo.user.UserId;
+import com.codenaiten.template.rest.app.old.authentication.AuthenticatedUser;
+import com.codenaiten.template.rest.app.old.authentication.SecurityHelper;
+import com.codenaiten.template.rest.app.old.authentication.TokenJwtManager;
+import com.codenaiten.template.rest.app.old.entity.Account;
+import com.codenaiten.template.rest.app.old.exception.InvalidAccessTokenException;
+import com.codenaiten.template.rest.app.old.properties.TokenSecurityProperties;
+import com.codenaiten.template.rest.app.old.vo.user.UserId;
 import com.codenaiten.template.rest.web.rest.util.HttpRequestUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

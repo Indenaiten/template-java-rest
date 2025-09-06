@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.web.rest.dto.request.account;
 
-import com.codenaiten.template.rest.app.vo.account.AccountPassword;
+import com.codenaiten.template.rest.app.old.vo.account.AccountPassword;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

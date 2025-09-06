@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.boot.config;
 
-import com.codenaiten.template.rest.app.authentication.SecurityHelper;
+import com.codenaiten.template.rest.app.old.authentication.SecurityHelper;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

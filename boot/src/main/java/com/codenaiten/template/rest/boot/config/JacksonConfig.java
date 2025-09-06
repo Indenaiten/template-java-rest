@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.boot.config;
 
-import com.codenaiten.template.rest.app.properties.TemporalFormatProperties;
+import com.codenaiten.template.rest.app.old.properties.TemporalFormatProperties;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;

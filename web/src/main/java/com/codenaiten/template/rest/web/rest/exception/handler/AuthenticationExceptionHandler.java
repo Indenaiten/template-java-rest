@@ -1,8 +1,8 @@
 package com.codenaiten.template.rest.web.rest.exception.handler;
 
-import com.codenaiten.template.rest.app.AppMessage;
-import com.codenaiten.template.rest.app.i18n.MessageI18n;
-import com.codenaiten.template.rest.app.i18n.MessageI18nManager;
+import com.codenaiten.template.rest.app.old.AppMessage;
+import com.codenaiten.template.rest.app.old.i18n.MessageI18n;
+import com.codenaiten.template.rest.app.old.i18n.MessageI18nManager;
 import com.codenaiten.template.rest.web.rest.dto.ApiRestResponse;
 import com.codenaiten.template.rest.web.rest.dto.Empty;
 import com.fasterxml.jackson.databind.ObjectMapper;
