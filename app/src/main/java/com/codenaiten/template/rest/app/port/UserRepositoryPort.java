@@ -1,8 +1,8 @@
 package com.codenaiten.template.rest.app.port;
 
-import com.codenaiten.template.rest.core.entity.User;
-import com.codenaiten.template.rest.core.vo.user.UserId;
-import com.codenaiten.template.rest.core.vo.user.UserUsername;
+import com.codenaiten.template.rest.core.feature.user.User;
+import com.codenaiten.template.rest.core.feature.user.vo.UserId;
+import com.codenaiten.template.rest.core.feature.user.vo.UserUsername;
 
 import java.util.Optional;
 

@@ -1,7 +1,7 @@
 package com.codenaiten.template.rest.app.port;
 
-import com.codenaiten.template.rest.core.vo.EncodedPassword;
-import com.codenaiten.template.rest.core.vo.Password;
+import com.codenaiten.template.rest.core.shared.vo.common.EncodedPassword;
+import com.codenaiten.template.rest.core.shared.vo.common.Password;
 
 public interface PasswordEncoderPort{
     EncodedPassword encode( Password password );

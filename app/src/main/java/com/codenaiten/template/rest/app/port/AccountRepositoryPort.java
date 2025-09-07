@@ -1,8 +1,8 @@
 package com.codenaiten.template.rest.app.port;
 
-import com.codenaiten.template.rest.core.entity.Account;
-import com.codenaiten.template.rest.core.vo.Email;
-import com.codenaiten.template.rest.core.vo.account.AccountId;
+import com.codenaiten.template.rest.core.feature.account.Account;
+import com.codenaiten.template.rest.core.feature.account.vo.AccountId;
+import com.codenaiten.template.rest.core.shared.vo.common.Email;
 
 import java.util.Optional;
 
