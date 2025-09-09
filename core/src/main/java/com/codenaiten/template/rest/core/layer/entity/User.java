@@ -1,0 +1,123 @@
+package com.codenaiten.template.rest.core.layer.entity;
+
+import com.codenaiten.template.rest.core.layer.exception.AppException;
+import com.codenaiten.template.rest.core.layer.vo.Email;
+import com.codenaiten.template.rest.core.layer.vo.EncodedPassword;
+import com.codenaiten.template.rest.core.layer.vo.Timestamp;
+import com.codenaiten.template.rest.core.layer.vo.media.MediaId;
+import com.codenaiten.template.rest.core.layer.vo.user.*;
+import lombok.Getter;
+
+import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Optional;
+
+@Getter
+public class User extends BaseEntity<UserId>{
+
+    private Email email;
+    private UserUsername username;
+    private UserRole role;
+    private MediaId image;
+    private UserName name;
+    private UserSurname surname;
+    private LocalDate birthdate;
+    private EncodedPassword password;
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public User( final UserId id, final Email email, final UserUsername username, final UserRole role,
+                 final MediaId image, final UserName name, final UserSurname surname, final LocalDate birthdate,
+                 final EncodedPassword password, final Timestamp createdAt, final Timestamp updatedAt ){
+        super( id, createdAt, updatedAt );
+        this.setEmail( email );
+        this.setUsername( username );
+        this.setRole( role );
+        this.setName( name );
+        this.setBirthdate( birthdate );
+        this.setPassword( password );
+        Optional.ofNullable( image ).ifPresent( this::setImage );
+        Optional.ofNullable( surname ).ifPresent( this::setSurname );
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| CHECKERS |-----------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public boolean isOwner( final UserId id ){
+        return Objects.equals( this.id, id );
+    }
+
+    public boolean isOwner( final User user ){
+        return this.isOwner( user.getId() );
+    }
+
+    public boolean hasRole( final UserRole role ){
+        return Objects.equals( this.role, role );
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| SETTERS |------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public void setEmail( final Email email ){
+        if( Objects.isNull( email )) throw new AppException();
+        this.email = email;
+    }
+
+    public void setUsername( final UserUsername username ){
+        if( Objects.isNull( username )) throw new AppException();
+        this.username = username;
+    }
+
+    public void setRole( final UserRole role ){
+        if( Objects.isNull( role )) throw new AppException();
+        this.role = role;
+    }
+
+    public void setImage( final MediaId image ){
+        if( Objects.isNull( image )) throw new AppException();
+        this.image = image;
+    }
+
+    public void setName( final UserName name ){
+        if( Objects.isNull( name )) throw new AppException();
+        this.name = name;
+    }
+
+    public void setSurname( final UserSurname surname ){
+        if( Objects.isNull( surname )) throw new AppException();
+        this.surname = surname;
+    }
+
+    public void setBirthdate( final LocalDate birthdate ){
+        if( Objects.isNull( birthdate )) throw new AppException();
+        this.birthdate = birthdate;
+    }
+
+    public void setPassword( final EncodedPassword password ){
+        if( Objects.isNull( password )) throw new AppException();
+        this.password = password;
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| GETTERS |------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public Optional<MediaId> getImage() {
+        return Optional.ofNullable( this.image );
+    }
+
+    public Optional<UserSurname> getSurname() {
+        return Optional.ofNullable( this.surname );
+    }
+
+    public Integer getAge(){
+        return this.birthdate.until( LocalDate.now() ).getYears();
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+
+}
