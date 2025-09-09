@@ -6,6 +6,7 @@ import com.codenaiten.template.rest.core.shared.vo.ValueObject;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -29,6 +30,24 @@ public enum MediaContentType implements ValueObject<String>{
     @Override
     public String value() {
         return this.value;
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| CHECKERS |-----------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public boolean isImage(){
+        return this.value.toLowerCase().startsWith( "image" );
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| GETTERS |------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public List<MediaContentType> getImageTypes(){
+        return Stream.of( values() )
+                .filter( type -> type.value().toLowerCase().startsWith( "image" ))
+                .toList();
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

@@ -1,15 +1,16 @@
-package com.codenaiten.template.rest.core.feature.user.service;
+package com.codenaiten.template.rest.core.feature.user.util;
 
+import com.codenaiten.template.rest.core.feature.media.spi.MediaRepository;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
 import com.codenaiten.template.rest.core.feature.user.User;
-import com.codenaiten.template.rest.core.feature.user.spec.MinimumUserAgeSpec;
-import com.codenaiten.template.rest.core.feature.user.spec.UniquenessUserEmailSpec;
-import com.codenaiten.template.rest.core.feature.user.spec.UniquenessUserUsernameSpec;
+import com.codenaiten.template.rest.core.feature.user.policy.ValidUserBirthdatePolicy;
+import com.codenaiten.template.rest.core.feature.user.policy.ValidUserEmailPolicy;
+import com.codenaiten.template.rest.core.feature.user.policy.ValidUserImagePolicy;
+import com.codenaiten.template.rest.core.feature.user.policy.ValidUserUsernamePolicy;
 import com.codenaiten.template.rest.core.feature.user.vo.UserName;
 import com.codenaiten.template.rest.core.feature.user.vo.UserRole;
 import com.codenaiten.template.rest.core.feature.user.vo.UserSurname;
 import com.codenaiten.template.rest.core.feature.user.vo.UserUsername;
-import com.codenaiten.template.rest.core.shared.exception.AppException;
 import com.codenaiten.template.rest.core.shared.spi.PasswordEncoder;
 import com.codenaiten.template.rest.core.shared.vo.Email;
 import com.codenaiten.template.rest.core.shared.vo.EncodedPassword;
@@ -24,22 +25,24 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UpdateUserService {
+public class UserEditor {
 
+    private final MediaRepository mediaRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UniquenessUserUsernameSpec uniquenessUserUsernameSpec;
-    private final UniquenessUserEmailSpec uniquenessUserEmailSpec;
-    private final MinimumUserAgeSpec minimumUserAgeSpec;
+    private final ValidUserUsernamePolicy validUserUsernamePolicy;
+    private final ValidUserEmailPolicy validUserEmailPolicy;
+    private final ValidUserBirthdatePolicy validUserBirthdatePolicy;
+    private final ValidUserImagePolicy validUserImagePolicy;
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| IMPLEMENTED METHODS |------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public void updateEmail( final User user, final Email email ){
+    public void updateEmail(final User user, final Email email ){
         if( Objects.isNull( user )) throw new IllegalArgumentException( "User to update email is required" );
         if( !Objects.equals( user.getEmail(), email )){
             user.setEmail( email );
-            if( this.uniquenessUserEmailSpec.not().test( user )) throw new AppException();
+            this.validUserEmailPolicy.check( user );
         }
     }
 
@@ -47,7 +50,7 @@ public class UpdateUserService {
         if( Objects.isNull( user )) throw new IllegalArgumentException( "User to update username is required" );
         if( !Objects.equals( user.getUsername(), username )){
             user.setUsername( username );
-            if( this.uniquenessUserUsernameSpec.not().test( user )) throw new AppException();
+            this.validUserUsernamePolicy.check( user );
         }
     }
 
@@ -58,7 +61,11 @@ public class UpdateUserService {
 
     public void updateImage( final User user, final MediaId image ){
         if( Objects.isNull( user )) throw new IllegalArgumentException( "User to update image is required" );
-        if( !Objects.equals( user.getImage().orElse( null ), image )) user.setImage( image );
+        final MediaId currentImage = user.getImage().orElse( null );
+        if( !Objects.equals( currentImage, image )){
+            user.setImage( image );
+            this.validUserImagePolicy.check( user );
+        }
     }
 
     public void updateName( final User user, final UserName name ){
@@ -75,7 +82,7 @@ public class UpdateUserService {
         if( Objects.isNull( user )) throw new IllegalArgumentException( "User to update birthdate is required" );
         if( !Objects.equals( user.getBirthdate(), birthdate )){
             user.setBirthdate( birthdate );
-            if( this.minimumUserAgeSpec.not().test( user )) throw new AppException();
+            this.validUserBirthdatePolicy.check( user );
         }
     }
 

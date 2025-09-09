@@ -8,12 +8,14 @@ import com.codenaiten.template.rest.core.shared.vo.Email;
 import com.codenaiten.template.rest.core.shared.vo.EncodedPassword;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 
 @Getter
+@SuperBuilder
 public class User extends BaseEntity<UserId>{
 
     private Email email;

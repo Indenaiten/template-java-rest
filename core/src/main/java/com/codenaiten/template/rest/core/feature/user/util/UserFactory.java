@@ -1,14 +1,13 @@
-package com.codenaiten.template.rest.core.feature.user.service;
+package com.codenaiten.template.rest.core.feature.user.util;
 
-import com.codenaiten.template.rest.core.feature.media.spi.MediaRepository;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
 import com.codenaiten.template.rest.core.feature.user.User;
-import com.codenaiten.template.rest.core.feature.user.spec.MinimumUserAgeSpec;
-import com.codenaiten.template.rest.core.feature.user.spec.UniquenessUserEmailSpec;
-import com.codenaiten.template.rest.core.feature.user.spec.UniquenessUserUsernameSpec;
+import com.codenaiten.template.rest.core.feature.user.policy.ValidUserBirthdatePolicy;
+import com.codenaiten.template.rest.core.feature.user.policy.ValidUserEmailPolicy;
+import com.codenaiten.template.rest.core.feature.user.policy.ValidUserImagePolicy;
+import com.codenaiten.template.rest.core.feature.user.policy.ValidUserUsernamePolicy;
 import com.codenaiten.template.rest.core.feature.user.spi.UserRepository;
 import com.codenaiten.template.rest.core.feature.user.vo.*;
-import com.codenaiten.template.rest.core.shared.exception.AppException;
 import com.codenaiten.template.rest.core.shared.spi.PasswordEncoder;
 import com.codenaiten.template.rest.core.shared.vo.Email;
 import com.codenaiten.template.rest.core.shared.vo.EncodedPassword;
@@ -21,26 +20,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CreateUserService{
+public class UserFactory {
 
     private final UserRepository userRepository;
-    private final MediaRepository mediaRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UniquenessUserUsernameSpec uniquenessUserUsernameSpec;
-    private final UniquenessUserEmailSpec uniquenessUserEmailSpec;
-    private final MinimumUserAgeSpec minimumUserAgeSpec;
+    private final ValidUserUsernamePolicy validUserUsernamePolicy;
+    private final ValidUserEmailPolicy validUserEmailPolicy;
+    private final ValidUserBirthdatePolicy validUserBirthdatePolicy;
+    private final ValidUserImagePolicy validUserImagePolicy;
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| IMPLEMENTED METHODS |------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public User create( final Input input ){
+    public User create(final Input input ){
         log.info( "Creating user: {}", input );
 
         // Get Default User Role
@@ -64,10 +62,10 @@ public class CreateUserService{
         final User user = new User( id, email, username, role, image, name, surname, birthdate, password, createdAt, updatedAt );
 
         // Check Restrictions
-        if( this.uniquenessUserUsernameSpec.not().test( user )) throw new AppException();
-        if( this.uniquenessUserEmailSpec.not().test( user )) throw new AppException();
-        if( this.minimumUserAgeSpec.not().test( user )) throw new AppException();
-        if( Objects.nonNull( image ) && !this.mediaRepository.exists( image )) throw new AppException();
+        this.validUserUsernamePolicy.check( user );
+        this.validUserEmailPolicy.check( user );
+        this.validUserBirthdatePolicy.check( user );
+        this.validUserImagePolicy.check( user );
 
         // Return User
         return user;

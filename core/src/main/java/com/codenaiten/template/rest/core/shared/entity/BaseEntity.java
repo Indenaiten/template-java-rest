@@ -3,12 +3,14 @@ package com.codenaiten.template.rest.core.shared.entity;
 import com.codenaiten.template.rest.core.shared.exception.AppException;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
 
 @Getter
+@SuperBuilder
 public abstract class BaseEntity<T extends Serializable> implements Entity<T>{
 
     protected T id;

@@ -8,13 +8,13 @@ import com.codenaiten.template.rest.core.shared.entity.BaseEntity;
 import com.codenaiten.template.rest.core.shared.exception.AppException;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 import java.util.Optional;
 
-@Setter
 @Getter
+@SuperBuilder
 public class Account extends BaseEntity<AccountId>{
 
     private AccountId id;
@@ -48,9 +48,14 @@ public class Account extends BaseEntity<AccountId>{
 //---| SETTERS |------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public void setOwner( final UserId owner ){
+    protected void setOwner( final UserId owner ){
         if( Objects.isNull( owner )) throw new AppException();
         this.owner = owner;
+    }
+
+    public void setLang( final Language lang ){
+        if( Objects.isNull( lang )) throw new AppException();
+        this.lang = lang;
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

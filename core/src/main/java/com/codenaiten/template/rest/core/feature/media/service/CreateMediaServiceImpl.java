@@ -1,9 +1,10 @@
-package com.codenaiten.template.rest.core.feature.account.service;
+package com.codenaiten.template.rest.core.feature.media.service;
 
-import com.codenaiten.template.rest.core.feature.account.Account;
-import com.codenaiten.template.rest.core.feature.account.policy.ValidAccountOwnerSpec;
-import com.codenaiten.template.rest.core.feature.account.vo.AccountId;
-import com.codenaiten.template.rest.core.feature.account.vo.Language;
+import com.codenaiten.template.rest.core.feature.media.Media;
+import com.codenaiten.template.rest.core.feature.media.policy.ValidMediaOwnerSpec;
+import com.codenaiten.template.rest.core.feature.media.vo.MediaContentSize;
+import com.codenaiten.template.rest.core.feature.media.vo.MediaContentType;
+import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
 import com.codenaiten.template.rest.core.feature.user.vo.UserId;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.Getter;
@@ -17,32 +18,34 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CreateAccountServiceImpl {
+public class CreateMediaServiceImpl {
 
-    private final ValidAccountOwnerSpec validAccountOwnerSpec;
+    private final ValidMediaOwnerSpec validMediaOwnerSpec;
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| IMPLEMENTED METHODS |------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public Account create( final Input input ){
-        log.info( "Creating account: {}", input );
+    public Media create( final Input input ){
+        log.info( "Creating media: {}", input );
 
         // Get Data
-        final AccountId id = AccountId.random();
+        final MediaId id = MediaId.random();
         final UserId owner = input.getOwner();
-        final Language lang = input.getLang().orElse( null );
+        final String namespace = input.getNamespace().orElse( null );
+        final MediaContentType contentType = input.getContentType();
+        final MediaContentSize contentSize = input.getContentSize();
         final Timestamp createdAt = Timestamp.now();
         final Timestamp updatedAt = null;
 
-        // Create Account
-        final Account account = new Account( id, owner, lang, createdAt, updatedAt );
+        // Create Media
+        final Media media = new Media( id, owner, namespace, contentType, contentSize, createdAt, updatedAt );
 
         // Check Restrictions
-        this.validAccountOwnerSpec.check( account );
+        this.validMediaOwnerSpec.check( media );
 
-        // Return Account
-        return account;
+        // Return Media
+        return media;
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\
@@ -55,14 +58,16 @@ public class CreateAccountServiceImpl {
     class Input {
 
         private final UserId owner;
-        private Language lang;
+        private final MediaContentType contentType;
+        private final MediaContentSize contentSize;
+        private String namespace;
 
     //----------------------------------------------------------------------------------------------------------------\\
     //---| GETTERS |--------------------------------------------------------------------------------------------------\\
     //----------------------------------------------------------------------------------------------------------------\\
 
-        public Optional<Language> getLang() {
-            return Optional.ofNullable( this.lang );
+        public Optional<String> getNamespace(){
+            return Optional.ofNullable( this.namespace );
         }
 
     //----------------------------------------------------------------------------------------------------------------\\
