@@ -4,29 +4,20 @@ import com.codenaiten.template.rest.core.shared.AppMessage;
 import lombok.Getter;
 
 @Getter
-public class AppException extends RuntimeException {
+public class ConstraintException extends AppException{
 
-    public static final AppMessage DEFAULT = AppMessage.ERROR_GENERIC;
-
-//--------------------------------------------------------------------------------------------------------------------\\
-
-    private final AppMessage appMessage;
-    private final Object[] args;
+    public static final AppMessage DEFAULT = AppMessage.ERROR_CONSTRAINT_GENERIC;
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public AppException( final AppMessage message, final Object... args ) {
-        super( message.getMessage().formatted( args ));
-        this.appMessage = message;
-        this.args = args;
+    public ConstraintException( final AppMessage message, final Object... args ) {
+        super( message, args );
     }
 
-    public AppException() {
-        super( DEFAULT.getMessage() );
-        this.appMessage = DEFAULT;
-        this.args = new String[0];
+    public ConstraintException(){
+        super( DEFAULT );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

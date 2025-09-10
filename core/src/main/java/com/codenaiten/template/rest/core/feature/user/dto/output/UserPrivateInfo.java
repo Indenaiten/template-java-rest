@@ -1,4 +1,4 @@
-package com.codenaiten.template.rest.core.feature.user.dto;
+package com.codenaiten.template.rest.core.feature.user.dto.output;
 
 import com.codenaiten.template.rest.core.feature.media.dto.MediaInfo;
 import com.codenaiten.template.rest.core.feature.user.vo.*;

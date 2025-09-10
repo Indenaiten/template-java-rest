@@ -1,7 +1,7 @@
 package com.codenaiten.template.rest.core.feature.media.policy;
 
 import com.codenaiten.template.rest.core.feature.media.Media;
-import com.codenaiten.template.rest.core.feature.user.spi.UserRepository;
+import com.codenaiten.template.rest.core.feature.user.port.spi.UserRepository;
 import com.codenaiten.template.rest.core.shared.exception.AppException;
 import com.codenaiten.template.rest.core.shared.policy.Policy;
 import lombok.RequiredArgsConstructor;

@@ -18,14 +18,14 @@ import java.util.Optional;
 public class Account extends BaseEntity<AccountId>{
 
     private AccountId id;
-    private UserId owner;
+    private User owner;
     private Language lang;
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public Account( final AccountId id, final UserId owner, final Language lang, final Timestamp createdAt,
+    public Account( final AccountId id, final User owner, final Language lang, final Timestamp createdAt,
                     final Timestamp updatedAt ){
         super( id, createdAt, updatedAt );
         this.setOwner( owner );
@@ -37,7 +37,7 @@ public class Account extends BaseEntity<AccountId>{
 //--------------------------------------------------------------------------------------------------------------------\\
 
     public boolean isOwner( final UserId user ){
-        return Objects.equals( this.owner, user );
+        return Objects.equals( this.owner.getId(), user );
     }
 
     public boolean isOwner( final User user ){
@@ -48,7 +48,7 @@ public class Account extends BaseEntity<AccountId>{
 //---| SETTERS |------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    protected void setOwner( final UserId owner ){
+    protected void setOwner( final User owner ){
         if( Objects.isNull( owner )) throw new AppException();
         this.owner = owner;
     }
@@ -64,6 +64,14 @@ public class Account extends BaseEntity<AccountId>{
 
     public Language getLang(){
         return Optional.ofNullable( this.lang ).orElse( Language.ES_ES );
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| CREATOR |------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public static AccountFactory create( final User owner ){
+        return new AccountFactory( owner );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

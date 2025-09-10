@@ -8,6 +8,7 @@ import com.codenaiten.template.rest.core.shared.vo.Email;
 import com.codenaiten.template.rest.core.shared.vo.EncodedPassword;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Getter
+@Setter
 @SuperBuilder
 public class User extends BaseEntity<UserId>{
 
@@ -38,11 +40,11 @@ public class User extends BaseEntity<UserId>{
         this.setEmail( email );
         this.setUsername( username );
         this.setRole( role );
+        this.setImage( image );
+        this.setSurname( surname );
         this.setName( name );
         this.setBirthdate( birthdate );
         this.setPassword( password );
-        Optional.ofNullable( image ).ifPresent( this::setImage );
-        Optional.ofNullable( surname ).ifPresent( this::setSurname );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\
@@ -72,19 +74,9 @@ public class User extends BaseEntity<UserId>{
         this.role = role;
     }
 
-    public void setImage( final MediaId image ){
-        if( Objects.isNull( image )) throw new AppException();
-        this.image = image;
-    }
-
     public void setName( final UserName name ){
         if( Objects.isNull( name )) throw new AppException();
         this.name = name;
-    }
-
-    public void setSurname( final UserSurname surname ){
-        if( Objects.isNull( surname )) throw new AppException();
-        this.surname = surname;
     }
 
     public void setBirthdate( final LocalDate birthdate ){
@@ -111,6 +103,15 @@ public class User extends BaseEntity<UserId>{
 
     public Integer getAge(){
         return this.birthdate.until( LocalDate.now() ).getYears();
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| CREATOR |------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public static UserFactory create( final Email email, final UserUsername username, final UserRole role,
+                                      final UserName name, final LocalDate birthdate, final EncodedPassword password ){
+        return new UserFactory( email, username, role, name, birthdate, password );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

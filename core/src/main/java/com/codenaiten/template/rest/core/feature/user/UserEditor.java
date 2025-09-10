@@ -1,8 +1,7 @@
-package com.codenaiten.template.rest.core.feature.user.util;
+package com.codenaiten.template.rest.core.feature.user;
 
 import com.codenaiten.template.rest.core.feature.media.spi.MediaRepository;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
-import com.codenaiten.template.rest.core.feature.user.User;
 import com.codenaiten.template.rest.core.feature.user.policy.ValidUserBirthdatePolicy;
 import com.codenaiten.template.rest.core.feature.user.policy.ValidUserEmailPolicy;
 import com.codenaiten.template.rest.core.feature.user.policy.ValidUserImagePolicy;
