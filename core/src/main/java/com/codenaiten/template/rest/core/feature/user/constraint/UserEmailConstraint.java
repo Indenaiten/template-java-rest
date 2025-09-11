@@ -1,10 +1,10 @@
-package com.codenaiten.template.rest.core.feature.user.validation.constraint;
+package com.codenaiten.template.rest.core.feature.user.constraint;
 
 import com.codenaiten.template.rest.core.feature.user.User;
+import com.codenaiten.template.rest.core.feature.user.constraint.violation.UniquenessUserUsernameConstraintViolation;
 import com.codenaiten.template.rest.core.feature.user.port.spi.UserRepository;
-import com.codenaiten.template.rest.core.shared.AppMessage;
-import com.codenaiten.template.rest.core.shared.exception.ConstraintException;
-import com.codenaiten.template.rest.core.shared.validator.Constraint;
+import com.codenaiten.template.rest.core.shared.constraint.Constraint;
+import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
 import com.codenaiten.template.rest.core.shared.vo.Email;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class UniquenessUserEmailConstraint implements Constraint<User> {
+public class UserEmailConstraint implements Constraint<User> {
 
     private final UserRepository userRepository;
 
@@ -22,11 +22,11 @@ public class UniquenessUserEmailConstraint implements Constraint<User> {
 //---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public UniquenessUserEmailConstraint( final UserRepository userRepository ){
-        log.info( "UniquenessUserEmailConstraint initialized" );
+    public UserEmailConstraint( final UserRepository userRepository ){
+        log.info( "UserEmailConstraint initialized" );
 
         if( Objects.isNull( userRepository ))
-            throw new IllegalArgumentException( "UserRepository is required by UniquenessUserEmailConstraint" );
+            throw new IllegalArgumentException( "UserRepository is required by UserEmailConstraint" );
 
         this.userRepository = userRepository;
     }
@@ -36,13 +36,13 @@ public class UniquenessUserEmailConstraint implements Constraint<User> {
 //--------------------------------------------------------------------------------------------------------------------\\
 
     @Override
-    public Optional<ConstraintException> check( final User candidate ) {
+    public Optional<ConstraintViolation<?>> check( final User candidate ) {
         if( Objects.isNull( candidate ))
-            throw new IllegalArgumentException( "User candidate to check UniquenessUserEmailConstraint is required" );
+            throw new IllegalArgumentException( "User candidate to check UserEmailConstraint is required" );
 
         final Email email = candidate.getEmail();
         if( !this.userRepository.exists( email ))
-            return Optional.of( new ConstraintException( AppMessage.ERROR_CONSTRAINT_USER_MINIMUM_AGE, email ));
+            return Optional.of( new UniquenessUserUsernameConstraintViolation( candidate ));
 
         return Optional.empty();
     }

@@ -84,6 +84,10 @@ public class Media extends BaseEntity<MediaId>{
         return Objects.equals( this.contentType, contentType );
     }
 
+    public boolean isImageType(){
+        return this.contentType.isImage();
+    }
+
 //--------------------------------------------------------------------------------------------------------------------\\
 
 }

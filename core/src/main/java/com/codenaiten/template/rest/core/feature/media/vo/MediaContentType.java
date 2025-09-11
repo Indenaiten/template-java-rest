@@ -3,6 +3,7 @@ package com.codenaiten.template.rest.core.feature.media.vo;
 import com.codenaiten.template.rest.core.shared.exception.AppException;
 import com.codenaiten.template.rest.core.shared.vo.BaseValueObject;
 import com.codenaiten.template.rest.core.shared.vo.ValueObject;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +21,7 @@ public enum MediaContentType implements ValueObject<String>{
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    private final String value;
+    private final @Getter( AccessLevel.NONE ) String value;
     private final String extension;
 
 //--------------------------------------------------------------------------------------------------------------------\\

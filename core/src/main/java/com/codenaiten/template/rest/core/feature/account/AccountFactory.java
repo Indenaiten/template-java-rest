@@ -1,22 +1,24 @@
 package com.codenaiten.template.rest.core.feature.account;
 
-import com.codenaiten.template.rest.core.feature.account.validation.AccountValidator;
+import com.codenaiten.template.rest.core.feature.account.constraint.AccountIdConstraint;
+import com.codenaiten.template.rest.core.feature.account.constraint.AccountOwnerConstraint;
 import com.codenaiten.template.rest.core.feature.account.vo.AccountId;
 import com.codenaiten.template.rest.core.feature.account.vo.Language;
-import com.codenaiten.template.rest.core.feature.user.User;
+import com.codenaiten.template.rest.core.feature.user.vo.UserId;
+import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
 import com.codenaiten.template.rest.core.shared.exception.ConstraintException;
-import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 public class AccountFactory {
 
-    private final User owner;
+    private final UserId owner;
 
 // -------------------------------------------------------------------------------------------------------------- \\
 
@@ -35,7 +37,7 @@ public class AccountFactory {
 // ---| BUILDER METHOD |--------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    public Account build( final AccountValidator validator ){
+    public Account build( final AccountIdConstraint accountIdConstraint, final AccountOwnerConstraint accountOwnerConstraint ){
         // Step 01: Create Account
         final AccountId id = AccountId.random();
         final Timestamp now = Timestamp.now();
@@ -43,8 +45,10 @@ public class AccountFactory {
                 .build();
 
         // Step 02: Validate Account
-        final List<ConstraintException> violations = validator.validate( account );
-        if( !violations.isEmpty() ) throw new ValidationException( violations );
+        final List<ConstraintViolation<?>> violations = new ArrayList<>();
+        accountIdConstraint.check( account ).ifPresent( violations::add );
+        accountOwnerConstraint.check( account ).ifPresent( violations::add );
+        if( !violations.isEmpty() ) throw new ConstraintException( violations );
 
         // Step 03: Return Account
         return account;

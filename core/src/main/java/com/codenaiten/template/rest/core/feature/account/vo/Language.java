@@ -3,12 +3,15 @@ package com.codenaiten.template.rest.core.feature.account.vo;
 import com.codenaiten.template.rest.core.shared.exception.AppException;
 import com.codenaiten.template.rest.core.shared.vo.BaseValueObject;
 import com.codenaiten.template.rest.core.shared.vo.ValueObject;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+@Getter
 @RequiredArgsConstructor
 public enum Language implements ValueObject<Locale>{
 
@@ -17,7 +20,7 @@ public enum Language implements ValueObject<Locale>{
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    private final Locale value;
+    private final @Getter( AccessLevel.NONE ) Locale value;
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| GETTERS |------------------------------------------------------------------------------------------------------\\

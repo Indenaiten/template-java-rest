@@ -1,22 +1,19 @@
-package com.codenaiten.template.rest.core.feature.user.exception;
+package com.codenaiten.template.rest.core.feature.user.constraint.violation;
 
 import com.codenaiten.template.rest.core.feature.user.User;
-import com.codenaiten.template.rest.core.shared.AppMessage;
-import com.codenaiten.template.rest.core.shared.exception.ConstraintException;
+import com.codenaiten.template.rest.core.shared.AppMessageKey;
+import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
 import lombok.Getter;
 
 @Getter
-public class UniquenessUserEmailConstraintException extends ConstraintException {
-
-    private final User user;
+public class AlreadyExistsUserIdConstraintViolation extends ConstraintViolation<User> {
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public UniquenessUserEmailConstraintException( final User user ){
-        super( AppMessage.ERROR_CONSTRAINT_USER_EMAIL_UNIQUENESS, user.getEmail() );
-        this.user = user;
+    public AlreadyExistsUserIdConstraintViolation( final User user ){
+        super( user, AppMessageKey.ERROR_CONSTRAINT_USER_ID_ALREADY_EXISTS, user.getId() );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

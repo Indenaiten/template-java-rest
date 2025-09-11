@@ -18,14 +18,14 @@ import java.util.Optional;
 public class Account extends BaseEntity<AccountId>{
 
     private AccountId id;
-    private User owner;
+    private UserId owner;
     private Language lang;
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public Account( final AccountId id, final User owner, final Language lang, final Timestamp createdAt,
+    public Account( final AccountId id, final UserId owner, final Language lang, final Timestamp createdAt,
                     final Timestamp updatedAt ){
         super( id, createdAt, updatedAt );
         this.setOwner( owner );
@@ -33,11 +33,21 @@ public class Account extends BaseEntity<AccountId>{
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\
+//---| COPY |---------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    @Override
+    public Account copy(){
+        return Account.builder().id( this.id ).owner( this.owner ).lang( this.lang ).createdAt( this.createdAt )
+                .updatedAt( this.updatedAt ).build();
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
 //---| CHECKERS |-----------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
     public boolean isOwner( final UserId user ){
-        return Objects.equals( this.owner.getId(), user );
+        return Objects.equals( this.owner, user );
     }
 
     public boolean isOwner( final User user ){
@@ -48,7 +58,7 @@ public class Account extends BaseEntity<AccountId>{
 //---| SETTERS |------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    protected void setOwner( final User owner ){
+    protected void setOwner( final UserId owner ){
         if( Objects.isNull( owner )) throw new AppException();
         this.owner = owner;
     }
@@ -67,10 +77,18 @@ public class Account extends BaseEntity<AccountId>{
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\
+//---| UPDATER |------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public AccountEditor update(){
+        return new AccountEditor( this );
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
 //---| CREATOR |------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public static AccountFactory create( final User owner ){
+    public static AccountFactory create( final UserId owner ){
         return new AccountFactory( owner );
     }
 

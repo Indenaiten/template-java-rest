@@ -1,11 +1,11 @@
-package com.codenaiten.template.rest.core.feature.user.validation.constraint;
+package com.codenaiten.template.rest.core.feature.user.constraint;
 
 import com.codenaiten.template.rest.core.feature.user.User;
-import com.codenaiten.template.rest.core.feature.user.exception.UniquenessUserUsernameConstraintException;
+import com.codenaiten.template.rest.core.feature.user.constraint.violation.AlreadyExistsUserIdConstraintViolation;
 import com.codenaiten.template.rest.core.feature.user.port.spi.UserRepository;
-import com.codenaiten.template.rest.core.feature.user.vo.UserUsername;
-import com.codenaiten.template.rest.core.shared.exception.ConstraintException;
-import com.codenaiten.template.rest.core.shared.validator.Constraint;
+import com.codenaiten.template.rest.core.feature.user.vo.UserId;
+import com.codenaiten.template.rest.core.shared.constraint.Constraint;
+import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class UniquenessUserUsernameConstraint implements Constraint<User> {
+public class UserIdConstraint implements Constraint<User> {
 
     private final UserRepository userRepository;
 
@@ -22,28 +22,26 @@ public class UniquenessUserUsernameConstraint implements Constraint<User> {
 //---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public UniquenessUserUsernameConstraint(final UserRepository userRepository ){
-        log.info( "UniquenessUserUsernameConstraint initialized" );
+    public UserIdConstraint( final UserRepository userRepository ){
+        log.info( "UserIdConstraint initialized" );
 
         if( Objects.isNull( userRepository ))
-            throw new IllegalArgumentException( "UserRepository is required by UniquenessUserUsernameConstraint" );
+            throw new IllegalArgumentException( "UserRepository is required by UserIdConstraint" );
 
         this.userRepository = userRepository;
     }
-
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| IMPLEMENTED METHODS |------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
     @Override
-    public Optional<ConstraintException> check( final User candidate ){
+    public Optional<ConstraintViolation<?>> check( final User candidate ){
         if( Objects.isNull( candidate ))
-            throw new IllegalArgumentException( "User candidate to check UniquenessUserUsernameConstraint is required" );
+            throw new IllegalArgumentException( "Account candidate to check UserIdConstraint is required" );
 
-        final UserUsername username = candidate.getUsername();
-        if( this.userRepository.exists( username ))
-            return Optional.of( new UniquenessUserUsernameConstraintException( candidate ));
+        final UserId id = candidate.getId();
+        if( this.userRepository.exists( id )) return Optional.of( new AlreadyExistsUserIdConstraintViolation( candidate ));
 
         return Optional.empty();
     }

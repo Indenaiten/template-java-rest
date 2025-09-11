@@ -1,14 +1,15 @@
 package com.codenaiten.template.rest.core.feature.account.service;
 
 import com.codenaiten.template.rest.core.feature.account.Account;
+import com.codenaiten.template.rest.core.feature.account.constraint.AccountIdConstraint;
+import com.codenaiten.template.rest.core.feature.account.constraint.AccountOwnerConstraint;
 import com.codenaiten.template.rest.core.feature.account.spi.AccountRepository;
-import com.codenaiten.template.rest.core.feature.account.validation.AccountValidator;
 import com.codenaiten.template.rest.core.feature.account.vo.Language;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
 import com.codenaiten.template.rest.core.feature.user.User;
+import com.codenaiten.template.rest.core.feature.user.constraint.*;
 import com.codenaiten.template.rest.core.feature.user.dto.input.CreateAccount;
 import com.codenaiten.template.rest.core.feature.user.port.spi.UserRepository;
-import com.codenaiten.template.rest.core.feature.user.validation.UserValidator;
 import com.codenaiten.template.rest.core.feature.user.vo.UserName;
 import com.codenaiten.template.rest.core.feature.user.vo.UserRole;
 import com.codenaiten.template.rest.core.feature.user.vo.UserSurname;
@@ -28,11 +29,21 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class CreateAccountService {
 
+    // Ports
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserValidator userValidator;
-    private final AccountValidator accountValidator;
+
+    // User Constraints
+    private final UserIdConstraint userIdConstraint;
+    private final UserEmailConstraint userEmailConstraint;
+    private final UserUsernameConstraint userUsernameConstraint;
+    private final UserBirthdateConstraint userBirthdateConstraint;
+    private final UserImageConstraint userImageConstraint;
+
+    // Account Validators
+    private final AccountIdConstraint accountIdConstraint;
+    private final AccountOwnerConstraint accountOwnerConstraint;
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| METHODS |------------------------------------------------------------------------------------------------------\\
@@ -53,8 +64,12 @@ public class CreateAccountService {
         final EncodedPassword password = this.passwordEncoder.encode( input.getPassword() );
 
         // Step 03: Create User with Factory
-        final User user = User.create( email, username, role, name, birthdate, password ).image( image )
-                .surname( surname ).build( this.userValidator );
+        final User user = User.create( email, username, role, name, birthdate, password ).image( image ).surname( surname )
+                .build( this.userIdConstraint,
+                        this.userEmailConstraint,
+                        this.userUsernameConstraint,
+                        this.userBirthdateConstraint,
+                        this.userImageConstraint );
 
         // Step 04: Get Default Account Data
         final Language defaultLang = Language.of( LocaleContextHolder.getLocale() );
@@ -63,7 +78,8 @@ public class CreateAccountService {
         final Language lang = input.getLanguage().orElse( defaultLang );
 
         // Step 06: Create Account with Factory
-        final Account account = Account.create( user ).language( lang ).build( this.accountValidator );
+        final Account account = Account.create( user.getId() ).language( lang )
+                .build( this.accountIdConstraint, this.accountOwnerConstraint );
 
         // Step 07: Save User and Account
         this.userRepository.save( user );

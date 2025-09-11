@@ -1,23 +1,19 @@
-package com.codenaiten.template.rest.core.shared.exception;
+package com.codenaiten.template.rest.core.feature.user.constraint.violation;
 
+import com.codenaiten.template.rest.core.feature.user.User;
 import com.codenaiten.template.rest.core.shared.AppMessageKey;
+import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
 import lombok.Getter;
 
 @Getter
-public class AppException extends RuntimeException {
-
-    public static final AppMessageKey DEFAULT = AppMessageKey.ERROR_GENERIC;
+public class UniquenessUserUsernameConstraintViolation extends ConstraintViolation<User> {
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public AppException( final String message ){
-        super( message );
-    }
-
-    public AppException(){
-        super( DEFAULT.getMessage() );
+    public UniquenessUserUsernameConstraintViolation( final User user ){
+        super( user, AppMessageKey.ERROR_CONSTRAINT_USER_USERNAME_UNIQUENESS, user.getUsername() );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\
