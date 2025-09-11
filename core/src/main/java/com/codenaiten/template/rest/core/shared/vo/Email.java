@@ -37,9 +37,9 @@ public class Email extends BaseValueObject<String> {
      */
     public Email( final String value ){
         super( value );
-        if( value.length() < MIN_SIZE ) throw new AppException();
-        if( value.length() > MAX_SIZE ) throw new AppException();
-        if( !value.matches( FORMAT )) throw new AppException();
+        if( this.value.length() < MIN_SIZE ) throw new AppException();
+        if( this.value.length() > MAX_SIZE ) throw new AppException();
+        if( !this.value.matches( FORMAT )) throw new AppException();
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

@@ -21,7 +21,7 @@ public class MediaContentSize extends BaseValueObject<Long>{
      */
     public MediaContentSize( final Long value ){
         super( value );
-        if( value <= 0 ) throw new AppException();
+        if( this.value <= 0 ) throw new AppException();
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

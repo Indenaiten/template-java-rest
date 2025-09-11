@@ -4,6 +4,7 @@ import com.codenaiten.template.rest.core.shared.exception.AppException;
 import com.codenaiten.template.rest.core.shared.vo.BaseValueObject;
 
 import java.io.Serial;
+import java.util.Objects;
 
 public class UserSurname extends BaseValueObject<String>{
 
@@ -31,10 +32,21 @@ public class UserSurname extends BaseValueObject<String>{
      * @param value {@link String} que representa el valor del {@link UserSurname}.
      */
     public UserSurname( final String value ){
-        super( value );
-        if( value.length() < MIN_SIZE ) throw new AppException();
-        if( value.length() > MAX_SIZE ) throw new AppException();
-        if( !value.matches( FORMAT )) throw new AppException();
+        super( value.trim() );
+        if( this.value.length() < MIN_SIZE ) throw new AppException();
+        if( this.value.length() > MAX_SIZE ) throw new AppException();
+        if( !this.value.matches( FORMAT )) throw new AppException();
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| COMPARISON |---------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    @Override
+    public boolean equals( final Object obj ){
+        if( Objects.isNull( obj ) || getClass() != obj.getClass() ) return false;
+        final UserSurname that = (UserSurname) obj;
+        return Objects.equals( this.value().toLowerCase(), that.value().toLowerCase() );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

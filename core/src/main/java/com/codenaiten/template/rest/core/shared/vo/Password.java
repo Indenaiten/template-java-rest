@@ -30,7 +30,7 @@ public class Password extends BaseValueObject<String>{
      * @param value {@link String} que representa el valor del {@link Password}.
      */
     public Password( final String value ){
-        super( value.toLowerCase().trim() );
+        super( value.trim() );
         if( this.value.length() < MIN_SIZE ) throw new AppException();
         if( this.value.length() > MAX_SIZE ) throw new AppException();
         if( !this.value.matches( FORMAT )) throw new AppException();

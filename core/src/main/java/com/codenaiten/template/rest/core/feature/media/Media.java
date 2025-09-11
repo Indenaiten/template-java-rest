@@ -6,6 +6,7 @@ import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
 import com.codenaiten.template.rest.core.feature.user.User;
 import com.codenaiten.template.rest.core.feature.user.vo.UserId;
 import com.codenaiten.template.rest.core.shared.entity.BaseEntity;
+import com.codenaiten.template.rest.core.shared.entity.Entity;
 import com.codenaiten.template.rest.core.shared.exception.AppException;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.Getter;
@@ -34,6 +35,17 @@ public class Media extends BaseEntity<MediaId>{
         this.setNamespace( namespace );
         this.setContentType( contentType );
         this.setContentSize( contentSize );
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| COPY |---------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    @Override
+    public Entity<MediaId> copy() {
+        return Media.builder().id( getId() ).owner( this.owner ).namespace( this.namespace )
+                .contentType( this.contentType ).contentSize( this.contentSize ).createdAt( this.createdAt )
+                .updatedAt( this.updatedAt ).build();
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\
