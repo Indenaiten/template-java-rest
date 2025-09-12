@@ -30,29 +30,50 @@ import static org.mockito.Mockito.*;
 class UserFactoryTest {
 
 //--------------------------------------------------------------------------------------------------------------------\\
+//---| HELPER METHODS |-----------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    private UserIdConstraint mockUserIdConstraintOk(){
+        final UserIdConstraint constraint = mock( UserIdConstraint.class );
+        when( constraint.check( any( User.class ))).thenReturn( Optional.empty() );
+        return constraint;
+    }
+
+    private UserEmailConstraint mockUserEmailConstraintOk(){
+        final UserEmailConstraint constraint = mock( UserEmailConstraint.class );
+        when( constraint.check( any( User.class ))).thenReturn( Optional.empty() );
+        return constraint;
+    }
+
+    private UserUsernameConstraint mockUserUsernameConstraintOK(){
+        final UserUsernameConstraint constraint = mock( UserUsernameConstraint.class );
+        when( constraint.check( any( User.class ))).thenReturn( Optional.empty() );
+        return constraint;
+    }
+
+    private UserBirthdateConstraint mockUserBirthdateConstraintOK(){
+        final UserBirthdateConstraint constraint = mock( UserBirthdateConstraint.class );
+        when( constraint.check( any( User.class ))).thenReturn( Optional.empty() );
+        return constraint;
+    }
+
+    private UserImageConstraint mockUserImageConstraintOK() {
+        final UserImageConstraint constraint = mock( UserImageConstraint.class );
+        when( constraint.check( any( User.class ))).thenReturn( Optional.empty() );
+        return constraint;
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
 
     @Test
     @DisplayName( "User creation succeeds when no constraint violations exist" )
     void givenValidUserDataAndNoConstraintViolations_whenBuildingUser_thenUserIsCreatedSuccessfully(){
-        // Given mocked UserIdConstraint that return no violations
-        final UserIdConstraint userIdConstraint = mock( UserIdConstraint.class );
-        when( userIdConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
-
-        // Given mocked UserEmailConstraint that return no violations
-        final UserEmailConstraint userEmailConstraint = mock( UserEmailConstraint.class );
-        when( userEmailConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
-
-        // Given mocked UserUsernameConstraint that return no violations
-        final UserUsernameConstraint userUsernameConstraint = mock( UserUsernameConstraint.class );
-        when( userUsernameConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
-
-        // Given mocked UserBirthdateConstraint that return no violations
-        final UserBirthdateConstraint userBirthdateConstraint = mock( UserBirthdateConstraint.class );
-        when( userBirthdateConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
-
-        // Given mocked UserImageConstraint that return no violations
-        final UserImageConstraint userImageConstraint = mock( UserImageConstraint.class );
-        when( userImageConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
+        // Given mocked Constraints
+        final UserIdConstraint userIdConstraint = this.mockUserIdConstraintOk();
+        final UserEmailConstraint userEmailConstraint = this.mockUserEmailConstraintOk();
+        final UserUsernameConstraint userUsernameConstraint = this.mockUserUsernameConstraintOK();
+        final UserBirthdateConstraint userBirthdateConstraint = this.mockUserBirthdateConstraintOK();
+        final UserImageConstraint userImageConstraint = this.mockUserImageConstraintOK();
 
         // Given valid User data
         final Email email = new Email("test@mail.cc" );
@@ -98,23 +119,23 @@ class UserFactoryTest {
         final ConstraintViolation<?> violation = mock( ConstraintViolation.class );
 
         // Given mocked UserIdConstraint that return violations
-        final UserIdConstraint userIdConstraint = mock( UserIdConstraint.class );
+        final UserIdConstraint userIdConstraint = this.mockUserIdConstraintOk();
         when( userIdConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
 
         // Given mocked UserEmailConstraint that return violations
-        final UserEmailConstraint userEmailConstraint = mock( UserEmailConstraint.class );
+        final UserEmailConstraint userEmailConstraint = this.mockUserEmailConstraintOk();
         when( userEmailConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
 
         // Given mocked UserUsernameConstraint that return violations
-        final UserUsernameConstraint userUsernameConstraint = mock( UserUsernameConstraint.class );
+        final UserUsernameConstraint userUsernameConstraint = this.mockUserUsernameConstraintOK();
         when( userUsernameConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
 
         // Given mocked UserBirthdateConstraint that return violations
-        final UserBirthdateConstraint userBirthdateConstraint = mock( UserBirthdateConstraint.class );
+        final UserBirthdateConstraint userBirthdateConstraint = this.mockUserBirthdateConstraintOK();
         when( userBirthdateConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
 
         // Given mocked UserImageConstraint that return violations
-        final UserImageConstraint userImageConstraint = mock( UserImageConstraint.class );
+        final UserImageConstraint userImageConstraint = this.mockUserImageConstraintOK();
         when( userImageConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
 
         // Given valid User data

@@ -3,9 +3,13 @@ package com.codenaiten.template.rest.core;
 import com.codenaiten.template.rest.core.feature.account.constraint.AccountIdConstraint;
 import com.codenaiten.template.rest.core.feature.account.constraint.AccountOwnerConstraint;
 import com.codenaiten.template.rest.core.feature.account.port.AccountRepository;
+import com.codenaiten.template.rest.core.feature.account.service.UpdateAccountService;
 import com.codenaiten.template.rest.core.feature.media.constraint.MediaIdConstraint;
 import com.codenaiten.template.rest.core.feature.media.constraint.MediaOwnerConstraint;
+import com.codenaiten.template.rest.core.feature.media.port.MediaFileManager;
 import com.codenaiten.template.rest.core.feature.media.port.MediaRepository;
+import com.codenaiten.template.rest.core.feature.media.service.CreateMediaService;
+import com.codenaiten.template.rest.core.feature.media.service.UpdateMediaService;
 import com.codenaiten.template.rest.core.feature.user.constraint.*;
 import com.codenaiten.template.rest.core.feature.user.port.MinimumUserAgeProvider;
 import com.codenaiten.template.rest.core.feature.user.port.UserRepository;
@@ -66,8 +70,9 @@ public abstract class CoreFactory {
     // User Service - CreateUserService
     public CreateUserService createUserService(){
         return new CreateUserService( this.userRepository(), this.accountRepository(), this.languageProvider(),
-                this.passwordEncoder(), this.userIdConstraint(), this.userEmailConstraint(), this.userUsernameConstraint(),
-                this.userBirthdateConstraint(), this.userImageConstraint(), this.accountIdConstraint(), this.accountOwnerConstraint() );
+                this.passwordEncoder(), this.languageResolver(), this.userIdConstraint(), this.userEmailConstraint(),
+                this.userUsernameConstraint(), this.userBirthdateConstraint(), this.userImageConstraint(),
+                this.accountIdConstraint(), this.accountOwnerConstraint() );
     }
 
     // User Service - UpdateUserService
@@ -95,12 +100,20 @@ public abstract class CoreFactory {
         return new AccountOwnerConstraint( this.userRepository(), this.accountRepository() );
     }
 
-//--------------------------------------------------------------------------------------------------------------------\\
+//---------------------------------------------------------------------------------------------------------------------\\
+
+    // Account Service - UpdateAccountService
+    protected UpdateAccountService updateAccountService(){
+        return new UpdateAccountService( this.accountRepository(), this.languageProvider(), this.languageResolver() );
+    }
+
+//---------------------------------------------------------------------------------------------------------------------\\
 //---| MEDIA |--------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
     // Media - Ports
     abstract MediaRepository mediaRepository();
+    abstract MediaFileManager mediaFileManager();
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
@@ -112,6 +125,19 @@ public abstract class CoreFactory {
     // Media Constraint - MediaOwnerConstraint
     protected MediaOwnerConstraint mediaOwnerConstraint(){
         return new MediaOwnerConstraint( this.userRepository() );
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    // Media Service - CreateMediaService
+    public CreateMediaService createMediaService(){
+        return new CreateMediaService( this.mediaRepository(), this.mediaFileManager(), this.mediaIdConstraint(),
+                this.mediaOwnerConstraint() );
+    }
+
+    // Media Service - UpdateMediaService
+    protected UpdateMediaService updateMediaService(){
+        return new UpdateMediaService( this.mediaRepository(), this.mediaFileManager() );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

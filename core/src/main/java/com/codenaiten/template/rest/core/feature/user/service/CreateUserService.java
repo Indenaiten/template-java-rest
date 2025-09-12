@@ -7,23 +7,26 @@ import com.codenaiten.template.rest.core.feature.account.port.AccountRepository;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
 import com.codenaiten.template.rest.core.feature.user.User;
 import com.codenaiten.template.rest.core.feature.user.constraint.*;
-import com.codenaiten.template.rest.core.feature.user.dto.input.CreateUser;
+import com.codenaiten.template.rest.core.feature.user.dto.input.CreateUserInput;
 import com.codenaiten.template.rest.core.feature.user.port.UserRepository;
 import com.codenaiten.template.rest.core.feature.user.vo.UserName;
 import com.codenaiten.template.rest.core.feature.user.vo.UserRole;
 import com.codenaiten.template.rest.core.feature.user.vo.UserSurname;
 import com.codenaiten.template.rest.core.feature.user.vo.UserUsername;
 import com.codenaiten.template.rest.core.shared.spi.LanguageProvider;
+import com.codenaiten.template.rest.core.shared.spi.LanguageResolver;
 import com.codenaiten.template.rest.core.shared.spi.PasswordEncoder;
 import com.codenaiten.template.rest.core.shared.vo.Email;
 import com.codenaiten.template.rest.core.shared.vo.EncodedPassword;
 import com.codenaiten.template.rest.core.shared.vo.Language;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class CreateUserService {
 
@@ -32,6 +35,7 @@ public class CreateUserService {
     private final AccountRepository accountRepository;
     private final LanguageProvider languageProvider;
     private final PasswordEncoder passwordEncoder;
+    private final LanguageResolver languageResolver;
 
     // User Constraints
     private final UserIdConstraint userIdConstraint;
@@ -54,7 +58,7 @@ public class CreateUserService {
 //---| METHODS |------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public Result create( final CreateUser input ){
+    public Result create( final CreateUserInput input ){
         // Step 01: Get Default User Data
         final UserRole defaultRole = this.userRepository.count() == 0 ? UserRole.ADMIN : UserRole.USER;
 
@@ -89,6 +93,7 @@ public class CreateUserService {
         // Step 07: Save User and Account
         this.userRepository.save( user );
         this.accountRepository.save( account );
+        this.languageResolver.setLanguage( account.getLang() );
 
         // Step 08: Return Result
         return new Result( user, account );

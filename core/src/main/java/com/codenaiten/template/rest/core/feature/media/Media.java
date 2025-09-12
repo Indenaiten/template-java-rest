@@ -11,26 +11,24 @@ import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 import java.util.Optional;
 
 @Getter
-@SuperBuilder
 public class Media extends BaseEntity<MediaId>{
 
     private UserId owner;
-    private @Setter String namespace;
     private MediaContentType contentType;
     private MediaContentSize contentSize;
+    private @Setter String namespace;
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public Media( final MediaId id, final UserId owner, final String namespace, final MediaContentType contentType,
-                  final MediaContentSize contentSize, final Timestamp createdAt, final Timestamp updatedAt ){
+    public Media( final MediaId id, final UserId owner, final MediaContentType contentType, final MediaContentSize contentSize,
+                  final String namespace, final Timestamp createdAt, final Timestamp updatedAt ){
         super( id, createdAt, updatedAt );
         this.setOwner( owner );
         this.setNamespace( namespace );
@@ -44,9 +42,7 @@ public class Media extends BaseEntity<MediaId>{
 
     @Override
     public Media copy() {
-        return Media.builder().id( getId() ).owner( this.owner ).namespace( this.namespace )
-                .contentType( this.contentType ).contentSize( this.contentSize ).createdAt( this.createdAt )
-                .updatedAt( this.updatedAt ).build();
+        return new Media( this.id, this.owner, this.contentType, this.contentSize, this.namespace, this.createdAt, this.updatedAt );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

@@ -46,8 +46,7 @@ public class MediaFactory {
         // Step 01: Create Media
         final MediaId id = MediaId.random();
         final Timestamp now = Timestamp.now();
-        final Media media = Media.builder().id( id ).owner( this.owner ).contentType( this.contentType )
-                .contentSize( this.contentSize ).namespace( this.namespace ).createdAt( now ).build();
+        final Media media = new Media( id, this.owner, this.contentType, this.contentSize, this.namespace, now, null );
 
         // Step 02: Validate Media
         final List<ConstraintViolation<?>> violations = new ArrayList<>();

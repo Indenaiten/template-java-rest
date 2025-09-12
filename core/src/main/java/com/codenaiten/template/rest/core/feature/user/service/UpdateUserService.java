@@ -6,7 +6,7 @@ import com.codenaiten.template.rest.core.feature.user.constraint.UserBirthdateCo
 import com.codenaiten.template.rest.core.feature.user.constraint.UserEmailConstraint;
 import com.codenaiten.template.rest.core.feature.user.constraint.UserImageConstraint;
 import com.codenaiten.template.rest.core.feature.user.constraint.UserUsernameConstraint;
-import com.codenaiten.template.rest.core.feature.user.dto.input.UpdateUser;
+import com.codenaiten.template.rest.core.feature.user.dto.input.UpdateUserInput;
 import com.codenaiten.template.rest.core.feature.user.exception.UserNotFoundException;
 import com.codenaiten.template.rest.core.feature.user.port.UserRepository;
 import com.codenaiten.template.rest.core.feature.user.vo.UserId;
@@ -15,8 +15,10 @@ import com.codenaiten.template.rest.core.shared.spi.PasswordEncoder;
 import com.codenaiten.template.rest.core.shared.vo.ValueObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class UpdateUserService {
 
@@ -34,7 +36,7 @@ public class UpdateUserService {
 //---| METHODS |------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public User update( final UserId id, final UpdateUser input ){
+    public User update( final UserId id, final UpdateUserInput input ){
         // Step 01: Get User to Update
         final User user = this.userRepository.find( id ).orElseThrow( () -> new UserNotFoundException( id ));
 

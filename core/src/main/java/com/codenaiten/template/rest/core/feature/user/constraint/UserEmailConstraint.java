@@ -8,11 +8,13 @@ import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
 import com.codenaiten.template.rest.core.shared.vo.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class UserEmailConstraint implements Constraint<User> {
 

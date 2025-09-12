@@ -41,8 +41,7 @@ public class AccountFactory {
         // Step 01: Create Account
         final AccountId id = AccountId.random();
         final Timestamp now = Timestamp.now();
-        final Account account = Account.builder().id( id ).owner( this.owner ).lang( this.language ).createdAt( now )
-                .build();
+        final Account account = new Account( id, this.owner, this.language, now, null );
 
         // Step 02: Validate Account
         final List<ConstraintViolation<?>> violations = new ArrayList<>();

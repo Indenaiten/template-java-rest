@@ -14,7 +14,7 @@ import java.util.Optional;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class CreateUser {
+public class CreateUserInput {
 
     private final Email email;
     private final UserUsername username;

@@ -107,6 +107,10 @@ public enum CoreMessageKey implements MessageKey {
 //---| ACCOUNT |------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
+    // Errors
+    ERROR_ACCOUNT_NOT_FOUND( "error.account.not.found", "Account not found" ),
+    ERROR_ACCOUNT_NOT_FOUND_BY_ID( "error.account.not.found.by.id", "Account not found by ID: { \"account-id\": \"%s\" }" ),
+
     // Fields Entity Account - Validation Errors
     ERROR_VALIDATION_ACCOUNT_OWNER_REQUIRED( "error.validation.account.owner.required", "Account Owner is required" ),
 
@@ -123,6 +127,10 @@ public enum CoreMessageKey implements MessageKey {
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| MEDIA |--------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
+
+    // Errors
+    ERROR_MEDIA_NOT_FOUND( "error.media.not.found", "Media not found" ),
+    ERROR_MEDIA_NOT_FOUND_BY_ID( "error.media.not.found.by.id", "Media not found by ID: { \"media-id\": \"%s\" }" ),
 
     // Fields Entity Media - Validation Errors
     ERROR_VALIDATION_MEDIA_OWNER_REQUIRED( "error.validation.media.owner.required", "Media Owner is required" ),

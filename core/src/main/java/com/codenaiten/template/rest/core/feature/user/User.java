@@ -10,14 +10,12 @@ import com.codenaiten.template.rest.core.shared.vo.EncodedPassword;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 
 @Getter
-@SuperBuilder
 public class User extends BaseEntity<UserId>{
 
     private Email email;
@@ -53,9 +51,8 @@ public class User extends BaseEntity<UserId>{
 
     @Override
     public User copy() {
-        return User.builder().id( this.id ).email( this.email ).username( this.username ).role( this.role )
-                .image( this.image ).name( this.name ).surname( this.surname ).birthdate( this.birthdate )
-                .password( this.password ).createdAt( this.createdAt ).updatedAt( this.updatedAt ).build();
+        return new User( this.id, this.email, this.username, this.role, this.image, this.name, this.surname,
+                this.birthdate, this.password, this.createdAt, this.updatedAt );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

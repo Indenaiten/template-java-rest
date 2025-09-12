@@ -1,6 +1,5 @@
 package com.codenaiten.template.rest.core.feature.media;
 
-import com.codenaiten.template.rest.core.feature.media.constraint.MediaOwnerConstraint;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaContentSize;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaContentType;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +58,7 @@ public class MediaEditor {
 // ---| APPLY METHOD |----------------------------------------------------------------------------------------------- \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
-    public boolean apply( final MediaOwnerConstraint mediaOwnerConstraint ){
+    public boolean apply(){
         // Step 01: Check changes
         final boolean hasChanges = this.hasChanges();
         if( hasChanges ){ // If has changes, apply them

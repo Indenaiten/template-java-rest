@@ -58,9 +58,8 @@ public class UserFactory {
         // Step 01: Create User
         final UserId id = UserId.random();
         final Timestamp now = Timestamp.now();
-        final User user = User.builder().id( id ).email( this.email ).username( this.username ).role( this.role )
-                .image( this.image ).name( this.name ).surname( this.surname ).birthdate( this.birthdate )
-                .password( this.password ).createdAt( now ).build();
+        final User user = new User( id, this.email, this.username, this.role, this.image, this.name, this.surname,
+                this.birthdate, this.password, now, null );
 
         // Step 02: Validate User
         final List<ConstraintViolation<?>> violations = new ArrayList<>();

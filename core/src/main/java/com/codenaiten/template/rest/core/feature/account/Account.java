@@ -10,16 +10,13 @@ import com.codenaiten.template.rest.core.shared.vo.Language;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 import java.util.Optional;
 
 @Getter
-@SuperBuilder
 public class Account extends BaseEntity<AccountId>{
 
-    private AccountId id;
     private UserId owner;
     private @Setter Language lang;
 
@@ -40,8 +37,7 @@ public class Account extends BaseEntity<AccountId>{
 
     @Override
     public Account copy(){
-        return Account.builder().id( this.id ).owner( this.owner ).lang( this.lang ).createdAt( this.createdAt )
-                .updatedAt( this.updatedAt ).build();
+        return new Account( this.id, this.owner, this.lang, this.createdAt, this.updatedAt );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

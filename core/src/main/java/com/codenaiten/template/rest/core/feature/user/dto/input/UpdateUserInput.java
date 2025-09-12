@@ -5,16 +5,14 @@ import com.codenaiten.template.rest.core.feature.user.vo.*;
 import com.codenaiten.template.rest.core.shared.vo.Email;
 import com.codenaiten.template.rest.core.shared.vo.Language;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
-@Getter
 @Setter
 @Builder
-public class UpdateUser {
+public class UpdateUserInput {
 
     private MediaId image;
     private Email email;
