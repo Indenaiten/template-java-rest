@@ -1,12 +1,9 @@
-package com.codenaiten.template.rest.core.feature.user.constraint;
+package com.codenaiten.template.rest.core.feature.media.constraint;
 
 import com.codenaiten.template.rest.core.feature.media.Media;
+import com.codenaiten.template.rest.core.feature.media.constraint.violation.AlreadyExistsMediaIdConstraintViolation;
 import com.codenaiten.template.rest.core.feature.media.spi.MediaRepository;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
-import com.codenaiten.template.rest.core.feature.user.User;
-import com.codenaiten.template.rest.core.feature.user.constraint.violation.InvalidContentTypeUserImageConstraintViolation;
-import com.codenaiten.template.rest.core.feature.user.constraint.violation.InvalidOwnerUserImageConstraintViolation;
-import com.codenaiten.template.rest.core.feature.user.constraint.violation.NotFoundUserImageConstraintViolation;
 import com.codenaiten.template.rest.core.shared.constraint.Constraint;
 import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +14,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class UserImageConstraint implements Constraint<User> {
+public class MediaIdConstraint implements Constraint<Media> {
 
     private final MediaRepository mediaRepository;
 
@@ -25,11 +22,11 @@ public class UserImageConstraint implements Constraint<User> {
 //---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public UserImageConstraint( final MediaRepository mediaRepository ){
-        log.info( "UserImageConstraint initialized" );
+    public MediaIdConstraint( final MediaRepository mediaRepository ){
+        log.info( "MediaIdConstraint initialized" );
 
         if( Objects.isNull( mediaRepository ))
-            throw new IllegalArgumentException( "MediaRepository is required by UserImageConstraint" );
+            throw new IllegalArgumentException( "MediaRepository is required by MediaIdConstraint" );
 
         this.mediaRepository = mediaRepository;
     }
@@ -39,19 +36,12 @@ public class UserImageConstraint implements Constraint<User> {
 //--------------------------------------------------------------------------------------------------------------------\\
 
     @Override
-    public Optional<ConstraintViolation<?>> check( final User candidate ){
+    public Optional<ConstraintViolation<?>> check( final Media candidate ){
         if( Objects.isNull( candidate ))
-            throw new IllegalArgumentException( "User candidate to check UserImageConstraint is required" );
+            throw new IllegalArgumentException( "Account candidate to check UserIdConstraint is required" );
 
-        final MediaId id = candidate.getImage().orElse( null );
-        if( Objects.nonNull( id )){
-            final Optional<Media> media = this.mediaRepository.find( id );
-            if( media.isEmpty() ) return Optional.of( new NotFoundUserImageConstraintViolation( candidate ));
-
-            final Media image = media.get();
-            if( !image.isOwner( candidate )) return Optional.of( new InvalidOwnerUserImageConstraintViolation( candidate, image ));
-            if( !image.isImageType() ) return Optional.of( new InvalidContentTypeUserImageConstraintViolation( candidate, image ));
-        }
+        final MediaId id = candidate.getId();
+        if( this.mediaRepository.exists( id )) return Optional.of( new AlreadyExistsMediaIdConstraintViolation( candidate ));
 
         return Optional.empty();
     }

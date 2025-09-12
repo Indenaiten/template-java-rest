@@ -2,7 +2,6 @@ package com.codenaiten.template.rest.core.feature.user.vo;
 
 import com.codenaiten.template.rest.core.shared.exception.AppException;
 import com.codenaiten.template.rest.core.shared.vo.BaseValueObject;
-import com.codenaiten.template.rest.core.shared.vo.ValueObject;
 
 import java.io.Serial;
 import java.util.Objects;

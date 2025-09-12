@@ -2,8 +2,9 @@ package com.codenaiten.template.rest.core.feature.user;
 
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
 import com.codenaiten.template.rest.core.feature.user.vo.*;
+import com.codenaiten.template.rest.core.shared.AppMessageKey;
 import com.codenaiten.template.rest.core.shared.entity.BaseEntity;
-import com.codenaiten.template.rest.core.shared.exception.AppException;
+import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 import com.codenaiten.template.rest.core.shared.vo.Email;
 import com.codenaiten.template.rest.core.shared.vo.EncodedPassword;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
@@ -16,16 +17,15 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Getter
-@Setter
 @SuperBuilder
 public class User extends BaseEntity<UserId>{
 
     private Email email;
     private UserUsername username;
     private UserRole role;
-    private MediaId image;
+    private @Setter MediaId image;
     private UserName name;
-    private UserSurname surname;
+    private @Setter UserSurname surname;
     private LocalDate birthdate;
     private EncodedPassword password;
 
@@ -59,44 +59,36 @@ public class User extends BaseEntity<UserId>{
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\
-//---| CHECKERS |-----------------------------------------------------------------------------------------------------\\
-//--------------------------------------------------------------------------------------------------------------------\\
-
-    public boolean hasRole( final UserRole role ){
-        return Objects.equals( this.role, role );
-    }
-
-//--------------------------------------------------------------------------------------------------------------------\\
 //---| SETTERS |------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
     public void setEmail( final Email email ){
-        if( Objects.isNull( email )) throw new AppException();
+        if( Objects.isNull( email )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_USER_EMAIL_REQUIRED );
         this.email = email;
     }
 
     public void setUsername( final UserUsername username ){
-        if( Objects.isNull( username )) throw new AppException();
+        if( Objects.isNull( username )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_USER_USERNAME_REQUIRED );
         this.username = username;
     }
 
     public void setRole( final UserRole role ){
-        if( Objects.isNull( role )) throw new AppException();
+        if( Objects.isNull( role )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_USER_ROLE_REQUIRED );
         this.role = role;
     }
 
     public void setName( final UserName name ){
-        if( Objects.isNull( name )) throw new AppException();
+        if( Objects.isNull( name )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_USER_NAME_REQUIRED );
         this.name = name;
     }
 
     public void setBirthdate( final LocalDate birthdate ){
-        if( Objects.isNull( birthdate )) throw new AppException();
+        if( Objects.isNull( birthdate )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_USER_BIRTHDATE_REQUIRED );
         this.birthdate = birthdate;
     }
 
     public void setPassword( final EncodedPassword password ){
-        if( Objects.isNull( password )) throw new AppException();
+        if( Objects.isNull( password )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_USER_PASSWORD_REQUIRED );
         this.password = password;
     }
 
@@ -114,6 +106,14 @@ public class User extends BaseEntity<UserId>{
 
     public Integer getAge(){
         return this.birthdate.until( LocalDate.now() ).getYears();
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| CHECKERS |-----------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public boolean hasRole( final UserRole role ){
+        return Objects.equals( this.role, role );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

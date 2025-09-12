@@ -5,11 +5,12 @@ import com.codenaiten.template.rest.core.feature.media.vo.MediaContentType;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
 import com.codenaiten.template.rest.core.feature.user.User;
 import com.codenaiten.template.rest.core.feature.user.vo.UserId;
+import com.codenaiten.template.rest.core.shared.AppMessageKey;
 import com.codenaiten.template.rest.core.shared.entity.BaseEntity;
-import com.codenaiten.template.rest.core.shared.entity.Entity;
-import com.codenaiten.template.rest.core.shared.exception.AppException;
+import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
@@ -20,7 +21,7 @@ import java.util.Optional;
 public class Media extends BaseEntity<MediaId>{
 
     private UserId owner;
-    private String namespace;
+    private @Setter String namespace;
     private MediaContentType contentType;
     private MediaContentSize contentSize;
 
@@ -42,7 +43,7 @@ public class Media extends BaseEntity<MediaId>{
 //--------------------------------------------------------------------------------------------------------------------\\
 
     @Override
-    public Entity<MediaId> copy() {
+    public Media copy() {
         return Media.builder().id( getId() ).owner( this.owner ).namespace( this.namespace )
                 .contentType( this.contentType ).contentSize( this.contentSize ).createdAt( this.createdAt )
                 .updatedAt( this.updatedAt ).build();
@@ -53,22 +54,17 @@ public class Media extends BaseEntity<MediaId>{
 //--------------------------------------------------------------------------------------------------------------------\\
 
     protected void setOwner( final UserId owner ){
-        if( Objects.isNull( owner ) ) throw new AppException();
+        if( Objects.isNull( owner ) ) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_MEDIA_OWNER_REQUIRED );
         this.owner = owner;
     }
 
-    public void setNamespace( final String namespace ){
-        if( Objects.isNull( namespace )) throw new AppException();
-        this.namespace = namespace;
-    }
-
     public void setContentType( final MediaContentType contentType ){
-        if( Objects.isNull( contentType )) throw new AppException();
+        if( Objects.isNull( contentType )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_MEDIA_CONTENT_TYPE_REQUIRED );
         this.contentType = contentType;
     }
 
     public void setContentSize( final MediaContentSize contentSize ){
-        if( Objects.isNull( contentSize )) throw new AppException();
+        if( Objects.isNull( contentSize )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_MEDIA_CONTENT_SIZE_REQUIRED );
         this.contentSize = contentSize;
     }
 
@@ -98,6 +94,22 @@ public class Media extends BaseEntity<MediaId>{
 
     public boolean isImageType(){
         return this.contentType.isImage();
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| UPDATER |------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public MediaEditor update(){
+        return new MediaEditor( this );
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| CREATOR |------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public static MediaFactory create( final UserId owner, final MediaContentType contentType, final MediaContentSize contentSize ){
+        return new MediaFactory( owner, contentType, contentSize );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

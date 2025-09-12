@@ -1,6 +1,7 @@
 package com.codenaiten.template.rest.core.shared.entity;
 
-import com.codenaiten.template.rest.core.shared.exception.AppException;
+import com.codenaiten.template.rest.core.shared.AppMessageKey;
+import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -32,17 +33,17 @@ public abstract class BaseEntity<T extends Serializable> implements Entity<T>{
 //------------------------------------------------------------------------------------------------------------------- \\
 
     protected void setId( final T id ){
-        if( Objects.isNull( id )) throw new AppException();
+        if( Objects.isNull( id )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_ENTITY_ID_REQUIRED );
         this.id = id;
     }
 
     protected void setCreatedAt( final Timestamp createdAt ){
-        if( Objects.isNull( createdAt )) throw new AppException();
+        if( Objects.isNull( createdAt )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_ENTITY_CREATED_AT_REQUIRED );
         this.createdAt = createdAt;
     }
 
     public void setUpdatedAt( final Timestamp updatedAt ){
-        if( Objects.isNull( updatedAt )) throw new AppException();
+        if( Objects.isNull( updatedAt )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_ENTITY_UPDATED_AT_REQUIRED );
         this.updatedAt = updatedAt;
     }
 

@@ -7,7 +7,7 @@ import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
 import lombok.Getter;
 
 @Getter
-public class InvalidUserImageConstraintViolation extends ConstraintViolation<User> {
+public class InvalidContentTypeUserImageConstraintViolation extends ConstraintViolation<User> {
 
     private final Media image;
 
@@ -15,8 +15,8 @@ public class InvalidUserImageConstraintViolation extends ConstraintViolation<Use
 //---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public InvalidUserImageConstraintViolation( final User user, final Media image ){
-        super( user, AppMessageKey.ERROR_CONSTRAINT_USER_IMAGE_INVALID, image.getId(), image.getContentType() );
+    public InvalidContentTypeUserImageConstraintViolation(final User user, final Media image ){
+        super( user, AppMessageKey.ERROR_CONSTRAINT_USER_IMAGE_CONTENT_TYPE_INVALID, image.getId(), image.getContentType() );
         this.image = image;
     }
 

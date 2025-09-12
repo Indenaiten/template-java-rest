@@ -1,4 +1,4 @@
-package com.codenaiten.template.rest.core.feature.account.dto.input;
+package com.codenaiten.template.rest.core.feature.user.dto.input;
 
 import com.codenaiten.template.rest.core.feature.account.vo.Language;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
@@ -18,7 +18,7 @@ import java.util.Optional;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class CreateAccount {
+public class CreateUser {
 
     private final Email email;
     private final UserUsername username;

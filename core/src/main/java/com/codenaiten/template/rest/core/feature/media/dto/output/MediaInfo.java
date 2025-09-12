@@ -1,4 +1,4 @@
-package com.codenaiten.template.rest.core.feature.media.dto;
+package com.codenaiten.template.rest.core.feature.media.dto.output;
 
 import com.codenaiten.template.rest.core.feature.media.vo.MediaContentSize;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaContentType;

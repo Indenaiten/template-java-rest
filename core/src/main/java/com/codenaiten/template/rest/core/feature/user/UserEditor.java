@@ -38,7 +38,7 @@ public class UserEditor {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     public UserEditor( final User user ){
-        Objects.requireNonNull( user, "User to update in UserEditor is required" );
+        Objects.requireNonNull( user, "User to update in Editor is required" );
         this.update = user.copy();
         this.user = user;
     }
@@ -146,7 +146,7 @@ public class UserEditor {
             this.user.setBirthdate( this.update.getBirthdate() );
             this.user.setPassword( this.update.getPassword() );
 
-            // Updated UpdatedAt Timestamp
+            // Update UpdatedAt Timestamp
             this.user.setUpdatedAt();
         }
 

@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.core.feature.user.dto.output;
 
-import com.codenaiten.template.rest.core.feature.media.dto.MediaInfo;
+import com.codenaiten.template.rest.core.feature.media.dto.output.MediaInfo;
 import com.codenaiten.template.rest.core.feature.user.vo.*;
 import com.codenaiten.template.rest.core.shared.vo.Email;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;

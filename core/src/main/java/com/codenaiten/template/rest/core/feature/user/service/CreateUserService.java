@@ -1,4 +1,4 @@
-package com.codenaiten.template.rest.core.feature.account.service;
+package com.codenaiten.template.rest.core.feature.user.service;
 
 import com.codenaiten.template.rest.core.feature.account.Account;
 import com.codenaiten.template.rest.core.feature.account.constraint.AccountIdConstraint;
@@ -8,7 +8,7 @@ import com.codenaiten.template.rest.core.feature.account.vo.Language;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
 import com.codenaiten.template.rest.core.feature.user.User;
 import com.codenaiten.template.rest.core.feature.user.constraint.*;
-import com.codenaiten.template.rest.core.feature.user.dto.input.CreateAccount;
+import com.codenaiten.template.rest.core.feature.user.dto.input.CreateUser;
 import com.codenaiten.template.rest.core.feature.user.port.spi.UserRepository;
 import com.codenaiten.template.rest.core.feature.user.vo.UserName;
 import com.codenaiten.template.rest.core.feature.user.vo.UserRole;
@@ -27,7 +27,7 @@ import java.time.LocalDate;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CreateAccountService {
+public class CreateUserService {
 
     // Ports
     private final UserRepository userRepository;
@@ -46,10 +46,16 @@ public class CreateAccountService {
     private final AccountOwnerConstraint accountOwnerConstraint;
 
 //--------------------------------------------------------------------------------------------------------------------\\
+//---| RESULT |-------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    public record Result ( User user, Account account ){}
+
+//--------------------------------------------------------------------------------------------------------------------\\
 //---| METHODS |------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public Account create( final CreateAccount input ){
+    public Result create( final CreateUser input ){
         // Step 01: Get Default User Data
         final UserRole defaultRole = this.userRepository.count() == 0 ? UserRole.ADMIN : UserRole.USER;
 
@@ -85,8 +91,8 @@ public class CreateAccountService {
         this.userRepository.save( user );
         this.accountRepository.save( account );
 
-        // Step 08: Return new Account
-        return account;
+        // Step 08: Return Result
+        return new Result( user, account );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

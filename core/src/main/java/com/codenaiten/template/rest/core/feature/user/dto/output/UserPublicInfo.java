@@ -7,15 +7,12 @@ import com.codenaiten.template.rest.core.feature.user.vo.UserSurname;
 import com.codenaiten.template.rest.core.feature.user.vo.UserUsername;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 
-import java.time.LocalDate;
-
 public record UserPublicInfo(
         UserId id,
         MediaId image,
         UserUsername username,
         UserName name,
         UserSurname surname,
-        LocalDate birthdate,
         Timestamp createdAt
 ){
 
