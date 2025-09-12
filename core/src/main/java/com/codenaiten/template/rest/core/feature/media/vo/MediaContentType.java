@@ -1,6 +1,7 @@
 package com.codenaiten.template.rest.core.feature.media.vo;
 
-import com.codenaiten.template.rest.core.shared.exception.AppException;
+import com.codenaiten.template.rest.core.CoreMessageKey;
+import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 import com.codenaiten.template.rest.core.shared.vo.BaseValueObject;
 import com.codenaiten.template.rest.core.shared.vo.ValueObject;
 import lombok.AccessLevel;
@@ -56,10 +57,11 @@ public enum MediaContentType implements ValueObject<String>{
 //--------------------------------------------------------------------------------------------------------------------\\
 
     public static MediaContentType of( final String value ){
+        if( Objects.isNull( value )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_VALUE_OBJECT_VALUE_NULL );
         return Stream.of( values() )
                 .filter( role -> Objects.equals( role.value(), value ))
                 .findFirst()
-                .orElseThrow( AppException::new );
+                .orElseThrow( () -> new ValidationException( CoreMessageKey.ERROR_VALIDATION_MEDIA_VO_MEDIA_CONTENT_TYPE_INVALID, value ));
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

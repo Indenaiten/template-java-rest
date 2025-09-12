@@ -1,8 +1,8 @@
 package com.codenaiten.template.rest.core.feature.user;
 
+import com.codenaiten.template.rest.core.CoreMessageKey;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
 import com.codenaiten.template.rest.core.feature.user.vo.*;
-import com.codenaiten.template.rest.core.shared.AppMessageKey;
 import com.codenaiten.template.rest.core.shared.entity.BaseEntity;
 import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 import com.codenaiten.template.rest.core.shared.vo.Email;
@@ -63,32 +63,32 @@ public class User extends BaseEntity<UserId>{
 //--------------------------------------------------------------------------------------------------------------------\\
 
     public void setEmail( final Email email ){
-        if( Objects.isNull( email )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_USER_EMAIL_REQUIRED );
+        if( Objects.isNull( email )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_USER_EMAIL_REQUIRED );
         this.email = email;
     }
 
     public void setUsername( final UserUsername username ){
-        if( Objects.isNull( username )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_USER_USERNAME_REQUIRED );
+        if( Objects.isNull( username )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_USER_USERNAME_REQUIRED );
         this.username = username;
     }
 
     public void setRole( final UserRole role ){
-        if( Objects.isNull( role )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_USER_ROLE_REQUIRED );
+        if( Objects.isNull( role )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_USER_ROLE_REQUIRED );
         this.role = role;
     }
 
     public void setName( final UserName name ){
-        if( Objects.isNull( name )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_USER_NAME_REQUIRED );
+        if( Objects.isNull( name )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_USER_NAME_REQUIRED );
         this.name = name;
     }
 
     public void setBirthdate( final LocalDate birthdate ){
-        if( Objects.isNull( birthdate )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_USER_BIRTHDATE_REQUIRED );
+        if( Objects.isNull( birthdate )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_USER_BIRTHDATE_REQUIRED );
         this.birthdate = birthdate;
     }
 
     public void setPassword( final EncodedPassword password ){
-        if( Objects.isNull( password )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_USER_PASSWORD_REQUIRED );
+        if( Objects.isNull( password )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_USER_PASSWORD_REQUIRED );
         this.password = password;
     }
 

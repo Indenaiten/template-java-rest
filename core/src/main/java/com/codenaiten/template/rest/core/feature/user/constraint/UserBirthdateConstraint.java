@@ -2,33 +2,20 @@ package com.codenaiten.template.rest.core.feature.user.constraint;
 
 import com.codenaiten.template.rest.core.feature.user.User;
 import com.codenaiten.template.rest.core.feature.user.constraint.violation.MinimumAgeUserBirthdateConstraintViolation;
-import com.codenaiten.template.rest.core.feature.user.port.spi.MinimumUserAgeProvider;
+import com.codenaiten.template.rest.core.feature.user.port.MinimumUserAgeProvider;
 import com.codenaiten.template.rest.core.shared.constraint.Constraint;
 import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
-@Component
+@RequiredArgsConstructor
 public class UserBirthdateConstraint implements Constraint<User> {
 
     private final MinimumUserAgeProvider minimumUserAgeProvider;
-
-//--------------------------------------------------------------------------------------------------------------------\\
-//---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
-//--------------------------------------------------------------------------------------------------------------------\\
-
-    public UserBirthdateConstraint( final MinimumUserAgeProvider minimumUserAgeProvider ){
-        log.info( "UserBirthdateConstraint initialized" );
-
-        if( Objects.isNull( minimumUserAgeProvider ))
-            throw new IllegalArgumentException( "MinimumUserAgeProvider is required by UserBirthdateConstraint" );
-
-        this.minimumUserAgeProvider = minimumUserAgeProvider;
-    }
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| IMPLEMENTED METHODS |------------------------------------------------------------------------------------------\\

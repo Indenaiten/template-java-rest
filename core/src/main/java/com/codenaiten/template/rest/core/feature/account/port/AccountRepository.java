@@ -1,31 +1,37 @@
-package com.codenaiten.template.rest.core.feature.media.spi;
+package com.codenaiten.template.rest.core.feature.account.port;
 
-import com.codenaiten.template.rest.core.feature.media.Media;
-import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
+import com.codenaiten.template.rest.core.feature.account.Account;
+import com.codenaiten.template.rest.core.feature.account.vo.AccountId;
+import com.codenaiten.template.rest.core.feature.user.vo.UserId;
+import com.codenaiten.template.rest.core.shared.vo.Email;
 
 import java.util.Optional;
 
-public interface MediaRepository{
+public interface AccountRepository{
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    Media save( Media media );
+    Account save( Account account );
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    void delete( Media media );
+    Optional<Account> find( AccountId id );
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    Optional<Media> find( MediaId id );
+    Optional<Account> find( UserId id );
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    boolean exists( MediaId id );
+    boolean exists( AccountId id );
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    Long count();
+    boolean exists( UserId id );
+
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    boolean exists( Email email );
 
 //--------------------------------------------------------------------------------------------------------------------\\
 

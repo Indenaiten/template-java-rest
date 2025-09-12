@@ -1,7 +1,7 @@
 package com.codenaiten.template.rest.core.feature.user.exception;
 
+import com.codenaiten.template.rest.core.CoreMessageKey;
 import com.codenaiten.template.rest.core.feature.user.vo.UserId;
-import com.codenaiten.template.rest.core.shared.AppMessageKey;
 import com.codenaiten.template.rest.core.shared.exception.LocalizedException;
 import lombok.Getter;
 
@@ -10,8 +10,8 @@ import java.util.Optional;
 @Getter
 public class UserNotFoundException extends LocalizedException {
 
-    public static final AppMessageKey DEFAULT = AppMessageKey.ERROR_USER_NOT_FOUND;
-    public static final AppMessageKey MESSAGE_KEY = AppMessageKey.ERROR_USER_NOT_FOUND_BY_ID;
+    public static final CoreMessageKey DEFAULT = CoreMessageKey.ERROR_USER_NOT_FOUND;
+    public static final CoreMessageKey MESSAGE_KEY = CoreMessageKey.ERROR_USER_NOT_FOUND_BY_ID;
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
@@ -28,6 +28,16 @@ public class UserNotFoundException extends LocalizedException {
 
     public UserNotFoundException(){
         super( DEFAULT );
+        this.id = null;
+    }
+
+    public UserNotFoundException( final Throwable cause, final UserId id ){
+        super( cause, MESSAGE_KEY, id );
+        this.id = id;
+    }
+
+    public UserNotFoundException( final Throwable cause ){
+        super( cause, DEFAULT );
         this.id = null;
     }
 

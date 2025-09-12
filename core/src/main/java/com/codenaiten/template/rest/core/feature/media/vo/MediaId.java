@@ -1,9 +1,9 @@
 package com.codenaiten.template.rest.core.feature.media.vo;
 
+import com.codenaiten.template.rest.core.CoreMessageKey;
 import com.codenaiten.template.rest.core.feature.user.vo.UserId;
-import com.codenaiten.template.rest.core.shared.exception.AppException;
+import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 import com.codenaiten.template.rest.core.shared.vo.BaseValueObject;
-import com.fasterxml.jackson.annotation.JsonCreator;
 
 import java.io.Serial;
 import java.util.UUID;
@@ -43,18 +43,22 @@ public class MediaId extends BaseValueObject<UUID>{
 //--------------------------------------------------------------------------------------------------------------------\\
 
     /**
-     * Crea un nuevo {@link MediaId} a partir de un {@link String}.
+     * Crea un nuevo {@link MediaId} a partir de un {@link String} válido.
+     *
+     * <li>El valor <strong>NO</strong> es {@code null}</li>
+     * <li>El valor <strong>NO</strong> es un {@link UUID}</li>
      *
      * @param value {@link String} que representa el valor del {@link MediaId}.
      *
+     * @throws ValidationException si el valor del {@link String} no es un {@link UUID} válido.
+     *
      * @return {@link MediaId} que representa el valor del {@link MediaId}.
      */
-    @JsonCreator
     public static MediaId of( final String value ){
         final UUID id;
         try{ id = UUID.fromString( value ); }
         catch( final IllegalArgumentException e ){
-            throw new AppException();
+            throw new ValidationException( e, CoreMessageKey.ERROR_VALIDATION_MEDIA_VO_MEDIA_ID_INVALID, value );
         }
         return new MediaId( id );
     }

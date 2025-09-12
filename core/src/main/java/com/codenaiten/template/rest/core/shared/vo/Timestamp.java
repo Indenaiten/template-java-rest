@@ -1,6 +1,7 @@
 package com.codenaiten.template.rest.core.shared.vo;
 
-import com.codenaiten.template.rest.core.shared.exception.AppException;
+import com.codenaiten.template.rest.core.CoreMessageKey;
+import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 
 import java.io.Serial;
 import java.time.LocalDateTime;
@@ -21,13 +22,18 @@ public class Timestamp extends BaseValueObject<LocalDateTime> {
 //--------------------------------------------------------------------------------------------------------------------\\
 
     /**
-     * Constructor que crea un {@link Timestamp} a partir de un {@link LocalDateTime}.
+     * Constructor que crea un {@link Timestamp} a partir de un {@link LocalDateTime} válido.
+     *
+     * <li>El valor <strong>NO</strong> es {@code null}</li>
+     * <li>El valor <strong>NO</strong> es posterior a la fecha y hora actual</li>
      *
      * @param value {@link LocalDateTime} que representa el valor del {@link Timestamp}.
+     *
+     * @throws ValidationException Si el valor del {@link Timestamp} no es válido.
      */
     public Timestamp( final LocalDateTime value ){
         super( value );
-        if( value.isAfter( LocalDateTime.now() )) throw new AppException();
+        if( value.isAfter( LocalDateTime.now() )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_VO_TIMESTAMP_DATE_FUTURE, value );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

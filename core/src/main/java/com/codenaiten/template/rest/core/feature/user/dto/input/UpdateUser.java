@@ -1,13 +1,9 @@
 package com.codenaiten.template.rest.core.feature.user.dto.input;
 
-import com.codenaiten.template.rest.core.feature.account.vo.Language;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
-import com.codenaiten.template.rest.core.feature.user.vo.UserName;
-import com.codenaiten.template.rest.core.feature.user.vo.UserRole;
-import com.codenaiten.template.rest.core.feature.user.vo.UserSurname;
-import com.codenaiten.template.rest.core.feature.user.vo.UserUsername;
+import com.codenaiten.template.rest.core.feature.user.vo.*;
 import com.codenaiten.template.rest.core.shared.vo.Email;
-import com.codenaiten.template.rest.core.shared.vo.Password;
+import com.codenaiten.template.rest.core.shared.vo.Language;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +23,7 @@ public class UpdateUser {
     private UserName name;
     private UserSurname surname;
     private LocalDate birthdate;
-    private Password password;
+    private UserPassword userPassword;
     private Language language;
 
 //--------------------------------------------------------------------------------------------------------------------\\
@@ -62,8 +58,8 @@ public class UpdateUser {
         return Optional.ofNullable( this.birthdate );
     }
 
-    public Optional<Password> getPassword() {
-        return Optional.ofNullable( this.password );
+    public Optional<UserPassword> getUserPassword() {
+        return Optional.ofNullable( this.userPassword);
     }
 
     public Optional<Language> getLanguage(){

@@ -1,4 +1,4 @@
-package com.codenaiten.template.rest.core.feature.user.port.spi;
+package com.codenaiten.template.rest.core.feature.user.port;
 
 import com.codenaiten.template.rest.core.feature.user.User;
 import com.codenaiten.template.rest.core.feature.user.vo.UserId;

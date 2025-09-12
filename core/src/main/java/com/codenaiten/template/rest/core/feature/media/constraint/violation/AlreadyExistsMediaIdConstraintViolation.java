@@ -1,7 +1,7 @@
 package com.codenaiten.template.rest.core.feature.media.constraint.violation;
 
+import com.codenaiten.template.rest.core.CoreMessageKey;
 import com.codenaiten.template.rest.core.feature.media.Media;
-import com.codenaiten.template.rest.core.shared.AppMessageKey;
 import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
 import lombok.Getter;
 
@@ -13,7 +13,7 @@ public class AlreadyExistsMediaIdConstraintViolation extends ConstraintViolation
 //--------------------------------------------------------------------------------------------------------------------\\
 
     public AlreadyExistsMediaIdConstraintViolation( final Media media ){
-        super( media, AppMessageKey.ERROR_CONSTRAINT_MEDIA_ID_ALREADY_EXISTS, media.getId() );
+        super( media, CoreMessageKey.ERROR_CONSTRAINT_MEDIA_ID_ALREADY_EXISTS, media.getId() );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

@@ -1,10 +1,12 @@
-package com.codenaiten.template.rest.core.feature.user.port.spi;
+package com.codenaiten.template.rest.core.shared.spi;
 
-public interface MinimumUserAgeProvider{
+import com.codenaiten.template.rest.core.shared.vo.Language;
+
+public interface LanguageProvider {
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    Integer getMinimumAge();
+    Language getDefaultLanguage();
 
 //--------------------------------------------------------------------------------------------------------------------\\
 

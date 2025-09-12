@@ -1,6 +1,7 @@
 package com.codenaiten.template.rest.core.feature.user.vo;
 
-import com.codenaiten.template.rest.core.shared.exception.AppException;
+import com.codenaiten.template.rest.core.CoreMessageKey;
+import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 import com.codenaiten.template.rest.core.shared.vo.BaseValueObject;
 import com.codenaiten.template.rest.core.shared.vo.ValueObject;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +32,12 @@ public enum UserRole implements ValueObject<Integer>{
 //---| BUILDER |------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    public static UserRole of(final Integer value ){
+    public static UserRole of( final Integer value ){
+        if( Objects.isNull( value )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_VALUE_OBJECT_VALUE_NULL );
         return Stream.of( values() )
                 .filter( role -> Objects.equals( role.value(), value ))
                 .findFirst()
-                .orElseThrow( AppException::new );
+                .orElseThrow( () -> new ValidationException( CoreMessageKey.ERROR_VALIDATION_USER_VO_USER_ROLE_INVALID, value ));
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

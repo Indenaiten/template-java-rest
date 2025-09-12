@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.core.feature.account;
 
-import com.codenaiten.template.rest.core.feature.account.vo.Language;
+import com.codenaiten.template.rest.core.shared.vo.Language;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

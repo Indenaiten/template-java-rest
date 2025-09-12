@@ -1,8 +1,7 @@
-package com.codenaiten.template.rest.core.feature.account.vo;
+package com.codenaiten.template.rest.core.shared.vo;
 
-import com.codenaiten.template.rest.core.shared.exception.AppException;
-import com.codenaiten.template.rest.core.shared.vo.BaseValueObject;
-import com.codenaiten.template.rest.core.shared.vo.ValueObject;
+import com.codenaiten.template.rest.core.CoreMessageKey;
+import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -36,20 +35,22 @@ public enum Language implements ValueObject<Locale>{
 //--------------------------------------------------------------------------------------------------------------------\\
 
     public static Language of( final Locale value ){
+        if( Objects.isNull( value )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_VALUE_OBJECT_VALUE_NULL);
         return Stream.of( values() )
                 .filter( lang -> Objects.equals( lang.value(), value ))
                 .findFirst()
-                .orElseThrow( AppException::new );
+                .orElseThrow( () -> new ValidationException( CoreMessageKey.ERROR_VALIDATION_VO_LANGUAGE_UNSUPPORTED, value ));
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
     public static Language of( final String value ){
+        if( Objects.isNull( value )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_VALUE_OBJECT_VALUE_NULL);
         final Locale locale = Locale.forLanguageTag( value );
         return Stream.of( values() )
                 .filter( lang -> Objects.equals( lang.value(), locale ))
                 .findFirst()
-                .orElseThrow( AppException::new );
+                .orElseThrow( () -> new ValidationException( CoreMessageKey.ERROR_VALIDATION_VO_LANGUAGE_UNSUPPORTED, locale ));
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

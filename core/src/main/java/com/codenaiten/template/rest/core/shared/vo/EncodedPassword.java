@@ -1,5 +1,8 @@
 package com.codenaiten.template.rest.core.shared.vo;
 
+import com.codenaiten.template.rest.core.CoreMessageKey;
+import com.codenaiten.template.rest.core.shared.exception.ValidationException;
+
 import java.io.Serial;
 
 public class EncodedPassword extends BaseValueObject<String>{
@@ -12,12 +15,18 @@ public class EncodedPassword extends BaseValueObject<String>{
 //--------------------------------------------------------------------------------------------------------------------\\
 
     /**
-     * Constructor que crea un {@link EncodedPassword} a partir de un {@link String}.
+     * Constructor que crea un {@link EncodedPassword} a partir de un {@link String} válido.
+     *
+     * <li>El valor <strong>NO</strong> es {@code null}</li>
+     * <li>El valor <strong>NO</strong> esta vacío/li>
      *
      * @param value {@link String} que representa el valor del {@link EncodedPassword}.
+     *
+     * @throws ValidationException Si el valor del {@link EncodedPassword} no es válido.
      */
     public EncodedPassword( final String value ){
         super( value.trim() );
+        if( this.value.isEmpty() ) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_VO_ENCODED_PASSWORD_EMPTY );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\

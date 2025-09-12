@@ -1,6 +1,7 @@
 package com.codenaiten.template.rest.core.shared.vo;
 
-import com.codenaiten.template.rest.core.shared.exception.AppException;
+import com.codenaiten.template.rest.core.CoreMessageKey;
+import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -19,7 +20,7 @@ public abstract class BaseValueObject<T extends Serializable> implements ValueOb
 
     @JsonCreator
     protected BaseValueObject( final T value ){
-        if( Objects.isNull( value )) throw new AppException();
+        if( Objects.isNull( value )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_VALUE_OBJECT_VALUE_NULL );
         this.value = value;
     }
 

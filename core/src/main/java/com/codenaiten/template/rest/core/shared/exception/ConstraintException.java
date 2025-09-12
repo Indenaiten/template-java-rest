@@ -1,6 +1,6 @@
 package com.codenaiten.template.rest.core.shared.exception;
 
-import com.codenaiten.template.rest.core.shared.AppMessageKey;
+import com.codenaiten.template.rest.core.CoreMessageKey;
 import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
 import lombok.Getter;
 
@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 public class ConstraintException extends AppException{
 
-    public static final AppMessageKey DEFAULT = AppMessageKey.ERROR_CONSTRAINT_GENERIC;
+    public static final CoreMessageKey DEFAULT = CoreMessageKey.ERROR_CONSTRAINT_GENERIC;
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
@@ -26,6 +26,16 @@ public class ConstraintException extends AppException{
 
     public ConstraintException( final List<ConstraintViolation<?>> violations ){
         super( DEFAULT.getMessage() );
+        this.violations = violations;
+    }
+
+    public ConstraintException( final Throwable cause, final ConstraintViolation<?>... violation ){
+        super( cause, DEFAULT.getMessage() );
+        this.violations = List.of( violation );
+    }
+
+    public ConstraintException( final Throwable cause, final List<ConstraintViolation<?>> violations ){
+        super( cause, DEFAULT.getMessage() );
         this.violations = violations;
     }
 

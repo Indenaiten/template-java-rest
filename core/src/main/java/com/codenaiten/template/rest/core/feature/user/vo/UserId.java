@@ -1,6 +1,7 @@
 package com.codenaiten.template.rest.core.feature.user.vo;
 
-import com.codenaiten.template.rest.core.shared.exception.AppException;
+import com.codenaiten.template.rest.core.CoreMessageKey;
+import com.codenaiten.template.rest.core.shared.exception.ValidationException;
 import com.codenaiten.template.rest.core.shared.vo.BaseValueObject;
 
 import java.io.Serial;
@@ -41,9 +42,14 @@ public class UserId extends BaseValueObject<UUID>{
 //--------------------------------------------------------------------------------------------------------------------\\
 
     /**
-     * Crea un nuevo {@link UserId} a partir de un {@link String}.
+     * Crea un nuevo {@link UserId} a partir de un {@link String} válido.
+     *
+     * <li>El valor <strong>NO</strong> es {@code null}</li>
+     * <li>El valor <strong>NO</strong> es un {@link UUID}</li>
      *
      * @param value {@link String} que representa el valor del {@link UserId}.
+     *
+     * @throws ValidationException si el valor del {@link String} no es un {@link UUID} válido.
      *
      * @return {@link UserId} que representa el valor del {@link UserId}.
      */
@@ -51,7 +57,7 @@ public class UserId extends BaseValueObject<UUID>{
         final UUID id;
         try{ id = UUID.fromString( value ); }
         catch( final IllegalArgumentException e ){
-            throw new AppException();
+            throw new ValidationException( e, CoreMessageKey.ERROR_VALIDATION_USER_VO_USER_ID_INVALID, value );
         }
         return new UserId( id );
     }

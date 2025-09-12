@@ -1,12 +1,12 @@
 package com.codenaiten.template.rest.core.feature.account;
 
+import com.codenaiten.template.rest.core.CoreMessageKey;
 import com.codenaiten.template.rest.core.feature.account.vo.AccountId;
-import com.codenaiten.template.rest.core.feature.account.vo.Language;
 import com.codenaiten.template.rest.core.feature.user.User;
 import com.codenaiten.template.rest.core.feature.user.vo.UserId;
-import com.codenaiten.template.rest.core.shared.AppMessageKey;
 import com.codenaiten.template.rest.core.shared.entity.BaseEntity;
 import com.codenaiten.template.rest.core.shared.exception.ValidationException;
+import com.codenaiten.template.rest.core.shared.vo.Language;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,7 +49,7 @@ public class Account extends BaseEntity<AccountId>{
 //--------------------------------------------------------------------------------------------------------------------\\
 
     protected void setOwner( final UserId owner ){
-        if( Objects.isNull( owner )) throw new ValidationException( AppMessageKey.ERROR_VALIDATION_ACCOUNT_OWNER_REQUIRED );
+        if( Objects.isNull( owner )) throw new ValidationException( CoreMessageKey.ERROR_VALIDATION_ACCOUNT_OWNER_REQUIRED );
         this.owner = owner;
     }
 

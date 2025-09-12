@@ -1,13 +1,9 @@
 package com.codenaiten.template.rest.core.feature.user.dto.input;
 
-import com.codenaiten.template.rest.core.feature.account.vo.Language;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
-import com.codenaiten.template.rest.core.feature.user.vo.UserName;
-import com.codenaiten.template.rest.core.feature.user.vo.UserRole;
-import com.codenaiten.template.rest.core.feature.user.vo.UserSurname;
-import com.codenaiten.template.rest.core.feature.user.vo.UserUsername;
+import com.codenaiten.template.rest.core.feature.user.vo.*;
 import com.codenaiten.template.rest.core.shared.vo.Email;
-import com.codenaiten.template.rest.core.shared.vo.Password;
+import com.codenaiten.template.rest.core.shared.vo.Language;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -24,7 +20,7 @@ public class CreateUser {
     private final UserUsername username;
     private final UserName name;
     private final LocalDate birthdate;
-    private final Password password;
+    private final UserPassword userPassword;
 
 //--------------------------------------------------------------------------------------------------------------------\\
 

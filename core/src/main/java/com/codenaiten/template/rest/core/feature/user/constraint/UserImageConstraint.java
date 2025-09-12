@@ -1,7 +1,7 @@
 package com.codenaiten.template.rest.core.feature.user.constraint;
 
 import com.codenaiten.template.rest.core.feature.media.Media;
-import com.codenaiten.template.rest.core.feature.media.spi.MediaRepository;
+import com.codenaiten.template.rest.core.feature.media.port.MediaRepository;
 import com.codenaiten.template.rest.core.feature.media.vo.MediaId;
 import com.codenaiten.template.rest.core.feature.user.User;
 import com.codenaiten.template.rest.core.feature.user.constraint.violation.InvalidContentTypeUserImageConstraintViolation;
@@ -9,30 +9,17 @@ import com.codenaiten.template.rest.core.feature.user.constraint.violation.Inval
 import com.codenaiten.template.rest.core.feature.user.constraint.violation.NotFoundUserImageConstraintViolation;
 import com.codenaiten.template.rest.core.shared.constraint.Constraint;
 import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
-@Component
+@RequiredArgsConstructor
 public class UserImageConstraint implements Constraint<User> {
 
     private final MediaRepository mediaRepository;
-
-//--------------------------------------------------------------------------------------------------------------------\\
-//---| CONSTRUCTOR |--------------------------------------------------------------------------------------------------\\
-//--------------------------------------------------------------------------------------------------------------------\\
-
-    public UserImageConstraint( final MediaRepository mediaRepository ){
-        log.info( "UserImageConstraint initialized" );
-
-        if( Objects.isNull( mediaRepository ))
-            throw new IllegalArgumentException( "MediaRepository is required by UserImageConstraint" );
-
-        this.mediaRepository = mediaRepository;
-    }
 
 //--------------------------------------------------------------------------------------------------------------------\\
 //---| IMPLEMENTED METHODS |------------------------------------------------------------------------------------------\\

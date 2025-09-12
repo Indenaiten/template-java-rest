@@ -8,16 +8,15 @@ import com.codenaiten.template.rest.core.feature.user.constraint.UserImageConstr
 import com.codenaiten.template.rest.core.feature.user.constraint.UserUsernameConstraint;
 import com.codenaiten.template.rest.core.feature.user.dto.input.UpdateUser;
 import com.codenaiten.template.rest.core.feature.user.exception.UserNotFoundException;
-import com.codenaiten.template.rest.core.feature.user.port.spi.UserRepository;
+import com.codenaiten.template.rest.core.feature.user.port.UserRepository;
 import com.codenaiten.template.rest.core.feature.user.vo.UserId;
 import com.codenaiten.template.rest.core.feature.user.vo.UserRole;
 import com.codenaiten.template.rest.core.shared.spi.PasswordEncoder;
+import com.codenaiten.template.rest.core.shared.vo.ValueObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class UpdateUserService {
 
@@ -51,7 +50,7 @@ public class UpdateUserService {
         input.getUsername().ifPresent( editor::username );
         input.getName().ifPresent( editor::name );
         input.getBirthdate().ifPresent( editor::birthdate );
-        input.getPassword().map( this.passwordEncoder::encode ).ifPresent( editor::password );
+        input.getUserPassword().map( ValueObject::value ).map( this.passwordEncoder::encode ).ifPresent( editor::password );
 
         // Step 04: Check if has changes
         if( editor.hasChanges() ){ // If has changes, apply changes
