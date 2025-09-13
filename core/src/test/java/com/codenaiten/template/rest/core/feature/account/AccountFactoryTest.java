@@ -7,6 +7,7 @@ import com.codenaiten.template.rest.core.feature.user.vo.UserId;
 import com.codenaiten.template.rest.core.shared.constraint.ConstraintViolation;
 import com.codenaiten.template.rest.core.shared.exception.ConstraintException;
 import com.codenaiten.template.rest.core.shared.vo.Language;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -22,20 +23,35 @@ import static org.mockito.Mockito.*;
 @Tag( "Account" )
 @Tag( "Factory" )
 @DisplayName( "Tests for AccountFactory" )
-class AccountFactoryTest {
+class AccountFactoryTest{
+
+    private AccountIdConstraint accountIdConstraint;
+    private AccountOwnerConstraint accountOwnerConstraint;
 
 //--------------------------------------------------------------------------------------------------------------------\\
+//---| SETUP |--------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
 
+    @BeforeEach
+    void setUp(){
+        this.accountIdConstraint = mock( AccountIdConstraint.class );
+        this.accountOwnerConstraint = mock( AccountOwnerConstraint.class );
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| TESTS |--------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    /**
+     * Test que comprueba que la clase {@link AccountFactory} construye una {@link Account} con datos válidos que no 
+     * violan las restricciones requeridas por la factoría para construir la {@link Account}.
+     */
     @Test
-    @DisplayName( "Account creation succeeds when no constraint violations exist" )
-    void givenValidAccountDataAndNoConstraintViolations_whenBuildingAccount_thenAccountIsCreatedSuccessfully(){
-        // Given mocked AccountIdConstraint that return no violations
-        final AccountIdConstraint accountIdConstraint = mock( AccountIdConstraint.class );
-        when( accountIdConstraint.check( any( Account.class ))).thenReturn( Optional.empty() );
-
-        // Given mocked AccountOwnerConstraint that return no violations
-        final AccountOwnerConstraint accountOwnerConstraint = mock( AccountOwnerConstraint.class );
-        when( accountOwnerConstraint.check( any( Account.class ))).thenReturn( Optional.empty() );
+    @DisplayName( "Given valid account data that does not violate constraints, When build is called, Then the account is created successfully" )
+    void givenValidAccountDataThatNotViolationConstraints_whenBuildCalled_thenAccountCreatedSuccessfully(){
+        // Mocks Setting
+        when( this.accountIdConstraint.check( any( Account.class ))).thenReturn( Optional.empty() );
+        when( this.accountOwnerConstraint.check( any( Account.class ))).thenReturn( Optional.empty() );
 
         // Given valid Account data
         final UserId owner = UserId.random();
@@ -43,11 +59,12 @@ class AccountFactoryTest {
 
         // When building the Account
         final Account account = Account.create( owner ).language( language )
-                .build( accountIdConstraint, accountOwnerConstraint );
+                .build( this.accountIdConstraint,
+                        this.accountOwnerConstraint );
 
         // Then check that constraints were checked
-        verify( accountIdConstraint ).check( any( Account.class ));
-        verify( accountOwnerConstraint ).check( any( Account.class ));
+        verify( this.accountIdConstraint ).check( any( Account.class ));
+        verify( this.accountOwnerConstraint ).check( any( Account.class ));
 
         // Then assert Account was created successfully with correct data
         assertNotNull( account.getId() );
@@ -59,19 +76,18 @@ class AccountFactoryTest {
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
+    /**
+     * Test que comprueba que la clase {@link AccountFactory} lanza la excepción {@link ConstraintException} cuando se
+     * intenta construir una {@link Account} con datos válidos que violan las restricciones requeridas por la factoría
+     * para construir la {@link Account}.
+     */
     @Test
-    @DisplayName( "Account creation fails with ConstraintException when constraint violations exist" )
-    void givenValidAccountDataAndConstraintViolations_whenBuildingAccount_thenThrowConstraintException(){
-        // Given mocked ConstraintViolation that constraints will be return
+    @DisplayName( "Given account data that violates constraints, When build is called, Then a ConstraintException is thrown" )
+    void givenValidAccountDataThatViolationConstraints_whenBuildCalled_thenThrowConstraintException(){
+        // Mocks Setting
         final ConstraintViolation<?> violation = mock( ConstraintViolation.class );
-
-        // Given mocked AccountIdConstraint that return violations
-        final AccountIdConstraint accountIdConstraint = mock( AccountIdConstraint.class );
-        when( accountIdConstraint.check( any( Account.class ))).thenReturn( Optional.of( violation ));
-
-        // Given mocked AccountOwnerConstraint that return violations
-        final AccountOwnerConstraint accountOwnerConstraint = mock( AccountOwnerConstraint.class );
-        when( accountOwnerConstraint.check( any( Account.class ))).thenReturn( Optional.of( violation ));
+        when( this.accountIdConstraint.check( any( Account.class ))).thenReturn( Optional.of( violation ));
+        when( this.accountOwnerConstraint.check( any( Account.class ))).thenReturn( Optional.of( violation ));
 
         // Given valid Account data
         final UserId owner = UserId.random();
@@ -79,12 +95,13 @@ class AccountFactoryTest {
 
         // When building the Account
         final AccountFactory factory = Account.create( owner ).language( language );
-        final ConstraintException exception = assertThrows( ConstraintException.class, () ->
-                factory.build( accountIdConstraint, accountOwnerConstraint ));
+        final ConstraintException exception = assertThrows( ConstraintException.class,
+                () -> factory.build( this.accountIdConstraint,
+                                     this.accountOwnerConstraint ));
 
         // Then check that constraints were checked
-        verify( accountIdConstraint ).check( any( Account.class ));
-        verify( accountOwnerConstraint ).check( any( Account.class ));
+        verify( this.accountIdConstraint ).check( any( Account.class ));
+        verify( this.accountOwnerConstraint ).check( any( Account.class ));
 
         // Then assert thrown exception
         assertEquals( CoreMessageKey.ERROR_CONSTRAINT_GENERIC.getMessage(), exception.getMessage() );
@@ -92,6 +109,6 @@ class AccountFactoryTest {
         assertEquals( 2, violations.size() );
     }
 
-//--------------------------------------------------------------------------------------------------------------------\\//--------------------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
 
 }

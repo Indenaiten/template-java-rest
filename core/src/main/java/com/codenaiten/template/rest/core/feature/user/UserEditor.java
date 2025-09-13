@@ -30,10 +30,6 @@ public class UserEditor {
     private final User user;
 
 // ------------------------------------------------------------------------------------------------------------------ \\
-
-    private boolean updatedPassword = false;
-
-// ------------------------------------------------------------------------------------------------------------------ \\
 // ---| CONSTRUCTOR |------------------------------------------------------------------------------------------------ \\
 // ------------------------------------------------------------------------------------------------------------------ \\
 
@@ -84,7 +80,6 @@ public class UserEditor {
 
     public UserEditor password( final EncodedPassword password ){
         this.update.setPassword( password );
-        this.updatedPassword = true;
         return this;
     }
 
@@ -93,14 +88,14 @@ public class UserEditor {
 // ------------------------------------------------------------------------------------------------------------------ \\
 
     public boolean hasChanges(){
-        return this.updatedPassword ||
-               !Objects.equals( this.user.getEmail(), this.update.getEmail() ) ||
+        return !Objects.equals( this.user.getEmail(), this.update.getEmail() ) ||
                !Objects.equals( this.user.getUsername(), this.update.getUsername() ) ||
                !Objects.equals( this.user.getRole(), this.update.getRole() ) ||
                !Objects.equals( this.user.getImage(), this.update.getImage() ) ||
                !Objects.equals( this.user.getName(), this.update.getName() ) ||
                !Objects.equals( this.user.getSurname(), this.update.getSurname() ) ||
-               !Objects.equals( this.user.getBirthdate(), this.update.getBirthdate() );
+               !Objects.equals( this.user.getBirthdate(), this.update.getBirthdate() ) ||
+               !Objects.equals( this.user.getPassword(), this.update.getPassword() );
     }
 
 // ------------------------------------------------------------------------------------------------------------------ \\

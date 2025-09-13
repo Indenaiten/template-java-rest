@@ -12,6 +12,7 @@ import com.codenaiten.template.rest.core.shared.exception.ConstraintException;
 import com.codenaiten.template.rest.core.shared.vo.Email;
 import com.codenaiten.template.rest.core.shared.vo.EncodedPassword;
 import com.codenaiten.template.rest.core.shared.vo.Timestamp;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -30,18 +31,40 @@ import static org.mockito.Mockito.*;
 @DisplayName( "Tests for UserEditor" )
 class UserEditorTest {
 
+    private UserEmailConstraint userEmailConstraint;
+    private UserUsernameConstraint userUsernameConstraint;
+    private UserBirthdateConstraint userBirthdateConstraint;
+    private UserImageConstraint userImageConstraint;
+
 //--------------------------------------------------------------------------------------------------------------------\\
-//---| HELPER METHODS |-----------------------------------------------------------------------------------------------\\
+//---| SETUP |--------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
-    private User createNewUser(){
+    @BeforeEach
+    void setUp(){
+        this.userEmailConstraint = mock( UserEmailConstraint.class );
+        this.userUsernameConstraint = mock( UserUsernameConstraint.class );
+        this.userBirthdateConstraint = mock( UserBirthdateConstraint.class );
+        this.userImageConstraint = mock( UserImageConstraint.class );
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| HELPER METHODS |--------------------------------------------------------------------------------------------------------\\
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    /**
+     * Crea un nuevo {@link User} para utilizarlo en los tests.
+     *
+     * @return {@link User} para utilizarlo en los tests.
+     */
+    public static User createNewUser(){
         final UserId id = UserId.random();
         final Email email = new Email( "test@mail.cc" );
         final UserUsername username = new UserUsername( "test" );
         final UserRole role = UserRole.USER;
-        final MediaId image = MediaId.random();
-        final UserName name = new UserName( "Test" );
-        final UserSurname surname = new UserSurname( "User" );
+        final MediaId image = MediaId.of( "7575299c-c194-4af6-82b1-5fb29664f724" );
+        final UserName name = new UserName( "Name Test" );
+        final UserSurname surname = new UserSurname( "Surname Test" );
         final LocalDate birthdate = LocalDate.of( 1993, 2, 10 );
         final EncodedPassword password = new EncodedPassword( "encoded-password" );
         final Timestamp createdAt = Timestamp.now();
@@ -49,390 +72,211 @@ class UserEditorTest {
         return new User( id, email, username, role, image, name, surname, birthdate, password, createdAt, null );
     }
 
-    private UserEmailConstraint mockUserEmailConstraintOk(){
-        final UserEmailConstraint constraint = mock( UserEmailConstraint.class );
-        when( constraint.check( any( User.class ))).thenReturn( Optional.empty() );
-        return constraint;
-    }
-
-    private UserUsernameConstraint mockUserUsernameConstraintOK(){
-        final UserUsernameConstraint constraint = mock( UserUsernameConstraint.class );
-        when( constraint.check( any( User.class ))).thenReturn( Optional.empty() );
-        return constraint;
-    }
-
-    private UserBirthdateConstraint mockUserBirthdateConstraintOK(){
-        final UserBirthdateConstraint constraint = mock( UserBirthdateConstraint.class );
-        when( constraint.check( any( User.class ))).thenReturn( Optional.empty() );
-        return constraint;
-    }
-
-    private UserImageConstraint mockUserImageConstraintOK() {
-        final UserImageConstraint constraint = mock( UserImageConstraint.class );
-        when( constraint.check( any( User.class ))).thenReturn( Optional.empty() );
-        return constraint;
-    }
-
+//--------------------------------------------------------------------------------------------------------------------\\
+//---| TESTS |--------------------------------------------------------------------------------------------------------\\
 //--------------------------------------------------------------------------------------------------------------------\\
 
+    /**
+     * Test que comprueba que la clase {@link UserEditor} actualiza un {@link User} con nuevos datos, el editor devuelve
+     * {@code true}, actualiza los correspondientes campos incluyendo el campo {@code updatedAt} con el {@link Timestamp}
+     * de la fecha y hora de actualización en la instacia {@link User} y no lanza la excepción {@link ConstraintException}.
+     */
     @Test
-    @DisplayName( "UserEditor succeeds without changes and does not trigger constraints" )
-    void givenNoChanges_whenApplyingEditor_thenUserIsUpdatedSuccessfullyAndReturnFalse() {
+    @DisplayName( "Given valid user data that does not violate constraints, When apply is called, Then it returns true, the user is updated, and no constraints are triggered" )
+    void givenValidUserDataThatNotViolationConstraints_whenApplyCalled_thenReturnTrueAndUserUpdatedAndConstraintsNotTriggered(){
+        // Mocks Setting
+        when( this.userEmailConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
+        when( this.userUsernameConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
+        when( this.userBirthdateConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
+        when( this.userImageConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
+
+        // Given Valid data
+        final Email email = new Email("new@mail.cc" );
+        final UserUsername username = new UserUsername( "new" );
+        final UserRole role = UserRole.ADMIN;
+        final MediaId image = MediaId.random();
+        final UserName name = new UserName( "Name New" );
+        final UserSurname surname = new UserSurname( "Surname New" );
+        final LocalDate birthdate = LocalDate.of( 2000, 1, 5 );
+        final EncodedPassword password = new EncodedPassword( "new-encoded-password" );
+
         // Given Valid User
-        final User user = this.createNewUser();
+        final User user = createNewUser();
 
-        // Given mocked Constraints
-        final UserEmailConstraint userEmailConstraint = this.mockUserEmailConstraintOk();
-        final UserUsernameConstraint userUsernameConstraint = this.mockUserUsernameConstraintOK();
-        final UserBirthdateConstraint userBirthdateConstraint = this.mockUserBirthdateConstraintOK();
-        final UserImageConstraint userImageConstraint = this.mockUserImageConstraintOK();
+        // Update User Data
+        final UserEditor editor = user.update().email( email ).username( username ).role( role ).image( image )
+                .name( name ).surname( surname ).birthdate( birthdate ).password( password );
 
-        // When apply update without changes
-        final boolean changed = user.update().apply( userEmailConstraint, userUsernameConstraint, userBirthdateConstraint, userImageConstraint );
+        // Check User Data
+        assertNotEquals( email, user.getEmail() );
+        assertNotEquals( username, user.getUsername() );
+        assertNotEquals( role, user.getRole() );
+        assertNotEquals( image, user.getImage().orElse( null ) );
+        assertNotEquals( name, user.getName() );
+        assertNotEquals( surname, user.getSurname().orElse( null ) );
+        assertNotEquals( birthdate, user.getBirthdate() );
+        assertNotEquals( password, user.getPassword() );
+        assertTrue( user.getUpdatedAt().isEmpty(), "UpdatedAt should be empty" );
 
-        // Then
-        assertFalse( changed, "Should not have changed" );
-        verify( userEmailConstraint, never() ).check( any( User.class ));
-        verify( userUsernameConstraint, never() ).check( any( User.class ));
-        verify( userBirthdateConstraint, never() ).check( any( User.class ));
-        verify( userBirthdateConstraint, never() ).check( any( User.class ));
-        assertTrue( user.getUpdatedAt().isEmpty(), "UpdatedAt should not have changed" );
-    }
-
-//--------------------------------------------------------------------------------------------------------------------\\
-
-    @Test
-    @DisplayName( "UserEditor fails with ConstraintException when constraint violations exist")
-    void givenInvalidUserDataAndConstraints_whenApplyingEditor_thenNotApplyChangesAndThrowConstraintException() {
-        // Given Valid User
-        final User user = this.createNewUser();
-
-        // Given mocked ConstraintViolation that constraints will be return
-        final ConstraintViolation<?> violation = mock( ConstraintViolation.class );
-
-        // Given mocked UserEmailConstraint that return violations
-        final UserEmailConstraint userEmailConstraint = this.mockUserEmailConstraintOk();
-        when( userEmailConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
-
-        // Given mocked UserUsernameConstraint that return violations
-        final UserUsernameConstraint userUsernameConstraint = this.mockUserUsernameConstraintOK();
-        when( userUsernameConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
-
-        // Given mocked UserBirthdateConstraint that return violations
-        final UserBirthdateConstraint userBirthdateConstraint = this.mockUserBirthdateConstraintOK();
-        when( userBirthdateConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
-
-        // Given mocked UserImageConstraint that return violations
-        final UserImageConstraint userImageConstraint = this.mockUserImageConstraintOK();
-        when( userImageConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
-
-        // When apply update without changes
-        final UserEditor editor = user.update().email( new Email( "new@mail.cc" ))
-                                               .username( new UserUsername( "new_username" ))
-                                               .birthdate( LocalDate.of( 2000, 2, 10 ))
-                                               .image( MediaId.random() );
-        final ConstraintException exception =  assertThrows( ConstraintException.class, () ->
-                editor.apply( userEmailConstraint, userUsernameConstraint, userBirthdateConstraint, userImageConstraint ));
+        // When editor apply changes
+        final boolean changed = assertDoesNotThrow( () -> editor.apply( this.userEmailConstraint,
+                                                                        this.userUsernameConstraint,
+                                                                        this.userBirthdateConstraint,
+                                                                        this.userImageConstraint ));
 
         // Then check that constraints were checked
-        verify( userEmailConstraint ).check( any( User.class ));
-        verify( userUsernameConstraint ).check( any( User.class ));
-        verify( userBirthdateConstraint ).check( any( User.class ));
-        verify( userImageConstraint ).check( any( User.class ));
+        verify( this.userEmailConstraint ).check( any( User.class ) );
+        verify( this.userUsernameConstraint ).check( any( User.class ) );
+        verify( this.userBirthdateConstraint ).check( any( User.class ) );
+        verify( this.userBirthdateConstraint ).check( any( User.class ) );
 
-        // Then assert thrown exception
+        // Then assert that return true and changes were made
+        assertTrue( changed, "Should have changed" );
+        assertEquals( email, user.getEmail() );
+        assertEquals( username, user.getUsername() );
+        assertEquals( role, user.getRole() );
+        assertEquals( image, user.getImage().orElse( null ) );
+        assertEquals( name, user.getName() );
+        assertEquals( surname, user.getSurname().orElse( null ) );
+        assertEquals( birthdate, user.getBirthdate() );
+        assertEquals( password, user.getPassword() );
+        assertTrue( user.getUpdatedAt().isPresent(), "UpdatedAt should not be empty" );
+    }
+
+//--------------------------------------------------------------------------------------------------------------------\\
+
+    /**
+     * Test que comprueba que la clase {@link UserEditor} no actualiza un {@link User} si se proporcionan datos que violan
+     * las restricciones requeridas por el {@link UserEditor} y lanza la excepción {@link ConstraintException} con una
+     * lista de {@link ConstraintViolation} que contiene las violaciones que se han producido.
+     */
+    @Test
+    @DisplayName( "Given user data that violates constraints, When apply is called, Then the user is not updated and a ConstraintException is thrown")
+    void givenValidUserDataThatViolationConstraints_whenApplyCalled_thenUserNotUpdatedAndThrowConstraintException(){
+        // Mocks Setting
+        final ConstraintViolation<?> violation = mock( ConstraintViolation.class );
+        when( this.userEmailConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
+        when( this.userUsernameConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
+        when( this.userBirthdateConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
+        when( this.userImageConstraint.check( any( User.class ))).thenReturn( Optional.of( violation ));
+
+        // Given Valid User
+        final User user = createNewUser();
+
+        // Check that UpdatedAt is empty
+        assertTrue( user.getUpdatedAt().isEmpty(), "UpdatedAt should be empty" );
+
+        // When update data
+        final UserEditor editor = user.update()
+                .email( new Email("new@mail.cc" ))
+                .username( new UserUsername( "new" ))
+                .image( MediaId.random() )
+                .birthdate( LocalDate.of( 2000, 1, 5 ));
+
+        // When editor apply changes
+        final ConstraintException exception =  assertThrows( ConstraintException.class,
+                () -> editor.apply( this.userEmailConstraint,
+                                    this.userUsernameConstraint,
+                                    this.userBirthdateConstraint,
+                                    this.userImageConstraint ));
+
+        // Then check that constraints were checked
+        verify( this.userEmailConstraint ).check( any( User.class ) );
+        verify( this.userUsernameConstraint ).check( any( User.class ) );
+        verify( this.userBirthdateConstraint ).check( any( User.class ) );
+        verify( this.userBirthdateConstraint ).check( any( User.class ) );
+
+        // Then assert thrown expected exception and no changes were made
         assertEquals( CoreMessageKey.ERROR_CONSTRAINT_GENERIC.getMessage(), exception.getMessage() );
         final List<ConstraintViolation<?>> violations = exception.getViolations();
         assertEquals( 4, violations.size() );
-        assertTrue( user.getUpdatedAt().isEmpty(), "UpdatedAt should not have changed" );
+        assertTrue( user.getUpdatedAt().isEmpty(), "UpdatedAt should still be empty" );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
+    /**
+     * Test que comprueba que la clase {@link UserEditor} actualiza un {@link User} sin nuevos datos, el editor devuelve
+     * {@code false}, no actualiza ningún campo de la instacia {@link User} y no lanza la excepción {@link ConstraintException}.
+     */
     @Test
-    @DisplayName( "UserEditor updates only email and triggers only UserEmailConstraint" )
-    void givenEmailChanged_whenApplyingEditor_thenUpdatesEmailAndChecksTriggerUserEmailConstraint() {
+    @DisplayName( "Given no changes, When apply is called, Then it returns false, the user is not updated, and no constraints are triggered")
+    void givenNoChanges_whenApplyCalled_thenReturnFalseAndUserNotUpdatedAndConstraintsNotTriggered(){
+        // Mocks Setting
+        when( this.userEmailConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
+        when( this.userUsernameConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
+        when( this.userBirthdateConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
+        when( this.userImageConstraint.check( any( User.class ))).thenReturn( Optional.empty() );
+
         // Given Valid User
-        final User user = this.createNewUser();
+        final User user = createNewUser();
 
-        // Given mocked Constraints
-        final UserEmailConstraint userEmailConstraint = this.mockUserEmailConstraintOk();
-        final UserUsernameConstraint userUsernameConstraint = this.mockUserUsernameConstraintOK();
-        final UserBirthdateConstraint userBirthdateConstraint = this.mockUserBirthdateConstraintOK();
-        final UserImageConstraint userImageConstraint = this.mockUserImageConstraintOK();
+        // Check that UpdatedAt is empty
+        assertTrue( user.getUpdatedAt().isEmpty(), "UpdatedAt should be empty" );
 
-        // Given new Email
-        final Email newEmail = new Email( "new@mail.cc" );
+        // When update without changes and apply
+        final boolean changed = assertDoesNotThrow( () -> user.update().apply( this.userEmailConstraint,
+                                                                               this.userUsernameConstraint,
+                                                                               this.userBirthdateConstraint,
+                                                                               this.userImageConstraint ));
 
-        // Set new Email in Editor but not apply changes
-        final UserEditor editor = new UserEditor( user ).email( newEmail );
+        // Then check that constraints were checked
+        verify( this.userEmailConstraint, never() ).check( any( User.class ) );
+        verify( this.userUsernameConstraint, never() ).check( any( User.class ) );
+        verify( this.userBirthdateConstraint, never() ).check( any( User.class ) );
+        verify( this.userBirthdateConstraint, never() ).check( any( User.class ) );
 
-        // Check of Email not changed in User
-        assertNotEquals( newEmail, user.getEmail() );
-
-        // When apply update with only email change
-        final boolean changed = editor.apply( userEmailConstraint, userUsernameConstraint, userBirthdateConstraint, userImageConstraint );
-
-        // Then
-        assertTrue( changed, "Should have changes" );
-        assertEquals( newEmail, user.getEmail() );
-        verify( userEmailConstraint ).check( any( User.class ));
-        verify( userUsernameConstraint, never() ).check( any( User.class ));
-        verify( userBirthdateConstraint, never() ).check( any( User.class ));
-        verify( userImageConstraint, never() ).check( any( User.class ));
-        assertTrue( user.getUpdatedAt().isPresent(), "UpdatedAt should have changed" );
+        // Then assert that return false and no changes were made
+        assertFalse( changed, "Should not have changed" );
+        assertTrue( user.getUpdatedAt().isEmpty(), "UpdatedAt should still be empty" );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
+    /**
+     * Test que comrpueba que la clase {@link UserEditor} devuelve {@code false} si no se han actualizado los campos del
+     * {@link User} con un nuevo valor.
+     */
     @Test
-    @DisplayName( "UserEditor updates only username and triggers only UserUsernameConstraint" )
-    void givenUsernameChanged_whenApplyingEditor_thenUpdatesUsernameAndChecksTriggerUserUsernameConstraint() {
+    @DisplayName( "Given no changes, When hasChanges is called, Then it returns false" )
+    void givenNoChanges_whenHasChangesCalled_thenReturnFalse(){
         // Given Valid User
-        final User user = this.createNewUser();
+        final User user = createNewUser();
 
-        // Given mocked Constraints
-        final UserEmailConstraint userEmailConstraint = this.mockUserEmailConstraintOk();
-        final UserUsernameConstraint userUsernameConstraint = this.mockUserUsernameConstraintOK();
-        final UserBirthdateConstraint userBirthdateConstraint = this.mockUserBirthdateConstraintOK();
-        final UserImageConstraint userImageConstraint = this.mockUserImageConstraintOK();
-
-        // Given new Username
-        final UserUsername newUsername = new UserUsername( "new_username" );
-
-        // Set new Username in Editor but not apply changes
-        final UserEditor editor = new UserEditor( user ).username( newUsername );
-
-        // Check of Username not changed in User
-        assertNotEquals( newUsername, user.getUsername() );
-
-        // When apply update with only username change
-        final boolean changed = editor.apply( userEmailConstraint, userUsernameConstraint, userBirthdateConstraint, userImageConstraint );
-
-        // Then
-        assertTrue( changed, "Should have changes" );
-        assertEquals( newUsername, user.getUsername() );
-        verify( userEmailConstraint, never() ).check( any( User.class ));
-        verify( userUsernameConstraint ).check( any( User.class ));
-        verify( userBirthdateConstraint, never() ).check( any( User.class ));
-        verify( userImageConstraint, never() ).check( any( User.class ));
-        assertTrue( user.getUpdatedAt().isPresent(), "UpdatedAt should have changed" );
+        // When Update and hasChanges called Then return false
+        final String message = "Should not have changes";
+        assertFalse( user.update().email( user.getEmail() ).hasChanges(), message );
+        assertFalse( user.update().username( user.getUsername() ).hasChanges(), message );
+        assertFalse( user.update().role( user.getRole() ).hasChanges(), message );
+        assertFalse( user.update().image( user.getImage().orElse( null )).hasChanges(), message );
+        assertFalse( user.update().name( user.getName() ).hasChanges(), message );
+        assertFalse( user.update().surname( user.getSurname().orElse( null )).hasChanges(), message );
+        assertFalse( user.update().birthdate( user.getBirthdate() ).hasChanges(), message );
+        assertFalse( user.update().password( user.getPassword() ).hasChanges(), message );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\
 
+    /**
+     * Test que comrpueba que la clase {@link UserEditor} devuelve {@code true} si se han actualizado alguno de los
+     * campos del {@link User}.
+     */
     @Test
-    @DisplayName( "UserEditor updates only birthdate and triggers only UserBirthdateConstraint" )
-    void givenBirthdateChanged_whenApplyingEditor_thenUpdatesBirthdateAndChecksTriggerUserBirthdateConstraint() {
+    @DisplayName( "Given valid user data, When hasChanges is called, Then it returns true" )
+    void givenValidUserData_whenHasChangesCalled_thenReturnTrue(){
         // Given Valid User
-        final User user = this.createNewUser();
+        final User user = createNewUser();
 
-        // Given mocked Constraints
-        final UserEmailConstraint userEmailConstraint = this.mockUserEmailConstraintOk();
-        final UserUsernameConstraint userUsernameConstraint = this.mockUserUsernameConstraintOK();
-        final UserBirthdateConstraint userBirthdateConstraint = this.mockUserBirthdateConstraintOK();
-        final UserImageConstraint userImageConstraint = this.mockUserImageConstraintOK();
-
-        // Given new Birthdate
-        final LocalDate newBirthdate = LocalDate.of( 2000, 2, 10 );
-
-        // Set new Birthdate in Editor but not apply changes
-        final UserEditor editor = new UserEditor( user ).birthdate( newBirthdate );
-
-        // Check of Birthdate not changed in User
-        assertNotEquals( newBirthdate, user.getBirthdate() );
-
-        // When apply update with only birthdate change
-        final boolean changed = editor.apply( userEmailConstraint, userUsernameConstraint, userBirthdateConstraint, userImageConstraint );
-
-        // Then
-        assertTrue( changed, "Should have changes" );
-        assertEquals( newBirthdate, user.getBirthdate() );
-        verify( userEmailConstraint, never() ).check( any( User.class ));
-        verify( userUsernameConstraint, never() ).check( any( User.class ));
-        verify( userBirthdateConstraint ).check( any( User.class ));
-        verify( userImageConstraint, never() ).check( any( User.class ));
-        assertTrue( user.getUpdatedAt().isPresent(), "UpdatedAt should have changed" );
-    }
-
-//--------------------------------------------------------------------------------------------------------------------\\
-
-    @Test
-    @DisplayName( "UserEditor updates only image and triggers only UserImageConstraint" )
-    void givenImageChanged_whenApplyingEditor_thenUpdatesImageAndChecksTriggerUserImageConstraint() {
-        // Given Valid User
-        final User user = this.createNewUser();
-
-        // Given mocked Constraints
-        final UserEmailConstraint userEmailConstraint = this.mockUserEmailConstraintOk();
-        final UserUsernameConstraint userUsernameConstraint = this.mockUserUsernameConstraintOK();
-        final UserBirthdateConstraint userBirthdateConstraint = this.mockUserBirthdateConstraintOK();
-        final UserImageConstraint userImageConstraint = this.mockUserImageConstraintOK();
-
-        // Given new Image
-        final MediaId newImage = MediaId.random();
-
-        // Set new Image in Editor but not apply changes
-        final UserEditor editor = new UserEditor( user ).image( newImage );
-
-        // Check of Image not changed in User
-        assertNotEquals( newImage, user.getImage().orElse( null ));
-
-        // When apply update with only image change
-        final boolean changed = editor.apply( userEmailConstraint, userUsernameConstraint, userBirthdateConstraint, userImageConstraint );
-
-        // Then
-        assertTrue( changed, "Should have changes" );
-        assertEquals( newImage, user.getImage().orElse( null ));
-        verify( userEmailConstraint, never() ).check( any( User.class ));
-        verify( userUsernameConstraint, never() ).check( any( User.class ));
-        verify( userBirthdateConstraint, never() ).check( any( User.class ));
-        verify( userImageConstraint ).check( any( User.class ));
-        assertTrue( user.getUpdatedAt().isPresent(), "UpdatedAt should have changed" );
-    }
-
-//--------------------------------------------------------------------------------------------------------------------\\
-
-    @Test
-    @DisplayName( "UserEditor updates only role and does not trigger constraints" )
-    void givenRoleChanged_whenApplyingEditor_thenUpdatesRoleAndConstraintsNotTriggered() {
-        // Given Valid User
-        final User user = this.createNewUser();
-
-        // Given mocked Constraints
-        final UserEmailConstraint userEmailConstraint = this.mockUserEmailConstraintOk();
-        final UserUsernameConstraint userUsernameConstraint = this.mockUserUsernameConstraintOK();
-        final UserBirthdateConstraint userBirthdateConstraint = this.mockUserBirthdateConstraintOK();
-        final UserImageConstraint userImageConstraint = this.mockUserImageConstraintOK();
-
-        // Given new Role
-        final UserRole newRole = UserRole.ADMIN;
-
-        // Set new Role in Editor but not apply changes
-        final UserEditor editor = new UserEditor( user ).role( newRole );
-
-        // Check of Role not changed in User
-        assertNotEquals( newRole, user.getRole() );
-
-        // When apply update with only role change
-        final boolean changed = editor.apply( userEmailConstraint, userUsernameConstraint, userBirthdateConstraint, userImageConstraint );
-
-        // Then
-        assertTrue( changed, "Should have changes" );
-        assertEquals( newRole, user.getRole() );
-        verify( userEmailConstraint, never() ).check( any( User.class ));
-        verify( userUsernameConstraint, never() ).check( any( User.class ));
-        verify( userBirthdateConstraint, never() ).check( any( User.class ));
-        verify( userImageConstraint, never() ).check( any( User.class ));
-        assertTrue( user.getUpdatedAt().isPresent(), "UpdatedAt should have changed" );
-    }
-
-//--------------------------------------------------------------------------------------------------------------------\\
-
-    @Test
-    @DisplayName( "UserEditor updates only name and does not trigger constraints" )
-    void givenNameChanged_whenApplyingEditor_thenUpdatesNameAndConstraintsNotTriggered() {
-        // Given Valid User
-        final User user = this.createNewUser();
-
-        // Given mocked Constraints
-        final UserEmailConstraint userEmailConstraint = this.mockUserEmailConstraintOk();
-        final UserUsernameConstraint userUsernameConstraint = this.mockUserUsernameConstraintOK();
-        final UserBirthdateConstraint userBirthdateConstraint = this.mockUserBirthdateConstraintOK();
-        final UserImageConstraint userImageConstraint = this.mockUserImageConstraintOK();
-
-        // Given new Name
-        final UserName newName = new UserName( "New Name" );
-
-        // Set new Name in Editor but not apply changes
-        final UserEditor editor = new UserEditor( user ).name( newName );
-
-        // Check of Name not changed in User
-        assertNotEquals( newName, user.getName() );
-
-        // When apply update with only name change
-        final boolean changed = editor.apply( userEmailConstraint, userUsernameConstraint, userBirthdateConstraint, userImageConstraint );
-
-        // Then
-        assertTrue( changed, "Should have changes" );
-        assertEquals( newName, user.getName() );
-        verify( userEmailConstraint, never() ).check( any( User.class ));
-        verify( userUsernameConstraint, never() ).check( any( User.class ));
-        verify( userBirthdateConstraint, never() ).check( any( User.class ));
-        verify( userImageConstraint, never() ).check( any( User.class ));
-        assertTrue( user.getUpdatedAt().isPresent(), "UpdatedAt should have changed" );
-    }
-
-//--------------------------------------------------------------------------------------------------------------------\\
-
-    @Test
-    @DisplayName( "UserEditor updates only surname and does not trigger constraints" )
-    void givenSurnameChanged_whenApplyingEditor_thenUpdatesSurnameAndConstraintsNotTriggered() {
-        // Given Valid User
-        final User user = this.createNewUser();
-
-        // Given mocked Constraints
-        final UserEmailConstraint userEmailConstraint = this.mockUserEmailConstraintOk();
-        final UserUsernameConstraint userUsernameConstraint = this.mockUserUsernameConstraintOK();
-        final UserBirthdateConstraint userBirthdateConstraint = this.mockUserBirthdateConstraintOK();
-        final UserImageConstraint userImageConstraint = this.mockUserImageConstraintOK();
-
-        // Given new Surname
-        final UserSurname newSurname = new UserSurname( "New Surname" );
-
-        // Set new Surname in Editor but not apply changes
-        final UserEditor editor = new UserEditor( user ).surname( newSurname );
-
-        // Check of Surname not changed in User
-        assertNotEquals( newSurname, user.getSurname().orElse( null ));
-
-        // When apply update with only surname change
-        final boolean changed = editor.apply( userEmailConstraint, userUsernameConstraint, userBirthdateConstraint, userImageConstraint );
-
-        // Then
-        assertTrue( changed, "Should have changes" );
-        assertEquals( newSurname, user.getSurname().orElse( null ));
-        verify( userEmailConstraint, never() ).check( any( User.class ));
-        verify( userUsernameConstraint, never() ).check( any( User.class ));
-        verify( userBirthdateConstraint, never() ).check( any( User.class ));
-        verify( userImageConstraint, never() ).check( any( User.class ));
-        assertTrue( user.getUpdatedAt().isPresent(), "UpdatedAt should have changed" );
-    }
-
-//--------------------------------------------------------------------------------------------------------------------\\
-
-    @Test
-    @DisplayName( "UserEditor updates only password and does not trigger constraints" )
-    void givenPasswordChanged_whenApplyingEditor_thenUpdatesPasswordAndConstraintsNotTriggered() {
-        // Given Valid User
-        final User user = this.createNewUser();
-
-        // Given mocked Constraints
-        final UserEmailConstraint userEmailConstraint = this.mockUserEmailConstraintOk();
-        final UserUsernameConstraint userUsernameConstraint = this.mockUserUsernameConstraintOK();
-        final UserBirthdateConstraint userBirthdateConstraint = this.mockUserBirthdateConstraintOK();
-        final UserImageConstraint userImageConstraint = this.mockUserImageConstraintOK();
-
-        // Given new Password
-        final EncodedPassword newPassword = new EncodedPassword( "new-password" );
-
-        // Set new Password in Editor but not apply changes
-        final UserEditor editor = new UserEditor( user ).password( newPassword );
-
-        // Check of Password not changed in User
-        assertNotEquals( newPassword, user.getPassword() );
-
-        // When apply update with only password change
-        final boolean changed = editor.apply( userEmailConstraint, userUsernameConstraint, userBirthdateConstraint, userImageConstraint );
-
-        // Then
-        assertTrue( changed, "Should have changes" );
-        assertEquals( newPassword, user.getPassword() );
-        verify( userEmailConstraint, never() ).check( any( User.class ));
-        verify( userUsernameConstraint, never() ).check( any( User.class ));
-        verify( userBirthdateConstraint, never() ).check( any( User.class ));
-        verify( userImageConstraint, never() ).check( any( User.class ));
-        assertTrue( user.getUpdatedAt().isPresent(), "UpdatedAt should have changed" );
+        // When Update and hasChanges called Then return true
+        final String message = "Should have changes";
+        assertTrue( user.update().email( new Email("new@mail.cc" )).hasChanges(), message );
+        assertTrue( user.update().username( new UserUsername( "new" )).hasChanges(), message );
+        assertTrue( user.update().role( UserRole.ADMIN ).hasChanges(), message );
+        assertTrue( user.update().image( MediaId.random() ).hasChanges(), message );
+        assertTrue( user.update().name( new UserName( "Name New" )).hasChanges(), message );
+        assertTrue( user.update().surname( new UserSurname( "Surname New" )).hasChanges(), message );
+        assertTrue( user.update().birthdate( LocalDate.of( 2000, 1, 5 )).hasChanges(), message );
+        assertTrue( user.update().password( new EncodedPassword( "new-encoded-password" )).hasChanges(), message );
     }
 
 //--------------------------------------------------------------------------------------------------------------------\\
